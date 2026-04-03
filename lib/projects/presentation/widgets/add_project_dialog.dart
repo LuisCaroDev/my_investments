@@ -1,3 +1,4 @@
+import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class AddProjectDialog extends StatefulWidget {
@@ -43,30 +44,31 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.initialName != null;
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
-      title: Text(isEditing ? 'Editar Proyecto' : 'Nuevo Proyecto'),
+      title: Text(isEditing ? l10n.dialog_project_edit_title : l10n.dialog_project_new_title),
       content: SizedBox(
         width: 400,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Nombre').small.medium,
+            Text(l10n.common_name_label).small.medium,
             const Gap(4),
             TextField(
               controller: _nameController,
-              placeholder: const Text('Ej: Inversión en Palma'),
+              placeholder: Text(l10n.dialog_project_name_placeholder),
             ),
             const Gap(12),
-            const Text('Descripción (opcional)').small.medium,
+            Text(l10n.common_description_label).small.medium,
             const Gap(4),
             TextField(
               controller: _descriptionController,
-              placeholder: const Text('Describe el proyecto...'),
+              placeholder: Text(l10n.dialog_project_description_placeholder),
               maxLines: 3,
             ),
             const Gap(12),
-            const Text('Presupuesto Global (opcional)').small.medium,
+            Text(l10n.dialog_project_budget_label).small.medium,
             const Gap(4),
             TextField(
               controller: _budgetController,
@@ -79,7 +81,7 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
       actions: [
         OutlineButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancelar'),
+          child: Text(l10n.common_cancel),
         ),
         PrimaryButton(
           onPressed: () {
@@ -93,7 +95,7 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
               'budget': budget,
             });
           },
-          child: Text(isEditing ? 'Guardar' : 'Crear'),
+          child: Text(isEditing ? l10n.common_save : l10n.common_create),
         ),
       ],
     );

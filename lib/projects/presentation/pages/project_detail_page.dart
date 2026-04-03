@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -81,12 +82,13 @@ class _ProjectDetailView extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context, ProjectDetailState state) {
+    final l10n = AppLocalizations.of(context)!;
     return switch (state) {
       ProjectDetailLoading() => const Center(
         child: CircularProgressIndicator(),
       ),
       ProjectDetailError(message: final msg) => Center(
-        child: Text('Error: $msg'),
+        child: Text(l10n.common_error_msg(msg)),
       ),
       ProjectDetailLoaded() => _ProjectDetailContent(state: state),
     };
@@ -101,6 +103,7 @@ class _ProjectDetailContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -114,12 +117,12 @@ class _ProjectDetailContent extends StatelessWidget {
                 OutlineButton(
                   onPressed: () => _openCategoryManagement(context),
                   size: ButtonSize.small,
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(RadixIcons.bookmarkFilled, size: 14),
-                      Gap(6),
-                      Text('Categorías'),
+                      const Icon(RadixIcons.bookmarkFilled, size: 14),
+                      const Gap(6),
+                      Text(l10n.project_detail_categories_title),
                     ],
                   ),
                 ),
@@ -127,12 +130,12 @@ class _ProjectDetailContent extends StatelessWidget {
                 PrimaryButton(
                   onPressed: () => _addActivity(context),
                   size: ButtonSize.small,
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(RadixIcons.plus, size: 14),
-                      Gap(6),
-                      Text('Actividad'),
+                      const Icon(RadixIcons.plus, size: 14),
+                      const Gap(6),
+                      Text(l10n.project_detail_add_activity_button),
                     ],
                   ),
                 ),
@@ -157,7 +160,7 @@ class _ProjectDetailContent extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: 'Depositado',
+                      label: l10n.project_detail_summary_deposited,
                       value: state.totalDeposited.toCompactCurrency(context),
                       icon: RadixIcons.arrowUp,
                       valueColor: theme.colorScheme.primary,
@@ -166,7 +169,7 @@ class _ProjectDetailContent extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: 'Gastado',
+                      label: l10n.project_detail_summary_spent,
                       value: state.totalSpent.toCompactCurrency(context),
                       icon: RadixIcons.arrowDown,
                       valueColor: theme.colorScheme.destructive,
@@ -175,7 +178,7 @@ class _ProjectDetailContent extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: 'Balance Operativo',
+                      label: l10n.project_detail_summary_operating,
                       value: state.operatingBalance.toCompactCurrency(context),
                       icon: RadixIcons.dimensions,
                     ),
@@ -183,7 +186,7 @@ class _ProjectDetailContent extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: 'Capital Inyectado',
+                      label: l10n.project_detail_summary_capital,
                       value: state.totalCapitalInjected.toCompactCurrency(
                         context,
                       ),
@@ -193,7 +196,7 @@ class _ProjectDetailContent extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: 'Balance Neto',
+                      label: l10n.project_detail_summary_net_balance,
                       value: state.netBalance.toCompactCurrency(context),
                       icon: RadixIcons.barChart,
                       valueColor: state.netBalance < 0
@@ -205,7 +208,7 @@ class _ProjectDetailContent extends StatelessWidget {
                     SizedBox(
                       width: cardWidth,
                       child: StatCard(
-                        label: 'Presupuesto',
+                        label: l10n.project_detail_summary_budget,
                         value: state.totalBudget.toCompactCurrency(context),
                         icon: RadixIcons.target,
                       ),
@@ -231,7 +234,7 @@ class _ProjectDetailContent extends StatelessWidget {
           // ── Categories ───────────────────────
           if (state.projectCategories.isNotEmpty) ...[
             const Gap(24),
-            const Text('Categorías del Proyecto').medium,
+            Text(l10n.project_detail_categories_title).medium,
             const Gap(8),
             Wrap(
               spacing: 6,
@@ -245,18 +248,15 @@ class _ProjectDetailContent extends StatelessWidget {
           // ── Project-Level Transactions ───────
           const Gap(24),
           SectionHeader(
-            title: 'Ultimas transacciones',
-            actionLabel: 'Ver mas',
+            title: l10n.project_detail_transactions_title,
+            actionLabel: l10n.project_detail_transactions_see_more,
             onAction: () => _openTransactionList(context),
           ),
-          const Gap(12),
           if (state.projectLevelTransactions.isEmpty)
-            const EmptyState(
+            EmptyState(
               icon: RadixIcons.cardStack,
-              title: 'Sin transacciones',
-              subtitle:
-                  'Agrega gastos, depósitos o inyecciones de capital '
-                  'para este proyecto.',
+              title: l10n.project_detail_transactions_empty,
+              subtitle: l10n.project_detail_transactions_empty_info,
             )
           else
             ..._latestTransactions(state.projectLevelTransactions).map(
@@ -272,15 +272,13 @@ class _ProjectDetailContent extends StatelessWidget {
 
           // ── Activities ───────────────────────
           const Gap(24),
-          const Text('Actividades').large.bold,
+          Text(l10n.project_detail_activities_title).large.bold,
           const Gap(12),
           if (state.activitySummaries.isEmpty)
-            const EmptyState(
+            EmptyState(
               icon: RadixIcons.layers,
-              title: 'Sin actividades',
-              subtitle:
-                  'Agrega actividades para organizar las fases '
-                  'de tu proyecto.',
+              title: l10n.project_detail_activities_empty,
+              subtitle: l10n.project_detail_activities_empty_info,
             )
           else
             Wrap(
@@ -306,24 +304,26 @@ class _ProjectDetailContent extends StatelessWidget {
   }
 
   void _openCategoryManagement(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cubit = context.read<ProjectDetailCubit>();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => CategoryManagementPage(
           projectId: cubit.projectId,
-          title: 'Categorías del Proyecto',
+          title: l10n.category_mgmt_project_title,
         ),
       ),
     );
   }
 
   void _openTransactionList(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cubit = context.read<ProjectDetailCubit>();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => TransactionListPage(
           projectId: cubit.projectId,
-          title: 'Transacciones',
+          title: l10n.transaction_list_page_title,
         ),
       ),
     );
@@ -403,17 +403,18 @@ class _ProjectDetailContent extends StatelessWidget {
 
   void _confirmDeleteActivity(BuildContext context, Activity activity) {
     final controller = TextEditingController();
+    final l10n = AppLocalizations.of(context)!;
     showDialog<void>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar actividad'),
+        title: Text(l10n.dialog_activity_delete_title),
         content: SizedBox(
           width: 360,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Escribe el nombre de la actividad para confirmar:').small,
+              Text(l10n.dialog_activity_delete_confirmation).small,
               const Gap(8),
               TextField(
                 controller: controller,
@@ -425,7 +426,7 @@ class _ProjectDetailContent extends StatelessWidget {
         actions: [
           OutlineButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancelar'),
+            child: Text(l10n.common_cancel),
           ),
           PrimaryButton(
             onPressed: () {
@@ -433,7 +434,7 @@ class _ProjectDetailContent extends StatelessWidget {
               Navigator.of(ctx).pop();
               context.read<ProjectDetailCubit>().deleteActivity(activity.id);
             },
-            child: const Text('Eliminar'),
+            child: Text(l10n.common_delete),
           ),
         ],
       ),
@@ -455,6 +456,7 @@ class _ActivityCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final cubit = context.read<ProjectDetailCubit>();
 
     return CardButton(
@@ -500,7 +502,7 @@ class _ActivityCard extends StatelessWidget {
                     children: [
                       Text(summary.activity.name).medium,
                       if (summary.activity.year != null)
-                        Text('Año ${summary.activity.year}').muted.small,
+                        Text(l10n.project_detail_activity_year(summary.activity.year!)).muted.small,
                     ],
                   ),
                 ),
@@ -508,7 +510,7 @@ class _ActivityCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SecondaryBadge(
-                      child: Text('${summary.transactionCount} tx'),
+                      child: Text(l10n.project_detail_activity_transaction_count(summary.transactionCount)),
                     ),
                     const Gap(4),
                     IconButton.ghost(
@@ -532,10 +534,10 @@ class _ActivityCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Dep: ${summary.deposited.toCompactCurrency(context)}',
+                    '${l10n.project_detail_summary_deposited}: ${summary.deposited.toCompactCurrency(context)}',
                   ).small(color: theme.colorScheme.primary),
                   Text(
-                    'Gasto: ${summary.spent.toCompactCurrency(context)}',
+                    '${l10n.project_detail_summary_spent}: ${summary.spent.toCompactCurrency(context)}',
                   ).small(color: theme.colorScheme.destructive),
                 ],
               ),
@@ -546,6 +548,7 @@ class _ActivityCard extends StatelessWidget {
   }
 
   void _showActionsMenu(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDropdown<void>(
       context: context,
       anchorAlignment: Alignment.bottomRight,
@@ -554,12 +557,12 @@ class _ActivityCard extends StatelessWidget {
         children: [
           MenuButton(
             leading: const Icon(RadixIcons.pencil1),
-            child: const Text('Editar'),
+            child: Text(l10n.common_edit),
             onPressed: (_) => onEdit(),
           ),
           MenuButton(
             leading: const Icon(RadixIcons.trash),
-            child: const Text('Eliminar'),
+            child: Text(l10n.common_delete),
             onPressed: (_) => onDelete(),
           ),
         ],

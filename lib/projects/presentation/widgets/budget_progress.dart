@@ -1,3 +1,4 @@
+import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class BudgetProgress extends StatelessWidget {
@@ -17,6 +18,7 @@ class BudgetProgress extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
     final progress = budget > 0 ? (deposited / budget).clamp(0.0, 1.0) : 0.0;
     final spentProgress = budget > 0 ? (spent / budget).clamp(0.0, 1.0) : 0.0;
 
@@ -26,7 +28,7 @@ class BudgetProgress extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Presupuesto: ${formatCurrency(budget)}').muted.small,
+            Text('${l10n.widget_budget_progress_budget} ${formatCurrency(budget)}').muted.small,
             Text('${(progress * 100).toStringAsFixed(0)}%').muted.small,
           ],
         ),
@@ -72,9 +74,9 @@ class BudgetProgress extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Depositado: ${formatCurrency(deposited)}')
+            Text('${l10n.widget_budget_progress_deposited} ${formatCurrency(deposited)}')
                 .small(color: theme.colorScheme.primary),
-            Text('Gastado: ${formatCurrency(spent)}')
+            Text('${l10n.widget_budget_progress_spent} ${formatCurrency(spent)}')
                 .small(color: theme.colorScheme.destructive),
           ],
         ),

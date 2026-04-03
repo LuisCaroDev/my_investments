@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -195,7 +196,8 @@ class _ActivityDetailView extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
     if (state.error != null) {
-      return Center(child: Text('Error: ${state.error}'));
+      final l10n = AppLocalizations.of(context)!;
+      return Center(child: Text(l10n.common_error_msg(state.error!)));
     }
     return _ActivityContent(state: state);
   }
@@ -209,6 +211,7 @@ class _ActivityContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
@@ -220,12 +223,12 @@ class _ActivityContent extends StatelessWidget {
               OutlineButton(
                 onPressed: () => _openCategoryManagement(context),
                 size: ButtonSize.small,
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(RadixIcons.bookmarkFilled, size: 14),
-                    Gap(6),
-                    Text('Categoría'),
+                    const Icon(RadixIcons.bookmarkFilled, size: 14),
+                    const Gap(6),
+                    Text(l10n.activity_detail_add_category_button),
                   ],
                 ),
               ),
@@ -255,7 +258,7 @@ class _ActivityContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text('Depositado').muted.small,
+                          Text(l10n.activity_detail_summary_deposited).muted.small,
                           const Gap(4),
                           Text(
                             state.deposited.toCompactCurrency(context),
@@ -272,7 +275,7 @@ class _ActivityContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text('Gastado').muted.small,
+                          Text(l10n.activity_detail_summary_spent).muted.small,
                           const Gap(4),
                           Text(
                             state.spent.toCompactCurrency(context),
@@ -289,7 +292,7 @@ class _ActivityContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text('Balance').muted.small,
+                          Text(l10n.activity_detail_summary_operating).muted.small,
                           const Gap(4),
                           Text(
                             state.operatingBalance.toCompactCurrency(context),
@@ -306,7 +309,7 @@ class _ActivityContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text('Capital Inyectado').muted.small,
+                          Text(l10n.activity_detail_summary_capital).muted.small,
                           const Gap(4),
                           Text(
                             state.capitalInjected.toCompactCurrency(context),
@@ -323,7 +326,7 @@ class _ActivityContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text('Balance Neto').muted.small,
+                          Text(l10n.activity_detail_summary_net_balance).muted.small,
                           const Gap(4),
                           Text(
                             state.netBalance.toCompactCurrency(context),
@@ -357,7 +360,7 @@ class _ActivityContent extends StatelessWidget {
           // ── Categories ───────────────────────
           if (state.categories.isNotEmpty) ...[
             const Gap(24),
-            const Text('Categorías').medium,
+            Text(l10n.activity_detail_categories_title).medium,
             const Gap(8),
             Wrap(
               spacing: 6,
@@ -367,7 +370,7 @@ class _ActivityContent extends StatelessWidget {
                   final isActivityLevel = cat.activityId != null;
                   return Chip(
                     child: Text(
-                      '${cat.name}${isActivityLevel ? '' : ' (proyecto)'}',
+                      '${cat.name}${isActivityLevel ? '' : ' ${l10n.activity_detail_category_project_label}'}',
                     ),
                   );
                 }),
@@ -378,19 +381,17 @@ class _ActivityContent extends StatelessWidget {
           // ── Transactions ─────────────────────
           const Gap(24),
           SectionHeader(
-            title: 'Ultimas transacciones',
-            actionLabel: 'Ver mas',
+            title: l10n.activity_detail_transactions_title,
+            actionLabel: l10n.activity_detail_transactions_see_more,
             onAction: () => _openTransactionList(context),
           ),
           const Gap(12),
 
           if (state.transactions.isEmpty)
-            const EmptyState(
+            EmptyState(
               icon: RadixIcons.cardStack,
-              title: 'Sin transacciones',
-              subtitle:
-                  'Agrega gastos, depósitos o inyecciones de capital '
-                  'para esta actividad.',
+              title: l10n.activity_detail_transactions_empty,
+              subtitle: l10n.activity_detail_transactions_empty_info,
             )
           else
             ..._latestTransactions(state.transactions).map(
@@ -409,26 +410,28 @@ class _ActivityContent extends StatelessWidget {
   }
 
   void _openCategoryManagement(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cubit = context.read<_ActivityDetailCubit>();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => CategoryManagementPage(
           projectId: cubit.projectId,
           activityId: cubit.activityId,
-          title: 'Categorías de la Actividad',
+          title: l10n.category_mgmt_activity_title,
         ),
       ),
     );
   }
 
   void _openTransactionList(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final cubit = context.read<_ActivityDetailCubit>();
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => TransactionListPage(
           projectId: cubit.projectId,
           activityId: cubit.activityId,
-          title: 'Transacciones',
+          title: l10n.transaction_list_page_title,
         ),
       ),
     );

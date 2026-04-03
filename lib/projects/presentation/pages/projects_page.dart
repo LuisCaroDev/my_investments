@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'package:my_investments/core/extensions/currency_ext.dart';
@@ -17,10 +18,11 @@ class ProjectsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       headers: [
         AppBar(
-          title: const Text('Mis Inversiones'),
+          title: Text(l10n.projects_title),
           trailing: [
             GhostButton(
               onPressed: () => _openSettings(context),
@@ -39,12 +41,12 @@ class ProjectsPage extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: PrimaryButton(
                 onPressed: () => _showAddProjectDialog(context),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(RadixIcons.plus, size: 16),
                     Gap(6),
-                    Text('Nuevo Proyecto'),
+                    Text(l10n.projects_add_button),
                   ],
                 ),
               ),
@@ -59,15 +61,14 @@ class ProjectsPage extends StatelessWidget {
               child: CircularProgressIndicator(),
             ),
             ProjectsError(message: final msg) => Center(
-              child: Text('Error: $msg'),
+              child: Text(l10n.common_error_msg(msg)),
             ),
             ProjectsLoaded(summaries: final summaries) =>
               summaries.isEmpty
                   ? EmptyState(
                       icon: RadixIcons.archive,
-                      title: 'Aún no tienes proyectos',
-                      subtitle:
-                          'Crea tu primer proyecto de inversión para comenzar a registrar gastos y presupuestos.',
+                      title: l10n.projects_empty_title,
+                      subtitle: l10n.projects_empty_subtitle,
                     )
                   : _ProjectsList(summaries: summaries),
           };
@@ -107,6 +108,7 @@ class _ProjectsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     // Calculate portfolio totals
     final totalBudget = summaries.fold(0.0, (sum, s) => sum + s.totalBudget);
     final totalSpent = summaries.fold(0.0, (sum, s) => sum + s.totalSpent);
@@ -130,6 +132,7 @@ class _ProjectsList extends StatelessWidget {
           // ── Portfolio Summary ─────────────────
           LayoutBuilder(
             builder: (context, constraints) {
+              final l10n = AppLocalizations.of(context)!;
               const spacing = 12.0;
               const minCardWidth = 150.0;
               int columns = (constraints.maxWidth / minCardWidth).floor();
@@ -144,7 +147,7 @@ class _ProjectsList extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: 'Depositado',
+                      label: l10n.projects_summary_deposited,
                       value: totalDeposited.toCompactCurrency(context),
                       icon: RadixIcons.download,
                     ),
@@ -152,7 +155,7 @@ class _ProjectsList extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: 'Gasto Total',
+                      label: l10n.projects_summary_spent,
                       value: totalSpent.toCompactCurrency(context),
                       icon: RadixIcons.minusCircled,
                       valueColor: Theme.of(context).colorScheme.destructive,
@@ -161,7 +164,7 @@ class _ProjectsList extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: 'Presupuesto',
+                      label: l10n.projects_summary_budget,
                       value: totalBudget.toCompactCurrency(context),
                       icon: RadixIcons.target,
                     ),
@@ -169,7 +172,7 @@ class _ProjectsList extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: 'Capital Inyectado',
+                      label: l10n.projects_summary_capital,
                       value: totalCapitalInjected.toCompactCurrency(context),
                       icon: RadixIcons.drawingPinSolid,
                     ),
@@ -177,7 +180,7 @@ class _ProjectsList extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: 'Balance Neto',
+                      label: l10n.projects_summary_net_balance,
                       value: totalNetBalance.toCompactCurrency(context),
                       icon: RadixIcons.barChart,
                       valueColor: totalNetBalance < 0
@@ -188,7 +191,7 @@ class _ProjectsList extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: 'Proyectos',
+                      label: l10n.projects_list_title,
                       value: summaries.length.toString(),
                       icon: RadixIcons.cube,
                     ),
@@ -200,7 +203,7 @@ class _ProjectsList extends StatelessWidget {
           const Gap(24),
 
           // ── Projects Grid ────────────────────
-          const Text('Proyectos').large.bold,
+          Text(l10n.projects_list_title).large.bold,
           const Gap(12),
           Wrap(
             spacing: 16,
@@ -225,6 +228,7 @@ class _ProjectCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return CardButton(
       onPressed: () {
@@ -273,7 +277,7 @@ class _ProjectCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SecondaryBadge(
-                      child: Text('${summary.activityCount} act.'),
+                      child: Text(l10n.projects_item_activity_count(summary.activityCount)),
                     ),
                     const Gap(4),
                     IconButton.ghost(
@@ -299,7 +303,7 @@ class _ProjectCard extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Depositado').muted.small,
+                      Text(l10n.projects_summary_deposited).muted.small,
                       Text(
                         summary.totalDeposited.toCompactCurrency(context),
                       ).semiBold(color: theme.colorScheme.primary),
@@ -308,7 +312,7 @@ class _ProjectCard extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Text('Gastado').muted.small,
+                      Text(l10n.projects_summary_spent).muted.small,
                       Text(
                         summary.totalSpent.toCompactCurrency(context),
                       ).semiBold(color: theme.colorScheme.destructive),
@@ -324,6 +328,7 @@ class _ProjectCard extends StatelessWidget {
   }
 
   void _showActionsMenu(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     showDropdown<void>(
       context: context,
       anchorAlignment: Alignment.bottomRight,
@@ -332,12 +337,12 @@ class _ProjectCard extends StatelessWidget {
         children: [
           MenuButton(
             leading: const Icon(RadixIcons.pencil1),
-            child: const Text('Editar'),
+            child: Text(l10n.common_edit),
             onPressed: (_) => _editProject(context),
           ),
           MenuButton(
             leading: const Icon(RadixIcons.trash),
-            child: const Text('Eliminar'),
+            child: Text(l10n.common_delete),
             onPressed: (_) => _confirmDeleteProject(context),
           ),
         ],
@@ -365,20 +370,20 @@ class _ProjectCard extends StatelessWidget {
   }
 
   void _confirmDeleteProject(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
     final controller = TextEditingController();
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar proyecto'),
+        title: Text(l10n.projects_delete_title),
         content: SizedBox(
           width: 360,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
-                'Escribe el nombre del proyecto para confirmar. '
-                'Se eliminarán sus actividades, categorías y transacciones.',
+              Text(
+                l10n.projects_delete_confirmation,
               ).small,
               const Gap(8),
               TextField(
@@ -391,14 +396,14 @@ class _ProjectCard extends StatelessWidget {
         actions: [
           OutlineButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancelar'),
+            child: Text(l10n.common_cancel),
           ),
           PrimaryButton(
             onPressed: () {
               if (controller.text.trim() != summary.project.name.trim()) return;
               Navigator.of(ctx).pop(true);
             },
-            child: const Text('Eliminar'),
+            child: Text(l10n.common_delete),
           ),
         ],
       ),

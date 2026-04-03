@@ -1,3 +1,4 @@
+import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'package:my_investments/core/extensions/currency_ext.dart';
@@ -41,13 +42,14 @@ class TransactionTile extends StatelessWidget {
         : isDeposit
         ? theme.colorScheme.primary
         : theme.colorScheme.cardForeground;
+    final l10n = AppLocalizations.of(context)!;
     final label =
         transaction.description ??
         (isExpense
-            ? 'Gasto'
+            ? l10n.dialog_tx_type_expense
             : isDeposit
-            ? 'Depósito'
-            : 'Inyección de capital');
+            ? l10n.dialog_tx_type_deposit
+            : l10n.dialog_tx_type_capital);
     final sign = isExpense ? '-' : '+';
 
     Widget content = Card(
@@ -81,8 +83,8 @@ class TransactionTile extends StatelessWidget {
           if (onEdit != null || onDelete != null) ...[
             const Gap(6),
             IconButton.ghost(
-              onPressed: () => _showActionsMenu(context),
-              icon: Icon(RadixIcons.dotsVertical, size: 16),
+              onPressed: () => _showActionsMenu(context, l10n),
+              icon: const Icon(RadixIcons.dotsVertical, size: 16),
             ),
           ],
         ],
@@ -92,7 +94,7 @@ class TransactionTile extends StatelessWidget {
     return Padding(padding: const EdgeInsets.only(bottom: 4), child: content);
   }
 
-  void _showActionsMenu(BuildContext context) {
+  void _showActionsMenu(BuildContext context, AppLocalizations l10n) {
     showDropdown<void>(
       context: context,
       anchorAlignment: Alignment.bottomRight,
@@ -102,43 +104,43 @@ class TransactionTile extends StatelessWidget {
           if (onEdit != null)
             MenuButton(
               leading: const Icon(RadixIcons.pencil1),
-              child: const Text('Editar'),
+              child: Text(l10n.common_edit),
               onPressed: (_) => onEdit?.call(),
             ),
           if (onDelete != null)
             MenuButton(
               leading: const Icon(RadixIcons.trash),
-              child: const Text('Eliminar'),
-              onPressed: (_) => _handleMenuDelete(context),
+              child: Text(l10n.common_delete),
+              onPressed: (_) => _handleMenuDelete(context, l10n),
             ),
         ],
       ),
     );
   }
 
-  Future<void> _handleMenuDelete(BuildContext context) async {
+  Future<void> _handleMenuDelete(BuildContext context, AppLocalizations l10n) async {
     if (onDelete == null) return;
     if (confirmDelete) {
-      final confirmed = await _confirmDelete(context);
+      final confirmed = await _confirmDelete(context, l10n);
       if (confirmed != true) return;
     }
     onDelete?.call();
   }
 
-  Future<bool?> _confirmDelete(BuildContext context) {
+  Future<bool?> _confirmDelete(BuildContext context, AppLocalizations l10n) {
     return showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar transacción'),
-        content: const Text('¿Seguro que quieres eliminar esta transacción?'),
+        title: Text(l10n.dialog_tx_delete_title),
+        content: Text(l10n.dialog_tx_delete_confirm),
         actions: [
           OutlineButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancelar'),
+            child: Text(l10n.common_cancel),
           ),
           PrimaryButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Eliminar'),
+            child: Text(l10n.common_delete),
           ),
         ],
       ),

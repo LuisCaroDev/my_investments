@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
 import 'package:my_investments/core/presentation/bloc/settings_state.dart';
 import 'package:my_investments/core/theme/app_theme.dart';
@@ -40,6 +42,16 @@ class MyInvestmentsApp extends StatelessWidget {
             theme: AppTheme.light(),
             darkTheme: AppTheme.dark(),
             themeMode: ThemeMode.system,
+            localizationsDelegates: [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: settingsState.appLocale == 'system'
+                ? null
+                : Locale(settingsState.appLocale),
             builder: (context, child) {
               final theme = Theme.of(context);
               final isDark = theme.brightness == Brightness.dark;

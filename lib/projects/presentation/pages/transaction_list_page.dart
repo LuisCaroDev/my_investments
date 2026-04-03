@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -55,6 +56,7 @@ class _TransactionListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<TransactionListCubit, TransactionListState>(
       builder: (context, state) {
         final footers = switch (state) {
@@ -66,12 +68,12 @@ class _TransactionListView extends StatelessWidget {
                   padding: const EdgeInsets.all(16),
                   child: PrimaryButton(
                     onPressed: () => _addTransaction(context, state),
-                    child: const Row(
+                    child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(RadixIcons.plus, size: 16),
-                        Gap(6),
-                        Text('Agregar'),
+                        const Icon(RadixIcons.plus, size: 16),
+                        const Gap(6),
+                        Text(l10n.common_add),
                       ],
                     ),
                   ),
@@ -103,12 +105,13 @@ class _TransactionListView extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context, TransactionListState state) {
+    final l10n = AppLocalizations.of(context)!;
     return switch (state) {
       TransactionListLoading() => const Center(
         child: CircularProgressIndicator(),
       ),
       TransactionListError(message: final msg) => Center(
-        child: Text('Error: $msg'),
+        child: Text(l10n.common_error_msg(msg)),
       ),
       TransactionListLoaded() => _TransactionListContent(state: state),
     };
@@ -146,16 +149,18 @@ class _TransactionListContent extends StatelessWidget {
 
   const _TransactionListContent({required this.state});
 
-  static const Map<TransactionSort, String> _sortLabels = {
-    TransactionSort.dateDesc: 'Fecha (reciente)',
-    TransactionSort.dateAsc: 'Fecha (antigua)',
-    TransactionSort.amountDesc: 'Monto (mayor)',
-    TransactionSort.amountAsc: 'Monto (menor)',
+  static Map<TransactionSort, String> _getSortLabels(AppLocalizations l10n) => {
+    TransactionSort.dateDesc: l10n.transaction_list_sort_date_desc,
+    TransactionSort.dateAsc: l10n.transaction_list_sort_date_asc,
+    TransactionSort.amountDesc: l10n.transaction_list_sort_amount_desc,
+    TransactionSort.amountAsc: l10n.transaction_list_sort_amount_asc,
   };
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
+    final sortLabels = _getSortLabels(l10n);
     return SingleChildScrollView(
       padding: EdgeInsets.only(
         top: theme.density.baseContentPadding,
@@ -168,7 +173,7 @@ class _TransactionListContent extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Text('Filtrar por categoría').small.medium,
+              Text(l10n.transaction_list_filter_category).small.medium,
               const Spacer(),
               OutlineButton(
                 onPressed: () => _showSortMenu(context),
@@ -178,7 +183,7 @@ class _TransactionListContent extends StatelessWidget {
                   children: [
                     const Icon(RadixIcons.mixerHorizontal, size: 14),
                     const Gap(6),
-                    Text(_sortLabels[state.sort] ?? 'Ordenar'),
+                    Text(sortLabels[state.sort] ?? l10n.transaction_list_sort_label),
                   ],
                 ),
               ),
@@ -195,7 +200,7 @@ class _TransactionListContent extends StatelessWidget {
                 style: state.selectedCategoryId == null
                     ? ButtonVariance.primary
                     : ButtonVariance.secondary,
-                child: const Text('Todas'),
+                child: Text(l10n.transaction_list_category_all),
               ),
               ...state.categories.map((cat) {
                 final isSelected = state.selectedCategoryId == cat.id;
@@ -213,10 +218,10 @@ class _TransactionListContent extends StatelessWidget {
           ),
           const Gap(16),
           if (state.filteredTransactions.isEmpty)
-            const EmptyState(
+            EmptyState(
               icon: RadixIcons.cardStack,
-              title: 'Sin transacciones',
-              subtitle: 'No hay transacciones para este filtro.',
+              title: l10n.transaction_list_empty,
+              subtitle: l10n.transaction_list_empty_filter,
             )
           else
             ...state.filteredTransactions.map(
@@ -239,17 +244,21 @@ class _TransactionListContent extends StatelessWidget {
       context: context,
       anchorAlignment: Alignment.bottomRight,
       alignment: Alignment.topRight,
-      builder: (ctx) => DropdownMenu(
-        children: TransactionSort.values
-            .map(
-              (sort) => MenuButton(
-                child: Text(_sortLabels[sort] ?? sort.name),
-                onPressed: (_) =>
-                    context.read<TransactionListCubit>().changeSort(sort),
-              ),
-            )
-            .toList(),
-      ),
+      builder: (ctx) {
+        final l10n = AppLocalizations.of(context)!;
+        final sortLabels = _getSortLabels(l10n);
+        return DropdownMenu(
+          children: TransactionSort.values
+              .map(
+                (sort) => MenuButton(
+                  child: Text(sortLabels[sort] ?? sort.name),
+                  onPressed: (_) =>
+                      context.read<TransactionListCubit>().changeSort(sort),
+                ),
+              )
+              .toList(),
+        );
+      },
     );
   }
 

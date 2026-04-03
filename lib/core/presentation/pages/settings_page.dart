@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart' show MaterialPageRoute; // For MaterialPageRoute
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
@@ -12,11 +12,12 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       headers: [
         AppBar(
-          title: const Text('Configuración'),
+          title: Text(l10n.settings_title),
           leading: [
             GhostButton(
               onPressed: () => Navigator.of(context).pop(),
@@ -31,7 +32,7 @@ class SettingsPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             // ── Sincronización / Nube ──────────────────────────────
-            const Text('Sincronización y Cuenta').h4,
+            Text(l10n.settings_sync_title).h4,
             const Gap(16),
             Card(
               padding: const EdgeInsets.all(16),
@@ -53,17 +54,19 @@ class SettingsPage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text('Modo Local Independiente').large.bold,
-                            const Text('Tus datos se guardan en este dispositivo.').muted,
+                            Text(l10n.settings_local_mode_title).large.bold,
+                            Text(
+                              l10n.settings_local_mode_info,
+                            ).muted,
                           ],
                         ),
                       ),
                     ],
                   ),
                   const Gap(16),
-                  const PrimaryButton(
+                  PrimaryButton(
                     onPressed: null, // Disabled
-                    child: Text('Iniciar Sesión (Próximamente)'),
+                    child: Text(l10n.settings_login_button),
                   ),
                 ],
               ),
@@ -71,104 +74,96 @@ class SettingsPage extends StatelessWidget {
             const Gap(32),
 
             // ── Preferencias ──────────────────────────────
-            const Text('Preferencias').h4,
+            Text(l10n.settings_preferences_title).h4,
             const Gap(16),
             BlocBuilder<SettingsCubit, SettingsState>(
               builder: (context, state) {
-                return Card(
-                  padding: const EdgeInsets.all(8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Idioma
-                      CardButton(
-                        onPressed: () => _showLocaleDialog(context, state),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              const Icon(RadixIcons.globe),
-                              const Gap(16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('Idioma de la App').medium,
-                                    Text(_getLocaleName(state.appLocale)).muted,
-                                  ],
-                                ),
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Idioma
+                    CardButton(
+                      onPressed: () => _showLocaleDialog(context, state),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            const Icon(RadixIcons.globe),
+                            const Gap(16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(l10n.settings_language_label).medium,
+                                  Text(_getLocaleName(context, state.appLocale)).muted,
+                                ],
                               ),
-                              const Icon(RadixIcons.chevronRight),
-                            ],
-                          ),
+                            ),
+                            const Icon(RadixIcons.chevronRight),
+                          ],
                         ),
                       ),
-                      const Gap(8),
-                      // Moneda
-                      CardButton(
-                        onPressed: () => _showCurrencyDialog(context, state),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            children: [
-                              const Icon(RadixIcons.component1),
-                              const Gap(16),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text('Tipo de Moneda').medium,
-                                    Text(
-                                      state.currencySymbol != null
-                                          ? '${state.currencySymbol} (${state.currencyLocale ?? "Por Defecto"})'
-                                          : 'Por Defecto del Sistema',
-                                    ).muted,
-                                  ],
-                                ),
+                    ),
+                    const Gap(8),
+                    // Moneda
+                    CardButton(
+                      onPressed: () => _showCurrencyDialog(context, state),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            const Icon(RadixIcons.component1),
+                            const Gap(16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(l10n.settings_currency_label).medium,
+                                  Text(
+                                    state.currencySymbol != null
+                                        ? '${state.currencySymbol} (${state.currencyLocale ?? l10n.settings_system_default})'
+                                        : l10n.settings_system_default,
+                                  ).muted,
+                                ],
                               ),
-                              const Icon(RadixIcons.chevronRight),
-                            ],
-                          ),
+                            ),
+                            const Icon(RadixIcons.chevronRight),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 );
               },
             ),
             const Gap(32),
 
             // ── Datos ──────────────────────────────
-            const Text('Datos').h4,
+            Text(l10n.settings_data_title).h4,
             const Gap(16),
-            Card(
-              padding: const EdgeInsets.all(8),
-              child: CardButton(
-                onPressed: () {
-                  Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (_) => const ImportExportPage(),
-                    ),
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      const Icon(RadixIcons.upload),
-                      const Gap(16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text('Importar / Exportar JSON').medium,
-                            const Text('Respalda tus datos manualmente').muted,
-                          ],
-                        ),
+            CardButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const ImportExportPage()),
+                );
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  children: [
+                    const Icon(RadixIcons.upload),
+                    const Gap(16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(l10n.settings_import_export_label).medium,
+                          Text(l10n.settings_import_export_info).muted,
+                        ],
                       ),
-                      const Icon(RadixIcons.chevronRight),
-                    ],
-                  ),
+                    ),
+                    const Icon(RadixIcons.chevronRight),
+                  ],
                 ),
               ),
             ),
@@ -178,28 +173,30 @@ class SettingsPage extends StatelessWidget {
     );
   }
 
-  String _getLocaleName(String code) {
+  String _getLocaleName(BuildContext context, String code) {
+    final l10n = AppLocalizations.of(context)!;
     switch (code) {
       case 'es':
         return 'Español';
       case 'en':
         return 'English';
       default:
-        return 'Sistema';
+        return l10n.settings_system_default;
     }
   }
 
   void _showLocaleDialog(BuildContext context, SettingsState state) {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Seleccionar Idioma'),
+        title: Text(l10n.settings_language_dialog_title),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _OptionButton(
-              label: 'Sistema',
+              label: l10n.settings_system_default,
               isSelected: state.appLocale == 'system',
               onPressed: () {
                 context.read<SettingsCubit>().updateAppLocale('system');
@@ -229,7 +226,7 @@ class SettingsPage extends StatelessWidget {
         actions: [
           OutlineButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancelar'),
+            child: Text(l10n.common_cancel),
           ),
         ],
       ),
@@ -238,16 +235,17 @@ class SettingsPage extends StatelessWidget {
 
   void _showCurrencyDialog(BuildContext context, SettingsState state) {
     final currentVal = state.currencySymbol ?? 'system';
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Tipo de Moneda'),
+        title: Text(l10n.settings_currency_label),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             _OptionButton(
-              label: 'Por Defecto del Sistema',
+              label: l10n.settings_system_default,
               isSelected: currentVal == 'system',
               onPressed: () {
                 context.read<SettingsCubit>().updateCurrency(null, null);
@@ -286,7 +284,7 @@ class SettingsPage extends StatelessWidget {
         actions: [
           OutlineButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('Cancelar'),
+            child: Text(l10n.common_cancel),
           ),
         ],
       ),
@@ -308,14 +306,8 @@ class _OptionButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (isSelected) {
-      return PrimaryButton(
-        onPressed: onPressed,
-        child: Text(label),
-      );
+      return PrimaryButton(onPressed: onPressed, child: Text(label));
     }
-    return OutlineButton(
-      onPressed: onPressed,
-      child: Text(label),
-    );
+    return OutlineButton(onPressed: onPressed, child: Text(label));
   }
 }

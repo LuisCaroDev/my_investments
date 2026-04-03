@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -70,12 +71,12 @@ class _CategoryManagementView extends StatelessWidget {
                 PrimaryButton(
                   onPressed: () => _addCategory(context),
                   size: ButtonSize.small,
-                  child: const Row(
+                  child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(RadixIcons.plus, size: 14),
-                      Gap(6),
-                      Text('Categoría'),
+                      const Icon(RadixIcons.plus, size: 14),
+                      const Gap(6),
+                      Text(AppLocalizations.of(context)!.common_category),
                     ],
                   ),
                 ),
@@ -89,11 +90,12 @@ class _CategoryManagementView extends StatelessWidget {
   }
 
   Widget _buildBody(BuildContext context, CategoryManagementState state) {
+    final l10n = AppLocalizations.of(context)!;
     return switch (state) {
       CategoryManagementLoading() =>
         const Center(child: CircularProgressIndicator()),
       CategoryManagementError(message: final msg) =>
-        Center(child: Text('Error: $msg')),
+        Center(child: Text(l10n.common_error_msg(msg))),
       CategoryManagementLoaded() => _CategoryManagementContent(state: state),
     };
   }
@@ -127,16 +129,18 @@ class _CategoryManagementContent extends StatelessWidget {
     final hasActivityScope =
         context.read<CategoryManagementCubit>().activityId != null;
 
+    final l10n = AppLocalizations.of(context)!;
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (hasActivityScope) ...[
-            const Text('Categorías de la Actividad').medium,
+            Text(l10n.category_mgmt_activity_title).medium,
             const Gap(8),
             if (state.activityCategories.isEmpty)
-              const Text('No hay categorías todavía.').muted
+              Text(l10n.category_mgmt_empty).muted
             else
               ...state.activityCategories.map(
                 (cat) => _CategoryRow(
@@ -146,10 +150,10 @@ class _CategoryManagementContent extends StatelessWidget {
               ),
             const Gap(20),
           ],
-          const Text('Categorías del Proyecto').medium,
+          Text(l10n.category_mgmt_project_title).medium,
           const Gap(8),
           if (state.projectCategories.isEmpty)
-            const Text('No hay categorías todavía.').muted
+            Text(l10n.category_mgmt_empty).muted
           else
             ...state.projectCategories.map(
               (cat) => _CategoryRow(

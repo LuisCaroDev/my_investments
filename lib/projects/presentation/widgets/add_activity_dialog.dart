@@ -1,3 +1,4 @@
+import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class AddActivityDialog extends StatefulWidget {
@@ -51,26 +52,27 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.initialName != null;
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
-      title: Text(isEditing ? 'Editar Actividad' : 'Nueva Actividad'),
+      title: Text(isEditing ? l10n.dialog_activity_edit_title : l10n.dialog_activity_new_title),
       content: SizedBox(
         width: 400,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Nombre').small.medium,
+            Text(l10n.common_name_label).small.medium,
             const Gap(4),
             TextField(
               controller: _nameController,
-              placeholder: const Text('Ej: Siembra 2025'),
+              placeholder: Text(l10n.dialog_activity_name_placeholder),
             ),
             const Gap(12),
-            const Text('Descripción (opcional)').small.medium,
+            Text(l10n.common_description_label).small.medium,
             const Gap(4),
             TextField(
               controller: _descriptionController,
-              placeholder: const Text('Describe la actividad...'),
+              placeholder: Text(l10n.dialog_activity_description_placeholder),
             ),
             const Gap(12),
             Row(
@@ -79,7 +81,7 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Año').small.medium,
+                      Text(l10n.dialog_activity_year_label).small.medium,
                       const Gap(4),
                       TextField(
                         controller: _yearController,
@@ -94,7 +96,7 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('Presupuesto').small.medium,
+                      Text(l10n.dialog_activity_budget_label).small.medium,
                       const Gap(4),
                       TextField(
                         controller: _budgetController,
@@ -112,7 +114,7 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
       actions: [
         OutlineButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancelar'),
+          child: Text(l10n.common_cancel),
         ),
         PrimaryButton(
           onPressed: () {
@@ -128,7 +130,7 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
               'budget': budget,
             });
           },
-          child: Text(isEditing ? 'Guardar' : 'Crear'),
+          child: Text(isEditing ? l10n.common_save : l10n.common_create),
         ),
       ],
     );

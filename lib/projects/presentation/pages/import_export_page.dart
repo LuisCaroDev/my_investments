@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -72,7 +73,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
                   icon: const Icon(RadixIcons.arrowLeft),
                 ),
               ],
-              title: const Text('Importar / Exportar'),
+              title: Text(AppLocalizations.of(context)!.settings_import_export_label),
             ),
           ],
           child: SingleChildScrollView(
@@ -80,11 +81,10 @@ class _ImportExportPageState extends State<ImportExportPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Text('Exportar').large.bold,
+                Text(AppLocalizations.of(context)!.import_export_export_tab).large.bold,
                 const Gap(8),
-                const Text(
-                  'Copia este contenido y guárdalo como .csv '
-                  '(incluye 4 tablas).',
+                Text(
+                  AppLocalizations.of(context)!.import_export_export_info,
                 ).small,
                 const Gap(12),
                 TextArea(
@@ -99,23 +99,22 @@ class _ImportExportPageState extends State<ImportExportPage> {
                     onPressed: () async {
                       await Clipboard.setData(ClipboardData(text: exportText));
                     },
-                    child: const Text('Copiar'),
+                    child: Text(AppLocalizations.of(context)!.import_export_copy_button),
                   ),
                 ),
                 const Gap(28),
                 const Divider(),
                 const Gap(20),
-                const Text('Importar').large.bold,
+                Text(AppLocalizations.of(context)!.import_export_import_tab).large.bold,
                 const Gap(8),
-                const Text(
-                  'Pega aquí tu export en formato CSV. '
-                  'Esto reemplazará todos los datos actuales.',
+                Text(
+                  AppLocalizations.of(context)!.import_export_import_info,
                 ).small,
                 const Gap(12),
                 TextArea(
                   controller: _importController,
-                  placeholder: const Text(
-                    'Pega el contenido exportado aquí...',
+                  placeholder: Text(
+                    AppLocalizations.of(context)!.import_export_import_placeholder,
                   ),
                   minHeight: 240,
                 ),
@@ -126,7 +125,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
                     onPressed: _importing
                         ? null
                         : () => _importData(context, ds),
-                    child: const Text('Importar'),
+                    child: Text(AppLocalizations.of(context)!.import_export_import_tab),
                   ),
                 ),
               ],
@@ -261,22 +260,22 @@ class _ImportExportPageState extends State<ImportExportPage> {
     final raw = _importController.text.trim();
     if (raw.isEmpty) return;
 
+    final l10n = AppLocalizations.of(context)!;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Confirmar importación'),
-        content: const Text(
-          'Esto reemplazará todos los datos actuales. '
-          '¿Deseas continuar?',
+        title: Text(l10n.import_export_confirm_title),
+        content: Text(
+          l10n.import_export_confirm_info,
         ),
         actions: [
           OutlineButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancelar'),
+            child: Text(l10n.common_cancel),
           ),
           PrimaryButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Importar'),
+            child: Text(l10n.import_export_import_tab),
           ),
         ],
       ),
@@ -292,36 +291,36 @@ class _ImportExportPageState extends State<ImportExportPage> {
       await ds.saveTransactions(parsed.transactions);
 
       if (context.mounted) {
-        context.read<ProjectsCubit>().loadProjects();
-        await showDialog<void>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Importación exitosa'),
-            content: const Text('Los datos fueron importados.'),
-            actions: [
-              PrimaryButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Cerrar'),
-              ),
-            ],
-          ),
-        );
+          context.read<ProjectsCubit>().loadProjects();
+          await showDialog<void>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text(l10n.import_export_success_title),
+              content: Text(l10n.import_export_success_info),
+              actions: [
+                PrimaryButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(l10n.common_close),
+                ),
+              ],
+            ),
+          );
       }
     } catch (e) {
       if (context.mounted) {
-        await showDialog<void>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Error al importar'),
-            content: Text('Detalles: $e'),
-            actions: [
-              PrimaryButton(
-                onPressed: () => Navigator.of(ctx).pop(),
-                child: const Text('Cerrar'),
-              ),
-            ],
-          ),
-        );
+          await showDialog<void>(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text(l10n.import_export_error_title),
+              content: Text(l10n.common_error_msg(e.toString())),
+              actions: [
+                PrimaryButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: Text(l10n.common_close),
+                ),
+              ],
+            ),
+          );
       }
     } finally {
       if (mounted) setState(() => _importing = false);

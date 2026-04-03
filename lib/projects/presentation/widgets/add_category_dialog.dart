@@ -1,3 +1,4 @@
+import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class AddCategoryDialog extends StatefulWidget {
@@ -32,28 +33,29 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
   @override
   Widget build(BuildContext context) {
     final isEditing = widget.initialName != null;
+    final l10n = AppLocalizations.of(context)!;
     return AlertDialog(
       title: Text(widget.isProjectLevel
           ? (isEditing
-              ? 'Editar Categoría de Proyecto'
-              : 'Nueva Categoría de Proyecto')
-          : (isEditing ? 'Editar Categoría' : 'Nueva Categoría')),
+              ? l10n.dialog_category_edit_project_title
+              : l10n.dialog_category_new_project_title)
+          : (isEditing ? l10n.dialog_category_edit_title : l10n.dialog_category_new_title)),
       content: SizedBox(
         width: 350,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Text('Nombre').small.medium,
+            Text(l10n.common_name_label).small.medium,
             const Gap(4),
             TextField(
               controller: _nameController,
-              placeholder: const Text('Ej: Compra de palma'),
+              placeholder: Text(l10n.dialog_category_name_placeholder),
             ),
             if (widget.isProjectLevel) ...[
               const Gap(8),
-              const Text(
-                'Esta categoría estará disponible en todas las actividades del proyecto.',
+              Text(
+                l10n.dialog_category_project_info,
               ).muted.small,
             ],
           ],
@@ -62,7 +64,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
       actions: [
         OutlineButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancelar'),
+          child: Text(l10n.common_cancel),
         ),
         PrimaryButton(
           onPressed: () {
@@ -70,7 +72,7 @@ class _AddCategoryDialogState extends State<AddCategoryDialog> {
             if (name.isEmpty) return;
             Navigator.of(context).pop(name);
           },
-          child: Text(isEditing ? 'Guardar' : 'Crear'),
+          child: Text(isEditing ? l10n.common_save : l10n.common_create),
         ),
       ],
     );

@@ -1,3 +1,4 @@
+import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:my_investments/projects/domain/entities/category.dart' as domain;
 import 'package:my_investments/projects/domain/entities/transaction.dart';
@@ -55,19 +56,21 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     final isExpense = _type == TransactionType.expense;
     final isDeposit = _type == TransactionType.deposit;
     final isEditing = widget.initialTransaction != null;
+    final l10n = AppLocalizations.of(context)!;
+
     final title = isEditing
         ? isExpense
-            ? 'Editar Gasto'
+            ? l10n.dialog_tx_edit_expense
             : isDeposit
-                ? 'Editar Depósito'
-                : 'Editar Inyección de capital'
+                ? l10n.dialog_tx_edit_deposit
+                : l10n.dialog_tx_edit_capital
         : widget.depositOnly
-            ? 'Nuevo Depósito'
+            ? l10n.dialog_tx_new_deposit
             : isExpense
-                ? 'Nuevo Gasto'
+                ? l10n.dialog_tx_new_expense
                 : isDeposit
-                    ? 'Nuevo Depósito'
-                    : 'Nueva Inyección de capital';
+                    ? l10n.dialog_tx_new_deposit
+                    : l10n.dialog_tx_new_capital;
     return AlertDialog(
       title: Text(title),
       content: SizedBox(
@@ -77,7 +80,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             if (!widget.depositOnly) ...[
-              const Text('Tipo').small.medium,
+              Text(l10n.dialog_tx_type_label).small.medium,
               const Gap(4),
               Row(
                 children: [
@@ -85,12 +88,12 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                     child: _type == TransactionType.expense
                         ? PrimaryButton(
                             onPressed: () {},
-                            child: const Text('Gasto'),
+                            child: Text(l10n.dialog_tx_type_expense),
                           )
                         : OutlineButton(
                             onPressed: () => setState(
                                 () => _type = TransactionType.expense),
-                            child: const Text('Gasto'),
+                            child: Text(l10n.dialog_tx_type_expense),
                           ),
                   ),
                   const Gap(8),
@@ -98,12 +101,12 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                     child: _type == TransactionType.deposit
                         ? PrimaryButton(
                             onPressed: () {},
-                            child: const Text('Depósito'),
+                            child: Text(l10n.dialog_tx_type_deposit),
                           )
                         : OutlineButton(
                             onPressed: () => setState(
                                 () => _type = TransactionType.deposit),
-                            child: const Text('Depósito'),
+                            child: Text(l10n.dialog_tx_type_deposit),
                           ),
                   ),
                   const Gap(8),
@@ -111,20 +114,20 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                     child: _type == TransactionType.capitalInjection
                         ? PrimaryButton(
                             onPressed: () {},
-                            child: const Text('Capital'),
+                            child: Text(l10n.dialog_tx_type_capital),
                           )
                         : OutlineButton(
                             onPressed: () => setState(
                               () => _type = TransactionType.capitalInjection,
                             ),
-                            child: const Text('Capital'),
+                            child: Text(l10n.dialog_tx_type_capital),
                           ),
                   ),
                 ],
               ),
               const Gap(12),
             ],
-            const Text('Monto').small.medium,
+            Text(l10n.dialog_tx_amount_label).small.medium,
             const Gap(4),
             TextField(
               controller: _amountController,
@@ -132,7 +135,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               keyboardType: TextInputType.number,
             ),
             const Gap(12),
-            const Text('Fecha').small.medium,
+            Text(l10n.dialog_tx_date_label).small.medium,
             const Gap(4),
             DatePicker(
               value: _selectedDate,
@@ -144,17 +147,17 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               mode: PromptMode.dialog,
             ),
             const Gap(12),
-            const Text('Descripción (opcional)').small.medium,
+            Text(l10n.common_description_label).small.medium,
             const Gap(4),
             TextField(
               controller: _descriptionController,
-              placeholder: const Text('Detalle de la transacción...'),
+              placeholder: Text(l10n.dialog_tx_description_placeholder),
             ),
             if (isExpense && widget.availableCategories.isNotEmpty) ...[
               const Gap(12),
-              const Text('Categoría (opcional)').small.medium,
+              Text(l10n.dialog_tx_category_label).small.medium,
               const Gap(4),
-              _buildCategorySelector(),
+              _buildCategorySelector(l10n),
             ],
           ],
         ),
@@ -162,7 +165,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       actions: [
         OutlineButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancelar'),
+          child: Text(l10n.common_cancel),
         ),
         PrimaryButton(
           onPressed: () {
@@ -177,13 +180,13 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               'categoryId': isExpense ? _selectedCategoryId : null,
             });
           },
-          child: Text(isEditing ? 'Guardar' : 'Agregar'),
+          child: Text(isEditing ? l10n.common_save : l10n.common_add),
         ),
       ],
     );
   }
 
-  Widget _buildCategorySelector() {
+  Widget _buildCategorySelector(AppLocalizations l10n) {
     final selectedCategory = _selectedCategoryId != null
         ? widget.availableCategories
             .where((c) => c.id == _selectedCategoryId)
@@ -191,17 +194,17 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
         : null;
 
     return OutlineButton(
-      onPressed: () => _showCategoryPicker(),
+      onPressed: () => _showCategoryPicker(l10n),
       child: Row(
         children: [
           Expanded(
             child: selectedCategory != null
                 ? Text(
                     selectedCategory.activityId == null
-                        ? '${selectedCategory.name} (proyecto)'
+                        ? '${selectedCategory.name} ${l10n.widget_tx_tile_project_label}'
                         : selectedCategory.name,
                   )
-                : const Text('Seleccionar categoría').muted,
+                : Text(l10n.dialog_tx_category_select).muted,
           ),
           const Icon(RadixIcons.chevronDown, size: 14),
         ],
@@ -209,7 +212,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     );
   }
 
-  void _showCategoryPicker() {
+  void _showCategoryPicker(AppLocalizations l10n) {
     final activityCategories = widget.availableCategories
         .where((c) => c.activityId != null)
         .toList();
@@ -220,7 +223,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Seleccionar Categoría'),
+        title: Text(l10n.dialog_tx_category_select),
         content: SizedBox(
           width: 300,
           child: Column(
@@ -233,15 +236,15 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                   setState(() => _selectedCategoryId = null);
                   Navigator.of(ctx).pop();
                 },
-                child: const Row(
+                child: Row(
                   children: [
-                    Expanded(child: Text('Sin categoría')),
+                    Expanded(child: Text(l10n.dialog_tx_category_none)),
                   ],
                 ),
               ),
               if (activityCategories.isNotEmpty) ...[
                 const Gap(8),
-                const Text('Actividad').small.medium,
+                Text(l10n.common_activity).small.medium,
                 const Gap(4),
                 ...activityCategories.map(
                   (cat) => GhostButton(
@@ -261,7 +264,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               ],
               if (projectCategories.isNotEmpty) ...[
                 const Gap(8),
-                const Text('Proyecto').small.medium,
+                Text(l10n.common_project).small.medium,
                 const Gap(4),
                 ...projectCategories.map(
                   (cat) => GhostButton(
