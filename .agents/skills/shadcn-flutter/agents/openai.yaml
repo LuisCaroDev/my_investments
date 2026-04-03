@@ -1,0 +1,4 @@
+interface:
+  display_name: "Shadcn Flutter"
+  short_description: "Map Material widgets to shadcn_flutter components"
+  default_prompt: "Replace Material widgets with shadcn_flutter components, update imports, and use Shadcn themes."
