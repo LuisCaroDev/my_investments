@@ -10,7 +10,8 @@ class TransactionTile extends StatelessWidget {
   final List<domain.Category> categories;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
-  final bool enableSwipeDelete;
+  final bool confirmSwipeDelete;
+  final bool confirmDelete;
 
   const TransactionTile({
     super.key,
@@ -18,7 +19,8 @@ class TransactionTile extends StatelessWidget {
     required this.categories,
     this.onEdit,
     this.onDelete,
-    this.enableSwipeDelete = false,
+    this.confirmSwipeDelete = true,
+    this.confirmDelete = true,
   });
 
   @override
@@ -80,27 +82,6 @@ class TransactionTile extends StatelessWidget {
       ),
     );
 
-    if (enableSwipeDelete && onDelete != null) {
-      content = Dismissible(
-        key: ValueKey(transaction.id),
-        direction: DismissDirection.endToStart,
-        background: Container(
-          alignment: Alignment.centerRight,
-          padding: const EdgeInsets.only(right: 16),
-          decoration: BoxDecoration(
-            color: theme.colorScheme.destructive.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: Icon(
-            RadixIcons.trash,
-            color: theme.colorScheme.destructive,
-          ),
-        ),
-        onDismissed: (_) => onDelete?.call(),
-        child: content,
-      );
-    }
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 4),
       child: content,
@@ -124,8 +105,39 @@ class TransactionTile extends StatelessWidget {
             MenuButton(
               leading: const Icon(RadixIcons.trash),
               child: const Text('Eliminar'),
-              onPressed: (_) => onDelete?.call(),
+              onPressed: (_) => _handleMenuDelete(context),
             ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleMenuDelete(BuildContext context) async {
+    if (onDelete == null) return;
+    if (confirmDelete) {
+      final confirmed = await _confirmDelete(context);
+      if (confirmed != true) return;
+    }
+    onDelete?.call();
+  }
+
+  Future<bool?> _confirmDelete(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Eliminar transacción'),
+        content: const Text(
+          '¿Seguro que quieres eliminar esta transacción?',
+        ),
+        actions: [
+          OutlineButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          PrimaryButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Eliminar'),
+          ),
         ],
       ),
     );

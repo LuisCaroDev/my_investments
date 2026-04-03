@@ -61,6 +61,10 @@ class ProjectsRepository {
         .toList();
   }
 
+  List<Activity> getAllActivities() {
+    return _localDataSource.getActivities();
+  }
+
   Future<void> addActivity(Activity activity) async {
     final activities = _localDataSource.getActivities();
     activities.add(ActivityModel.fromEntity(activity));
@@ -99,6 +103,10 @@ class ProjectsRepository {
         .getCategories()
         .where((c) => c.projectId == projectId && c.activityId == null)
         .toList();
+  }
+
+  List<Category> getAllCategories() {
+    return _localDataSource.getCategories();
   }
 
   /// Returns categories scoped to an activity.
@@ -148,6 +156,10 @@ class ProjectsRepository {
         .getTransactions()
         .where((t) => t.projectId == projectId)
         .toList();
+  }
+
+  List<Transaction> getAllTransactions() {
+    return _localDataSource.getTransactions();
   }
 
   List<Transaction> getTransactionsForActivity(String activityId) {

@@ -10,8 +10,10 @@ import 'package:my_investments/projects/domain/entities/category.dart'
     as domain;
 import 'package:my_investments/projects/domain/entities/transaction.dart';
 import 'package:my_investments/projects/presentation/pages/category_management_page.dart';
+import 'package:my_investments/projects/presentation/pages/transaction_list_page.dart';
 import 'package:my_investments/projects/presentation/widgets/add_transaction_dialog.dart';
 import 'package:my_investments/projects/presentation/widgets/budget_progress.dart';
+import 'package:my_investments/projects/presentation/widgets/section_header.dart';
 import 'package:my_investments/projects/presentation/widgets/transaction_tile.dart';
 
 /// A dedicated page for viewing an Activity's details, its categories,
@@ -55,8 +57,6 @@ class ActivityDetailPage extends StatelessWidget {
 
 // ── Private Cubit for Activity Detail ─────────────────────────
 
-const _unsetCategoryFilter = Object();
-
 class _ActivityDetailState {
   final bool loading;
   final String? error;
@@ -65,7 +65,6 @@ class _ActivityDetailState {
   final double spent;
   final List<Transaction> transactions;
   final List<domain.Category> categories;
-  final String? selectedCategoryId;
 
   const _ActivityDetailState({
     this.loading = true,
@@ -75,41 +74,9 @@ class _ActivityDetailState {
     this.spent = 0,
     this.transactions = const [],
     this.categories = const [],
-    this.selectedCategoryId,
   });
 
   double get balance => deposited - spent;
-
-  List<Transaction> get filteredTransactions {
-    if (selectedCategoryId == null) return transactions;
-    return transactions
-        .where((t) => t.categoryId == selectedCategoryId)
-        .toList();
-  }
-
-  _ActivityDetailState copyWith({
-    bool? loading,
-    String? error,
-    double? budget,
-    double? deposited,
-    double? spent,
-    List<Transaction>? transactions,
-    List<domain.Category>? categories,
-    Object? selectedCategoryId = _unsetCategoryFilter,
-  }) {
-    return _ActivityDetailState(
-      loading: loading ?? this.loading,
-      error: error,
-      budget: budget ?? this.budget,
-      deposited: deposited ?? this.deposited,
-      spent: spent ?? this.spent,
-      transactions: transactions ?? this.transactions,
-      categories: categories ?? this.categories,
-      selectedCategoryId: selectedCategoryId == _unsetCategoryFilter
-          ? this.selectedCategoryId
-          : selectedCategoryId as String?,
-    );
-  }
 }
 
 class _ActivityDetailCubit extends Cubit<_ActivityDetailState> {
@@ -149,7 +116,6 @@ class _ActivityDetailCubit extends Cubit<_ActivityDetailState> {
           spent: spent,
           transactions: transactions,
           categories: categories,
-          selectedCategoryId: state.selectedCategoryId,
         ),
       );
     } catch (e) {
@@ -185,10 +151,6 @@ class _ActivityDetailCubit extends Cubit<_ActivityDetailState> {
   Future<void> deleteCategory(String categoryId) async {
     await _repository.deleteCategory(categoryId);
     load();
-  }
-
-  void selectCategory(String? categoryId) {
-    emit(state.copyWith(selectedCategoryId: categoryId));
   }
 }
 
@@ -257,19 +219,6 @@ class _ActivityContent extends StatelessWidget {
                     Icon(RadixIcons.bookmarkFilled, size: 14),
                     Gap(6),
                     Text('Categoría'),
-                  ],
-                ),
-              ),
-              const Gap(6),
-              PrimaryButton(
-                onPressed: () => _addTransaction(context),
-                size: ButtonSize.small,
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(RadixIcons.plus, size: 14),
-                    Gap(6),
-                    Text('Transacción'),
                   ],
                 ),
               ),
@@ -356,24 +305,9 @@ class _ActivityContent extends StatelessWidget {
               spacing: 6,
               runSpacing: 6,
               children: [
-                Chip(
-                  onPressed: () =>
-                      context.read<_ActivityDetailCubit>().selectCategory(null),
-                  style: state.selectedCategoryId == null
-                      ? ButtonVariance.primary
-                      : ButtonVariance.secondary,
-                  child: const Text('Todas'),
-                ),
                 ...state.categories.map((cat) {
                   final isActivityLevel = cat.activityId != null;
-                  final isSelected = state.selectedCategoryId == cat.id;
                   return Chip(
-                    onPressed: () => context
-                        .read<_ActivityDetailCubit>()
-                        .selectCategory(isSelected ? null : cat.id),
-                    style: isSelected
-                        ? ButtonVariance.primary
-                        : ButtonVariance.secondary,
                     child: Text(
                       '${cat.name}${isActivityLevel ? '' : ' (proyecto)'}',
                     ),
@@ -385,21 +319,24 @@ class _ActivityContent extends StatelessWidget {
 
           // ── Transactions ─────────────────────
           const Gap(24),
-          const Text('Transacciones').large.bold,
+          SectionHeader(
+            title: 'Ultimas transacciones',
+            actionLabel: 'Ver mas',
+            onAction: () => _openTransactionList(context),
+          ),
           const Gap(12),
 
-          if (state.filteredTransactions.isEmpty)
+          if (state.transactions.isEmpty)
             const EmptyState(
               icon: RadixIcons.cardStack,
               title: 'Sin transacciones',
               subtitle: 'Agrega gastos o depósitos para esta actividad.',
             )
           else
-            ...state.filteredTransactions.reversed.map(
+            ..._latestTransactions(state.transactions).map(
               (t) => TransactionTile(
                 transaction: t,
                 categories: state.categories,
-                enableSwipeDelete: true,
                 onEdit: () => _editTransaction(context, t),
                 onDelete: () {
                   context.read<_ActivityDetailCubit>().deleteTransaction(t.id);
@@ -411,31 +348,6 @@ class _ActivityContent extends StatelessWidget {
     );
   }
 
-  void _addTransaction(BuildContext context) async {
-    final cubit = context.read<_ActivityDetailCubit>();
-    final state = cubit.state;
-
-    final result = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (ctx) =>
-          AddTransactionDialog(availableCategories: state.categories),
-    );
-    if (result != null && context.mounted) {
-      final transaction = Transaction(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        projectId: cubit.projectId,
-        activityId: cubit.activityId,
-        type: result['type'] as TransactionType,
-        amount: result['amount'] as double,
-        date: result['date'] as DateTime,
-        description: result['description'] as String?,
-        categoryId: result['categoryId'] as String?,
-        createdAt: DateTime.now(),
-      );
-      cubit.addTransaction(transaction);
-    }
-  }
-
   void _openCategoryManagement(BuildContext context) {
     final cubit = context.read<_ActivityDetailCubit>();
     Navigator.of(context).push(
@@ -444,6 +356,19 @@ class _ActivityContent extends StatelessWidget {
           projectId: cubit.projectId,
           activityId: cubit.activityId,
           title: 'Categorías de la Actividad',
+        ),
+      ),
+    );
+  }
+
+  void _openTransactionList(BuildContext context) {
+    final cubit = context.read<_ActivityDetailCubit>();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => TransactionListPage(
+          projectId: cubit.projectId,
+          activityId: cubit.activityId,
+          title: 'Transacciones',
         ),
       ),
     );
@@ -471,4 +396,9 @@ class _ActivityContent extends StatelessWidget {
     }
   }
 
+  List<Transaction> _latestTransactions(List<Transaction> items) {
+    final sorted = List<Transaction>.from(items)
+      ..sort((a, b) => b.date.compareTo(a.date));
+    return sorted.take(5).toList();
+  }
 }

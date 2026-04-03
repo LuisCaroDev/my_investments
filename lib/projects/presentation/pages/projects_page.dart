@@ -7,6 +7,7 @@ import 'package:my_investments/core/widgets/stat_card.dart';
 import 'package:my_investments/projects/domain/entities/project.dart';
 import 'package:my_investments/projects/presentation/bloc/projects_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/projects_state.dart';
+import 'package:my_investments/projects/presentation/pages/import_export_page.dart';
 import 'package:my_investments/projects/presentation/pages/project_detail_page.dart';
 import 'package:my_investments/projects/presentation/widgets/add_project_dialog.dart';
 import 'package:my_investments/projects/presentation/widgets/budget_progress.dart';
@@ -21,19 +22,34 @@ class ProjectsPage extends StatelessWidget {
         AppBar(
           title: const Text('Mis Inversiones'),
           trailing: [
-            PrimaryButton(
-              onPressed: () => _showAddProjectDialog(context),
+            GhostButton(
+              onPressed: () => _openImportExport(context),
               size: ButtonSize.small,
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(RadixIcons.plus, size: 14),
-                  Gap(6),
-                  Text('Nuevo Proyecto'),
-                ],
-              ),
+              child: const Icon(RadixIcons.upload),
             ),
           ],
+        ),
+      ],
+      floatingFooter: true,
+      footers: [
+        Align(
+          alignment: Alignment.bottomRight,
+          child: SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: PrimaryButton(
+                onPressed: () => _showAddProjectDialog(context),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(RadixIcons.plus, size: 16),
+                    Gap(6),
+                    Text('Nuevo Proyecto'),
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
       ],
       child: BlocBuilder<ProjectsCubit, ProjectsState>(
@@ -52,10 +68,6 @@ class ProjectsPage extends StatelessWidget {
                       title: 'Aún no tienes proyectos',
                       subtitle:
                           'Crea tu primer proyecto de inversión para comenzar a registrar gastos y presupuestos.',
-                      action: PrimaryButton(
-                        onPressed: () => _showAddProjectDialog(context),
-                        child: const Text('Crear Proyecto'),
-                      ),
                     )
                   : _ProjectsList(summaries: summaries),
           };
@@ -80,6 +92,12 @@ class ProjectsPage extends StatelessWidget {
       context.read<ProjectsCubit>().addProject(project);
     }
   }
+
+  void _openImportExport(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const ImportExportPage()),
+    );
+  }
 }
 
 class _ProjectsList extends StatelessWidget {
@@ -98,7 +116,7 @@ class _ProjectsList extends StatelessWidget {
         summaries.fold(0.0, (sum, s) => sum + s.totalDeposited);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

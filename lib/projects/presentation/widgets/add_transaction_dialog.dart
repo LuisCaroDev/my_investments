@@ -176,7 +176,11 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
         children: [
           Expanded(
             child: selectedCategory != null
-                ? Text(selectedCategory.name)
+                ? Text(
+                    selectedCategory.activityId == null
+                        ? '${selectedCategory.name} (proyecto)'
+                        : selectedCategory.name,
+                  )
                 : const Text('Seleccionar categoría').muted,
           ),
           const Icon(RadixIcons.chevronDown, size: 14),
@@ -186,6 +190,13 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   }
 
   void _showCategoryPicker() {
+    final activityCategories = widget.availableCategories
+        .where((c) => c.activityId != null)
+        .toList();
+    final projectCategories = widget.availableCategories
+        .where((c) => c.activityId == null)
+        .toList();
+
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -194,6 +205,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
           width: 300,
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // None option
               GhostButton(
@@ -207,21 +219,46 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                   ],
                 ),
               ),
-              ...widget.availableCategories.map(
-                (cat) => GhostButton(
-                  onPressed: () {
-                    setState(() => _selectedCategoryId = cat.id);
-                    Navigator.of(ctx).pop();
-                  },
-                  child: Row(
-                    children: [
-                      Expanded(child: Text(cat.name)),
-                      if (_selectedCategoryId == cat.id)
-                        const Icon(RadixIcons.check, size: 14),
-                    ],
+              if (activityCategories.isNotEmpty) ...[
+                const Gap(8),
+                const Text('Actividad').small.medium,
+                const Gap(4),
+                ...activityCategories.map(
+                  (cat) => GhostButton(
+                    onPressed: () {
+                      setState(() => _selectedCategoryId = cat.id);
+                      Navigator.of(ctx).pop();
+                    },
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(cat.name)),
+                        if (_selectedCategoryId == cat.id)
+                          const Icon(RadixIcons.check, size: 14),
+                      ],
+                    ),
                   ),
                 ),
-              ),
+              ],
+              if (projectCategories.isNotEmpty) ...[
+                const Gap(8),
+                const Text('Proyecto').small.medium,
+                const Gap(4),
+                ...projectCategories.map(
+                  (cat) => GhostButton(
+                    onPressed: () {
+                      setState(() => _selectedCategoryId = cat.id);
+                      Navigator.of(ctx).pop();
+                    },
+                    child: Row(
+                      children: [
+                        Expanded(child: Text(cat.name)),
+                        if (_selectedCategoryId == cat.id)
+                          const Icon(RadixIcons.check, size: 14),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),

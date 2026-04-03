@@ -8,7 +8,6 @@ import 'package:my_investments/projects/presentation/bloc/project_detail_state.d
 class ProjectDetailCubit extends Cubit<ProjectDetailState> {
   final ProjectsRepository _repository;
   final String projectId;
-  String? _selectedCategoryId;
 
   ProjectDetailCubit({
     required ProjectsRepository repository,
@@ -67,7 +66,6 @@ class ProjectDetailCubit extends Cubit<ProjectDetailState> {
           activitySummaries: activitySummaries,
           projectLevelTransactions: projectLevelTransactions,
           projectCategories: projectCategories,
-          selectedCategoryId: _selectedCategoryId,
           totalBudget: totalBudget,
           totalSpent: totalSpent,
           totalDeposited: totalDeposited,
@@ -126,11 +124,6 @@ class ProjectDetailCubit extends Cubit<ProjectDetailState> {
 
   Future<void> deleteTransaction(String transactionId) async {
     await _repository.deleteTransaction(transactionId);
-    load();
-  }
-
-  void selectCategory(String? categoryId) {
-    _selectedCategoryId = categoryId;
     load();
   }
 }

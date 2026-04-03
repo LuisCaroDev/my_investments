@@ -16,7 +16,6 @@ class ProjectDetailLoaded extends ProjectDetailState {
   final List<ActivitySummary> activitySummaries;
   final List<Transaction> projectLevelTransactions;
   final List<Category> projectCategories;
-  final String? selectedCategoryId;
   final double totalBudget;
   final double totalSpent;
   final double totalDeposited;
@@ -26,7 +25,6 @@ class ProjectDetailLoaded extends ProjectDetailState {
     required this.activitySummaries,
     required this.projectLevelTransactions,
     required this.projectCategories,
-    this.selectedCategoryId,
     required this.totalBudget,
     required this.totalSpent,
     required this.totalDeposited,
@@ -37,12 +35,6 @@ class ProjectDetailLoaded extends ProjectDetailState {
   double get budgetProgress =>
       totalBudget > 0 ? (totalDeposited / totalBudget).clamp(0.0, 1.0) : 0.0;
 
-  List<Transaction> get filteredProjectTransactions {
-    if (selectedCategoryId == null) return projectLevelTransactions;
-    return projectLevelTransactions
-        .where((t) => t.categoryId == selectedCategoryId)
-        .toList();
-  }
 }
 
 class ProjectDetailError extends ProjectDetailState {

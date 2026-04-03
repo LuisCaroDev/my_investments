@@ -15,9 +15,11 @@ import 'package:my_investments/projects/presentation/bloc/project_detail_cubit.d
 import 'package:my_investments/projects/presentation/bloc/project_detail_state.dart';
 import 'package:my_investments/projects/presentation/pages/activity_detail_page.dart';
 import 'package:my_investments/projects/presentation/pages/category_management_page.dart';
+import 'package:my_investments/projects/presentation/pages/transaction_list_page.dart';
 import 'package:my_investments/projects/presentation/widgets/add_activity_dialog.dart';
 import 'package:my_investments/projects/presentation/widgets/add_transaction_dialog.dart';
 import 'package:my_investments/projects/presentation/widgets/budget_progress.dart';
+import 'package:my_investments/projects/presentation/widgets/section_header.dart';
 import 'package:my_investments/projects/presentation/widgets/transaction_tile.dart';
 
 class ProjectDetailPage extends StatelessWidget {
@@ -124,19 +126,6 @@ class _ProjectDetailContent extends StatelessWidget {
                   ),
                 ),
                 const Gap(6),
-                OutlineButton(
-                  onPressed: () => _addTransaction(context),
-                  size: ButtonSize.small,
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(RadixIcons.plus, size: 14),
-                      Gap(6),
-                      Text('Transacción'),
-                    ],
-                  ),
-                ),
-                const Gap(6),
                 PrimaryButton(
                   onPressed: () => _addActivity(context),
                   size: ButtonSize.small,
@@ -217,39 +206,28 @@ class _ProjectDetailContent extends StatelessWidget {
             Wrap(
               spacing: 6,
               runSpacing: 6,
-              children: [
-                Chip(
-                  onPressed: () =>
-                      context.read<ProjectDetailCubit>().selectCategory(null),
-                  style: state.selectedCategoryId == null
-                      ? ButtonVariance.primary
-                      : ButtonVariance.secondary,
-                  child: const Text('Todas'),
-                ),
-                ...state.projectCategories.map(
-                  (cat) {
-                    final isSelected = state.selectedCategoryId == cat.id;
-                    return Chip(
-                      onPressed: () => context
-                          .read<ProjectDetailCubit>()
-                          .selectCategory(isSelected ? null : cat.id),
-                      style: isSelected
-                          ? ButtonVariance.primary
-                          : ButtonVariance.secondary,
-                      child: Text(cat.name),
-                    );
-                  },
-                ),
-              ],
+              children: state.projectCategories
+                  .map((cat) => Chip(child: Text(cat.name)))
+                  .toList(),
             ),
           ],
 
           // ── Project-Level Transactions ───────
-          if (state.projectLevelTransactions.isNotEmpty) ...[
-            const Gap(24),
-            const Text('Transacciones del Proyecto').medium,
-            const Gap(8),
-            ...state.filteredProjectTransactions.map(
+          const Gap(24),
+          SectionHeader(
+            title: 'Ultimas transacciones',
+            actionLabel: 'Ver mas',
+            onAction: () => _openTransactionList(context),
+          ),
+          const Gap(12),
+          if (state.projectLevelTransactions.isEmpty)
+            const EmptyState(
+              icon: RadixIcons.cardStack,
+              title: 'Sin transacciones',
+              subtitle: 'Agrega gastos o depósitos para este proyecto.',
+            )
+          else
+            ..._latestTransactions(state.projectLevelTransactions).map(
               (t) => TransactionTile(
                 transaction: t,
                 categories: state.projectCategories,
@@ -259,7 +237,6 @@ class _ProjectDetailContent extends StatelessWidget {
                 },
               ),
             ),
-          ],
 
           // ── Activities ───────────────────────
           const Gap(24),
@@ -285,10 +262,10 @@ class _ProjectDetailContent extends StatelessWidget {
                           child: _ActivityCard(
                             summary: s,
                             onEdit: () => _editActivity(context, s.activity),
-                            onDelete: () =>
-                                context.read<ProjectDetailCubit>().deleteActivity(
-                                  s.activity.id,
-                                ),
+                            onDelete: () => _confirmDeleteActivity(
+                              context,
+                              s.activity,
+                            ),
                           ),
                         ),
                   )
@@ -311,29 +288,16 @@ class _ProjectDetailContent extends StatelessWidget {
     );
   }
 
-  void _addTransaction(BuildContext context) async {
-    final state = context.read<ProjectDetailCubit>().state;
-    if (state is! ProjectDetailLoaded) return;
-
-    final result = await showDialog<Map<String, dynamic>>(
-      context: context,
-      builder: (ctx) =>
-          AddTransactionDialog(availableCategories: state.projectCategories),
+  void _openTransactionList(BuildContext context) {
+    final cubit = context.read<ProjectDetailCubit>();
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => TransactionListPage(
+          projectId: cubit.projectId,
+          title: 'Transacciones',
+        ),
+      ),
     );
-    if (result != null && context.mounted) {
-      final cubit = context.read<ProjectDetailCubit>();
-      final transaction = Transaction(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        projectId: cubit.projectId,
-        type: result['type'] as TransactionType,
-        amount: result['amount'] as double,
-        date: result['date'] as DateTime,
-        description: result['description'] as String?,
-        categoryId: result['categoryId'] as String?,
-        createdAt: DateTime.now(),
-      );
-      cubit.addTransaction(transaction);
-    }
   }
 
   void _editTransaction(BuildContext context, Transaction transaction) async {
@@ -358,6 +322,12 @@ class _ProjectDetailContent extends StatelessWidget {
       );
       cubit.updateTransaction(updated);
     }
+  }
+
+  List<Transaction> _latestTransactions(List<Transaction> items) {
+    final sorted = List<Transaction>.from(items)
+      ..sort((a, b) => b.date.compareTo(a.date));
+    return sorted.take(5).toList();
   }
 
   void _addActivity(BuildContext context) async {
@@ -400,6 +370,47 @@ class _ProjectDetailContent extends StatelessWidget {
       );
       cubit.updateActivity(updated);
     }
+  }
+
+  void _confirmDeleteActivity(BuildContext context, Activity activity) {
+    final controller = TextEditingController();
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Eliminar actividad'),
+        content: SizedBox(
+          width: 360,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Escribe el nombre de la actividad para confirmar:',
+              ).small,
+              const Gap(8),
+              TextField(
+                controller: controller,
+                placeholder: Text(activity.name),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          OutlineButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancelar'),
+          ),
+          PrimaryButton(
+            onPressed: () {
+              if (controller.text.trim() != activity.name.trim()) return;
+              Navigator.of(ctx).pop();
+              context.read<ProjectDetailCubit>().deleteActivity(activity.id);
+            },
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
   }
 }
 
