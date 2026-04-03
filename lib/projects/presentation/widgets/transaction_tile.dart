@@ -76,7 +76,7 @@ class TransactionTile extends StatelessWidget {
             ),
           ),
           Text(
-            '$sign${transaction.amount.toCompactCurrency()}',
+            '$sign${transaction.amount.toCompactCurrency(context)}',
           ).small.semiBold(color: valueColor),
           if (onEdit != null || onDelete != null) ...[
             const Gap(6),

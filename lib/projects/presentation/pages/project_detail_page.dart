@@ -147,7 +147,8 @@ class _ProjectDetailContent extends StatelessWidget {
               const minCardWidth = 150.0;
               int columns = (constraints.maxWidth / minCardWidth).floor();
               if (columns < 2) columns = 2;
-              final cardWidth = (constraints.maxWidth - (spacing * (columns - 1))) / columns;
+              final cardWidth =
+                  (constraints.maxWidth - (spacing * (columns - 1))) / columns;
 
               return Wrap(
                 spacing: spacing,
@@ -157,7 +158,7 @@ class _ProjectDetailContent extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: 'Depositado',
-                      value: state.totalDeposited.toCompactCurrency(),
+                      value: state.totalDeposited.toCompactCurrency(context),
                       icon: RadixIcons.arrowUp,
                       valueColor: theme.colorScheme.primary,
                     ),
@@ -166,7 +167,7 @@ class _ProjectDetailContent extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: 'Gastado',
-                      value: state.totalSpent.toCompactCurrency(),
+                      value: state.totalSpent.toCompactCurrency(context),
                       icon: RadixIcons.arrowDown,
                       valueColor: theme.colorScheme.destructive,
                     ),
@@ -175,7 +176,7 @@ class _ProjectDetailContent extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: 'Balance Operativo',
-                      value: state.operatingBalance.toCompactCurrency(),
+                      value: state.operatingBalance.toCompactCurrency(context),
                       icon: RadixIcons.dimensions,
                     ),
                   ),
@@ -183,7 +184,9 @@ class _ProjectDetailContent extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: 'Capital Inyectado',
-                      value: state.totalCapitalInjected.toCompactCurrency(),
+                      value: state.totalCapitalInjected.toCompactCurrency(
+                        context,
+                      ),
                       icon: RadixIcons.drawingPinSolid,
                     ),
                   ),
@@ -191,10 +194,10 @@ class _ProjectDetailContent extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: 'Balance Neto',
-                      value: state.netBalance.toCompactCurrency(),
+                      value: state.netBalance.toCompactCurrency(context),
                       icon: RadixIcons.barChart,
-                      valueColor: state.netBalance < 0 
-                          ? theme.colorScheme.destructive 
+                      valueColor: state.netBalance < 0
+                          ? theme.colorScheme.destructive
                           : theme.colorScheme.primary,
                     ),
                   ),
@@ -203,7 +206,7 @@ class _ProjectDetailContent extends StatelessWidget {
                       width: cardWidth,
                       child: StatCard(
                         label: 'Presupuesto',
-                        value: state.totalBudget.toCompactCurrency(),
+                        value: state.totalBudget.toCompactCurrency(context),
                         icon: RadixIcons.target,
                       ),
                     ),
@@ -220,7 +223,7 @@ class _ProjectDetailContent extends StatelessWidget {
                 budget: state.totalBudget,
                 deposited: state.totalDeposited,
                 spent: state.totalSpent,
-                formatCurrency: (v) => v.toCompactCurrency(),
+                formatCurrency: (v) => v.toCompactCurrency(context),
               ),
             ),
           ],
@@ -285,18 +288,15 @@ class _ProjectDetailContent extends StatelessWidget {
               runSpacing: 16,
               children: state.activitySummaries
                   .map(
-                    (s) =>
-                        SizedBox(
-                          width: 340,
-                          child: _ActivityCard(
-                            summary: s,
-                            onEdit: () => _editActivity(context, s.activity),
-                            onDelete: () => _confirmDeleteActivity(
-                              context,
-                              s.activity,
-                            ),
-                          ),
-                        ),
+                    (s) => SizedBox(
+                      width: 340,
+                      child: _ActivityCard(
+                        summary: s,
+                        onEdit: () => _editActivity(context, s.activity),
+                        onDelete: () =>
+                            _confirmDeleteActivity(context, s.activity),
+                      ),
+                    ),
                   )
                   .toList(),
             ),
@@ -413,9 +413,7 @@ class _ProjectDetailContent extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                'Escribe el nombre de la actividad para confirmar:',
-              ).small,
+              Text('Escribe el nombre de la actividad para confirmar:').small,
               const Gap(8),
               TextField(
                 controller: controller,
@@ -527,17 +525,17 @@ class _ActivityCard extends StatelessWidget {
                 budget: summary.budget,
                 deposited: summary.deposited,
                 spent: summary.spent,
-                formatCurrency: (v) => v.toCompactCurrency(),
+                formatCurrency: (v) => v.toCompactCurrency(context),
               )
             else
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Dep: ${summary.deposited.toCompactCurrency()}',
+                    'Dep: ${summary.deposited.toCompactCurrency(context)}',
                   ).small(color: theme.colorScheme.primary),
                   Text(
-                    'Gasto: ${summary.spent.toCompactCurrency()}',
+                    'Gasto: ${summary.spent.toCompactCurrency(context)}',
                   ).small(color: theme.colorScheme.destructive),
                 ],
               ),

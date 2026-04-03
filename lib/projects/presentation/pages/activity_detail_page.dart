@@ -240,7 +240,8 @@ class _ActivityContent extends StatelessWidget {
               const minCardWidth = 140.0;
               int columns = (constraints.maxWidth / minCardWidth).floor();
               if (columns < 2) columns = 2;
-              final cardWidth = (constraints.maxWidth - (spacing * (columns - 1))) / columns;
+              final cardWidth =
+                  (constraints.maxWidth - (spacing * (columns - 1))) / columns;
 
               return Wrap(
                 spacing: spacing,
@@ -257,7 +258,7 @@ class _ActivityContent extends StatelessWidget {
                           const Text('Depositado').muted.small,
                           const Gap(4),
                           Text(
-                            state.deposited.toCompactCurrency(),
+                            state.deposited.toCompactCurrency(context),
                           ).bold(color: theme.colorScheme.primary),
                         ],
                       ),
@@ -274,7 +275,7 @@ class _ActivityContent extends StatelessWidget {
                           const Text('Gastado').muted.small,
                           const Gap(4),
                           Text(
-                            state.spent.toCompactCurrency(),
+                            state.spent.toCompactCurrency(context),
                           ).bold(color: theme.colorScheme.destructive),
                         ],
                       ),
@@ -290,7 +291,9 @@ class _ActivityContent extends StatelessWidget {
                         children: [
                           const Text('Balance').muted.small,
                           const Gap(4),
-                          Text(state.operatingBalance.toCompactCurrency()).bold,
+                          Text(
+                            state.operatingBalance.toCompactCurrency(context),
+                          ).bold,
                         ],
                       ),
                     ),
@@ -305,7 +308,9 @@ class _ActivityContent extends StatelessWidget {
                         children: [
                           const Text('Capital Inyectado').muted.small,
                           const Gap(4),
-                          Text(state.capitalInjected.toCompactCurrency()).bold,
+                          Text(
+                            state.capitalInjected.toCompactCurrency(context),
+                          ).bold,
                         ],
                       ),
                     ),
@@ -320,9 +325,11 @@ class _ActivityContent extends StatelessWidget {
                         children: [
                           const Text('Balance Neto').muted.small,
                           const Gap(4),
-                          Text(state.netBalance.toCompactCurrency()).bold(
-                            color: state.netBalance < 0 
-                                ? theme.colorScheme.destructive 
+                          Text(
+                            state.netBalance.toCompactCurrency(context),
+                          ).bold(
+                            color: state.netBalance < 0
+                                ? theme.colorScheme.destructive
                                 : theme.colorScheme.primary,
                           ),
                         ],
@@ -342,7 +349,7 @@ class _ActivityContent extends StatelessWidget {
                 budget: state.budget,
                 deposited: state.deposited,
                 spent: state.spent,
-                formatCurrency: (v) => v.toCompactCurrency(),
+                formatCurrency: (v) => v.toCompactCurrency(context),
               ),
             ),
           ],

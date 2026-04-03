@@ -2,12 +2,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'package:my_investments/core/extensions/currency_ext.dart';
+import 'package:my_investments/core/presentation/pages/settings_page.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/core/widgets/stat_card.dart';
 import 'package:my_investments/projects/domain/entities/project.dart';
 import 'package:my_investments/projects/presentation/bloc/projects_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/projects_state.dart';
-import 'package:my_investments/projects/presentation/pages/import_export_page.dart';
 import 'package:my_investments/projects/presentation/pages/project_detail_page.dart';
 import 'package:my_investments/projects/presentation/widgets/add_project_dialog.dart';
 import 'package:my_investments/projects/presentation/widgets/budget_progress.dart';
@@ -23,9 +23,9 @@ class ProjectsPage extends StatelessWidget {
           title: const Text('Mis Inversiones'),
           trailing: [
             GhostButton(
-              onPressed: () => _openImportExport(context),
+              onPressed: () => _openSettings(context),
               size: ButtonSize.small,
-              child: const Icon(RadixIcons.upload),
+              child: const Icon(RadixIcons.gear),
             ),
           ],
         ),
@@ -93,10 +93,10 @@ class ProjectsPage extends StatelessWidget {
     }
   }
 
-  void _openImportExport(BuildContext context) {
+  void _openSettings(BuildContext context) {
     Navigator.of(
       context,
-    ).push(MaterialPageRoute(builder: (_) => const ImportExportPage()));
+    ).push(MaterialPageRoute(builder: (_) => const SettingsPage()));
   }
 }
 
@@ -134,7 +134,8 @@ class _ProjectsList extends StatelessWidget {
               const minCardWidth = 150.0;
               int columns = (constraints.maxWidth / minCardWidth).floor();
               if (columns < 2) columns = 2;
-              final cardWidth = (constraints.maxWidth - (spacing * (columns - 1))) / columns;
+              final cardWidth =
+                  (constraints.maxWidth - (spacing * (columns - 1))) / columns;
 
               return Wrap(
                 spacing: spacing,
@@ -144,7 +145,7 @@ class _ProjectsList extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: 'Depositado',
-                      value: totalDeposited.toCompactCurrency(),
+                      value: totalDeposited.toCompactCurrency(context),
                       icon: RadixIcons.download,
                     ),
                   ),
@@ -152,7 +153,7 @@ class _ProjectsList extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: 'Gasto Total',
-                      value: totalSpent.toCompactCurrency(),
+                      value: totalSpent.toCompactCurrency(context),
                       icon: RadixIcons.minusCircled,
                       valueColor: Theme.of(context).colorScheme.destructive,
                     ),
@@ -161,7 +162,7 @@ class _ProjectsList extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: 'Presupuesto',
-                      value: totalBudget.toCompactCurrency(),
+                      value: totalBudget.toCompactCurrency(context),
                       icon: RadixIcons.target,
                     ),
                   ),
@@ -169,7 +170,7 @@ class _ProjectsList extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: 'Capital Inyectado',
-                      value: totalCapitalInjected.toCompactCurrency(),
+                      value: totalCapitalInjected.toCompactCurrency(context),
                       icon: RadixIcons.drawingPinSolid,
                     ),
                   ),
@@ -177,10 +178,10 @@ class _ProjectsList extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: 'Balance Neto',
-                      value: totalNetBalance.toCompactCurrency(),
+                      value: totalNetBalance.toCompactCurrency(context),
                       icon: RadixIcons.barChart,
-                      valueColor: totalNetBalance < 0 
-                          ? Theme.of(context).colorScheme.destructive 
+                      valueColor: totalNetBalance < 0
+                          ? Theme.of(context).colorScheme.destructive
                           : Theme.of(context).colorScheme.primary,
                     ),
                   ),
@@ -289,7 +290,7 @@ class _ProjectCard extends StatelessWidget {
                 budget: summary.totalBudget,
                 deposited: summary.totalDeposited,
                 spent: summary.totalSpent,
-                formatCurrency: (v) => v.toCompactCurrency(),
+                formatCurrency: (v) => v.toCompactCurrency(context),
               ),
             if (summary.totalBudget == 0) ...[
               Row(
@@ -300,7 +301,7 @@ class _ProjectCard extends StatelessWidget {
                     children: [
                       const Text('Depositado').muted.small,
                       Text(
-                        summary.totalDeposited.toCompactCurrency(),
+                        summary.totalDeposited.toCompactCurrency(context),
                       ).semiBold(color: theme.colorScheme.primary),
                     ],
                   ),
@@ -309,7 +310,7 @@ class _ProjectCard extends StatelessWidget {
                     children: [
                       const Text('Gastado').muted.small,
                       Text(
-                        summary.totalSpent.toCompactCurrency(),
+                        summary.totalSpent.toCompactCurrency(context),
                       ).semiBold(color: theme.colorScheme.destructive),
                     ],
                   ),
