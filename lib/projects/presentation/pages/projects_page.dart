@@ -124,8 +124,14 @@ class _ProjectsList extends StatelessWidget {
     final totalOperatingBalance = totalDeposited - totalSpent;
     final totalNetBalance = totalOperatingBalance + totalCapitalInjected;
 
+    final theme = Theme.of(context);
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
+      padding: EdgeInsets.only(
+        top: theme.density.baseContentPadding,
+        left: theme.density.baseContentPadding,
+        right: theme.density.baseContentPadding,
+        bottom: theme.density.baseContentPadding + 80,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -277,7 +283,11 @@ class _ProjectCard extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SecondaryBadge(
-                      child: Text(l10n.projects_item_activity_count(summary.activityCount)),
+                      child: Text(
+                        l10n.projects_item_activity_count(
+                          summary.activityCount,
+                        ),
+                      ),
                     ),
                     const Gap(4),
                     IconButton.ghost(
@@ -382,9 +392,7 @@ class _ProjectCard extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text(
-                l10n.projects_delete_confirmation,
-              ).small,
+              Text(l10n.projects_delete_confirmation).small,
               const Gap(8),
               TextField(
                 controller: controller,

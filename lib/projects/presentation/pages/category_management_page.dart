@@ -67,20 +67,28 @@ class _CategoryManagementView extends StatelessWidget {
                 ),
               ],
               title: Text(title),
-              trailing: [
-                PrimaryButton(
-                  onPressed: () => _addCategory(context),
-                  size: ButtonSize.small,
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(RadixIcons.plus, size: 14),
-                      const Gap(6),
-                      Text(AppLocalizations.of(context)!.common_category),
-                    ],
+            ),
+          ],
+          floatingFooter: true,
+          footers: [
+            Align(
+              alignment: Alignment.bottomRight,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: PrimaryButton(
+                    onPressed: () => _addCategory(context),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(RadixIcons.plus, size: 16),
+                        const Gap(6),
+                        Text(AppLocalizations.of(context)!.common_category),
+                      ],
+                    ),
                   ),
                 ),
-              ],
+              ),
             ),
           ],
           child: _buildBody(context, state),
@@ -92,10 +100,12 @@ class _CategoryManagementView extends StatelessWidget {
   Widget _buildBody(BuildContext context, CategoryManagementState state) {
     final l10n = AppLocalizations.of(context)!;
     return switch (state) {
-      CategoryManagementLoading() =>
-        const Center(child: CircularProgressIndicator()),
-      CategoryManagementError(message: final msg) =>
-        Center(child: Text(l10n.common_error_msg(msg))),
+      CategoryManagementLoading() => const Center(
+        child: CircularProgressIndicator(),
+      ),
+      CategoryManagementError(message: final msg) => Center(
+        child: Text(l10n.common_error_msg(msg)),
+      ),
       CategoryManagementLoaded() => _CategoryManagementContent(state: state),
     };
   }
@@ -130,9 +140,15 @@ class _CategoryManagementContent extends StatelessWidget {
         context.read<CategoryManagementCubit>().activityId != null;
 
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.only(
+        top: theme.density.baseContentPadding,
+        left: theme.density.baseContentPadding,
+        right: theme.density.baseContentPadding,
+        bottom: theme.density.baseContentPadding + 80,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -143,10 +159,7 @@ class _CategoryManagementContent extends StatelessWidget {
               Text(l10n.category_mgmt_empty).muted
             else
               ...state.activityCategories.map(
-                (cat) => _CategoryRow(
-                  category: cat,
-                  canEdit: true,
-                ),
+                (cat) => _CategoryRow(category: cat, canEdit: true),
               ),
             const Gap(20),
           ],
@@ -156,10 +169,7 @@ class _CategoryManagementContent extends StatelessWidget {
             Text(l10n.category_mgmt_empty).muted
           else
             ...state.projectCategories.map(
-              (cat) => _CategoryRow(
-                category: cat,
-                canEdit: true,
-              ),
+              (cat) => _CategoryRow(category: cat, canEdit: true),
             ),
         ],
       ),
@@ -171,10 +181,7 @@ class _CategoryRow extends StatelessWidget {
   final domain.Category category;
   final bool canEdit;
 
-  const _CategoryRow({
-    required this.category,
-    required this.canEdit,
-  });
+  const _CategoryRow({required this.category, required this.canEdit});
 
   @override
   Widget build(BuildContext context) {
@@ -185,18 +192,40 @@ class _CategoryRow extends StatelessWidget {
         child: Row(
           children: [
             Expanded(child: Text(category.name)),
-            if (canEdit) ...[
+            if (canEdit)
               IconButton.ghost(
-                onPressed: () => _editCategory(context),
-                icon: const Icon(RadixIcons.pencil1, size: 14),
+                onPressed: () => _showActionsMenu(context),
+                icon: const Icon(RadixIcons.dotsVertical, size: 14),
               ),
-              IconButton.ghost(
-                onPressed: () => _deleteCategory(context),
-                icon: const Icon(RadixIcons.trash, size: 14),
-              ),
-            ],
           ],
         ),
+      ),
+    );
+  }
+
+  void _showActionsMenu(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    showDropdown<void>(
+      context: context,
+      anchorAlignment: Alignment.bottomRight,
+      alignment: Alignment.topRight,
+      builder: (ctx) => DropdownMenu(
+        children: [
+          MenuButton(
+            leading: const Icon(RadixIcons.pencil1),
+            child: Text(l10n.common_edit),
+            onPressed: (_) {
+              _editCategory(context);
+            },
+          ),
+          MenuButton(
+            leading: const Icon(RadixIcons.trash),
+            child: Text(l10n.common_delete),
+            onPressed: (_) {
+              _deleteCategory(context);
+            },
+          ),
+        ],
       ),
     );
   }
@@ -211,8 +240,8 @@ class _CategoryRow extends StatelessWidget {
     );
     if (result != null && context.mounted) {
       context.read<CategoryManagementCubit>().updateCategory(
-            category.copyWith(name: result),
-          );
+        category.copyWith(name: result),
+      );
     }
   }
 

@@ -190,31 +190,62 @@ class _TransactionListContent extends StatelessWidget {
             ],
           ),
           const Gap(8),
-          Wrap(
-            spacing: 6,
-            runSpacing: 6,
-            children: [
-              Chip(
-                onPressed: () =>
-                    context.read<TransactionListCubit>().selectCategory(null),
-                style: state.selectedCategoryId == null
-                    ? ButtonVariance.primary
-                    : ButtonVariance.secondary,
-                child: Text(l10n.transaction_list_category_all),
-              ),
-              ...state.categories.map((cat) {
-                final isSelected = state.selectedCategoryId == cat.id;
-                return Chip(
-                  onPressed: () => context
-                      .read<TransactionListCubit>()
-                      .selectCategory(isSelected ? null : cat.id),
-                  style: isSelected
-                      ? ButtonVariance.primary
-                      : ButtonVariance.secondary,
-                  child: Text(cat.name),
-                );
-              }),
-            ],
+          Select<String?>(
+            value: state.selectedCategoryId,
+            onChanged: (value) {
+              context.read<TransactionListCubit>().selectCategory(value);
+            },
+            placeholder: Text(l10n.transaction_list_category_all),
+            itemBuilder: (context, value) {
+              if (value == null) {
+                return Text(l10n.transaction_list_category_all);
+              }
+              final category = state.categories.firstWhere((c) => c.id == value);
+              return Text(category.name);
+            },
+            popup: (context) {
+              final activityCategories =
+                  state.categories.where((c) => c.activityId != null).toList();
+              final projectCategories =
+                  state.categories.where((c) => c.activityId == null).toList();
+
+              return SelectPopup(
+                items: SelectItemList(
+                  children: [
+                    SelectItemButton(
+                      value: null,
+                      child: Text(l10n.transaction_list_category_all),
+                    ),
+                    if (activityCategories.isNotEmpty)
+                      SelectGroup(
+                        headers: [
+                          SelectLabel(child: Text(l10n.common_activity)),
+                        ],
+                        children: activityCategories
+                            .map(
+                              (cat) => SelectItemButton(
+                                value: cat.id,
+                                child: Text(cat.name),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                    if (projectCategories.isNotEmpty)
+                      SelectGroup(
+                        headers: [SelectLabel(child: Text(l10n.common_project))],
+                        children: projectCategories
+                            .map(
+                              (cat) => SelectItemButton(
+                                value: cat.id,
+                                child: Text(cat.name),
+                              ),
+                            )
+                            .toList(),
+                      ),
+                  ],
+                ),
+              );
+            },
           ),
           const Gap(16),
           if (state.filteredTransactions.isEmpty)

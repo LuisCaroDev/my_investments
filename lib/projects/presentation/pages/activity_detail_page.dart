@@ -171,8 +171,32 @@ class _ActivityDetailView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return BlocBuilder<_ActivityDetailCubit, _ActivityDetailState>(
       builder: (context, state) {
+        final footers = [
+          if (!state.loading && state.error == null)
+            Align(
+              alignment: Alignment.bottomRight,
+              child: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: PrimaryButton(
+                    onPressed: () => _addTransaction(context),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(RadixIcons.plus, size: 16),
+                        const Gap(6),
+                        Text(l10n.common_add),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ];
+
         return Scaffold(
           headers: [
             AppBar(
@@ -185,10 +209,38 @@ class _ActivityDetailView extends StatelessWidget {
               title: Text(activityName),
             ),
           ],
+          floatingFooter: true,
+          footers: footers,
           child: _buildBody(context, state),
         );
       },
     );
+  }
+
+  void _addTransaction(BuildContext context) async {
+    final cubit = context.read<_ActivityDetailCubit>();
+    final state = cubit.state;
+
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (ctx) =>
+          AddTransactionDialog(availableCategories: state.categories),
+    );
+
+    if (result != null && context.mounted) {
+      final transaction = Transaction(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        projectId: cubit.projectId,
+        activityId: cubit.activityId,
+        type: result['type'] as TransactionType,
+        amount: result['amount'] as double,
+        date: result['date'] as DateTime,
+        description: result['description'] as String?,
+        categoryId: result['categoryId'] as String?,
+        createdAt: DateTime.now(),
+      );
+      cubit.addTransaction(transaction);
+    }
   }
 
   Widget _buildBody(BuildContext context, _ActivityDetailState state) {
@@ -214,28 +266,16 @@ class _ActivityContent extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.only(
+        top: theme.density.baseContentPadding,
+        left: theme.density.baseContentPadding,
+        right: theme.density.baseContentPadding,
+        bottom: theme.density.baseContentPadding + 80,
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              OutlineButton(
-                onPressed: () => _openCategoryManagement(context),
-                size: ButtonSize.small,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(RadixIcons.bookmarkFilled, size: 14),
-                    const Gap(6),
-                    Text(l10n.activity_detail_add_category_button),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          const Gap(12),
+          const Gap(8),
           // ── Summary ──────────────────────────
           LayoutBuilder(
             builder: (context, constraints) {
@@ -258,7 +298,9 @@ class _ActivityContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(l10n.activity_detail_summary_deposited).muted.small,
+                          Text(
+                            l10n.activity_detail_summary_deposited,
+                          ).muted.small,
                           const Gap(4),
                           Text(
                             state.deposited.toCompactCurrency(context),
@@ -292,7 +334,9 @@ class _ActivityContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(l10n.activity_detail_summary_operating).muted.small,
+                          Text(
+                            l10n.activity_detail_summary_operating,
+                          ).muted.small,
                           const Gap(4),
                           Text(
                             state.operatingBalance.toCompactCurrency(context),
@@ -309,7 +353,9 @@ class _ActivityContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(l10n.activity_detail_summary_capital).muted.small,
+                          Text(
+                            l10n.activity_detail_summary_capital,
+                          ).muted.small,
                           const Gap(4),
                           Text(
                             state.capitalInjected.toCompactCurrency(context),
@@ -326,7 +372,9 @@ class _ActivityContent extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(l10n.activity_detail_summary_net_balance).muted.small,
+                          Text(
+                            l10n.activity_detail_summary_net_balance,
+                          ).muted.small,
                           const Gap(4),
                           Text(
                             state.netBalance.toCompactCurrency(context),
@@ -358,9 +406,13 @@ class _ActivityContent extends StatelessWidget {
           ],
 
           // ── Categories ───────────────────────
+          const Gap(24),
+          SectionHeader(
+            title: l10n.activity_detail_categories_title,
+            actionLabel: l10n.activity_detail_transactions_see_more,
+            onAction: () => _openCategoryManagement(context),
+          ),
           if (state.categories.isNotEmpty) ...[
-            const Gap(24),
-            Text(l10n.activity_detail_categories_title).medium,
             const Gap(8),
             Wrap(
               spacing: 6,
@@ -375,6 +427,13 @@ class _ActivityContent extends StatelessWidget {
                   );
                 }),
               ],
+            ),
+          ] else ...[
+            const Gap(12),
+            EmptyState(
+              icon: RadixIcons.bookmark,
+              title: l10n.category_mgmt_empty,
+              subtitle: l10n.activity_detail_transactions_empty_info,
             ),
           ],
 
@@ -409,10 +468,10 @@ class _ActivityContent extends StatelessWidget {
     );
   }
 
-  void _openCategoryManagement(BuildContext context) {
+  void _openCategoryManagement(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     final cubit = context.read<_ActivityDetailCubit>();
-    Navigator.of(context).push(
+    await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => CategoryManagementPage(
           projectId: cubit.projectId,
@@ -421,12 +480,15 @@ class _ActivityContent extends StatelessWidget {
         ),
       ),
     );
+    if (context.mounted) {
+      cubit.load();
+    }
   }
 
-  void _openTransactionList(BuildContext context) {
+  void _openTransactionList(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     final cubit = context.read<_ActivityDetailCubit>();
-    Navigator.of(context).push(
+    await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => TransactionListPage(
           projectId: cubit.projectId,
@@ -435,6 +497,9 @@ class _ActivityContent extends StatelessWidget {
         ),
       ),
     );
+    if (context.mounted) {
+      cubit.load();
+    }
   }
 
   void _editTransaction(BuildContext context, Transaction transaction) async {
