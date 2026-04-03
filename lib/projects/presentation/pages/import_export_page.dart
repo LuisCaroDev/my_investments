@@ -351,7 +351,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
 
     void flush() {
       if (current != null) {
-        sections[current!] = buffer.toString();
+        sections[current] = buffer.toString();
         buffer.clear();
       }
     }
@@ -429,9 +429,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
         projectId: map['project_id'] ?? '',
         activityId: _nullIfEmpty(map['activity_id']),
         categoryId: _nullIfEmpty(map['category_id']),
-        type: (map['type'] ?? 'expense') == 'deposit'
-            ? TransactionType.deposit
-            : TransactionType.expense,
+        type: _parseTransactionType(map['type']),
         amount: _toDouble(map['amount']) ?? 0,
         date: DateTime.parse(map['date'] ?? DateTime.now().toString()),
         description: _nullIfEmpty(map['description']),
@@ -499,6 +497,15 @@ class _ImportExportPageState extends State<ImportExportPage> {
     final v = value?.trim();
     if (v == null || v.isEmpty) return null;
     return int.tryParse(v);
+  }
+
+  TransactionType _parseTransactionType(String? value) {
+    final v = value?.trim();
+    return switch (v) {
+      'deposit' => TransactionType.deposit,
+      'capitalInjection' => TransactionType.capitalInjection,
+      _ => TransactionType.expense,
+    };
   }
 }
 

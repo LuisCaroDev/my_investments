@@ -56,11 +56,11 @@ class ProjectsPage extends StatelessWidget {
         builder: (context, state) {
           return switch (state) {
             ProjectsInitial() || ProjectsLoading() => const Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: CircularProgressIndicator(),
+            ),
             ProjectsError(message: final msg) => Center(
-                child: Text('Error: $msg'),
-              ),
+              child: Text('Error: $msg'),
+            ),
             ProjectsLoaded(summaries: final summaries) =>
               summaries.isEmpty
                   ? EmptyState(
@@ -94,9 +94,9 @@ class ProjectsPage extends StatelessWidget {
   }
 
   void _openImportExport(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const ImportExportPage()),
-    );
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const ImportExportPage()));
   }
 }
 
@@ -108,12 +108,19 @@ class _ProjectsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Calculate portfolio totals
-    final totalBudget =
-        summaries.fold(0.0, (sum, s) => sum + s.totalBudget);
-    final totalSpent =
-        summaries.fold(0.0, (sum, s) => sum + s.totalSpent);
-    final totalDeposited =
-        summaries.fold(0.0, (sum, s) => sum + s.totalDeposited);
+    final totalBudget = summaries.fold(0.0, (sum, s) => sum + s.totalBudget);
+    final totalSpent = summaries.fold(0.0, (sum, s) => sum + s.totalSpent);
+    final totalDeposited = summaries.fold(
+      0.0,
+      (sum, s) => sum + s.totalDeposited,
+    );
+
+    final totalCapitalInjected = summaries.fold(
+      0.0,
+      (sum, s) => sum + s.totalCapitalInjected,
+    );
+    final totalOperatingBalance = totalDeposited - totalSpent;
+    final totalNetBalance = totalOperatingBalance + totalCapitalInjected;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 120),
@@ -121,44 +128,73 @@ class _ProjectsList extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // ── Portfolio Summary ─────────────────
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              SizedBox(
-                width: 200,
-                child: StatCard(
-                  label: 'Inversión Total',
-                  value: totalDeposited.toCompactCurrency(),
-                  icon: RadixIcons.barChart,
-                ),
-              ),
-              SizedBox(
-                width: 200,
-                child: StatCard(
-                  label: 'Gasto Total',
-                  value: totalSpent.toCompactCurrency(),
-                  icon: RadixIcons.minusCircled,
-                  valueColor: Theme.of(context).colorScheme.destructive,
-                ),
-              ),
-              SizedBox(
-                width: 200,
-                child: StatCard(
-                  label: 'Presupuesto',
-                  value: totalBudget.toCompactCurrency(),
-                  icon: RadixIcons.target,
-                ),
-              ),
-              SizedBox(
-                width: 200,
-                child: StatCard(
-                  label: 'Proyectos',
-                  value: summaries.length.toString(),
-                  icon: RadixIcons.cube,
-                ),
-              ),
-            ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const spacing = 12.0;
+              const minCardWidth = 150.0;
+              int columns = (constraints.maxWidth / minCardWidth).floor();
+              if (columns < 2) columns = 2;
+              final cardWidth = (constraints.maxWidth - (spacing * (columns - 1))) / columns;
+
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: [
+                  SizedBox(
+                    width: cardWidth,
+                    child: StatCard(
+                      label: 'Depositado',
+                      value: totalDeposited.toCompactCurrency(),
+                      icon: RadixIcons.download,
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: StatCard(
+                      label: 'Gasto Total',
+                      value: totalSpent.toCompactCurrency(),
+                      icon: RadixIcons.minusCircled,
+                      valueColor: Theme.of(context).colorScheme.destructive,
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: StatCard(
+                      label: 'Presupuesto',
+                      value: totalBudget.toCompactCurrency(),
+                      icon: RadixIcons.target,
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: StatCard(
+                      label: 'Capital Inyectado',
+                      value: totalCapitalInjected.toCompactCurrency(),
+                      icon: RadixIcons.drawingPinSolid,
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: StatCard(
+                      label: 'Balance Neto',
+                      value: totalNetBalance.toCompactCurrency(),
+                      icon: RadixIcons.barChart,
+                      valueColor: totalNetBalance < 0 
+                          ? Theme.of(context).colorScheme.destructive 
+                          : Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: StatCard(
+                      label: 'Proyectos',
+                      value: summaries.length.toString(),
+                      icon: RadixIcons.cube,
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
           const Gap(24),
 
@@ -169,10 +205,9 @@ class _ProjectsList extends StatelessWidget {
             spacing: 16,
             runSpacing: 16,
             children: summaries
-                .map((s) => SizedBox(
-                      width: 340,
-                      child: _ProjectCard(summary: s),
-                    ))
+                .map(
+                  (s) => SizedBox(width: 340, child: _ProjectCard(summary: s)),
+                )
                 .toList(),
           ),
         ],
@@ -264,16 +299,18 @@ class _ProjectCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text('Depositado').muted.small,
-                      Text(summary.totalDeposited.toCompactCurrency())
-                          .semiBold(color: theme.colorScheme.primary),
+                      Text(
+                        summary.totalDeposited.toCompactCurrency(),
+                      ).semiBold(color: theme.colorScheme.primary),
                     ],
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       const Text('Gastado').muted.small,
-                      Text(summary.totalSpent.toCompactCurrency())
-                          .semiBold(color: theme.colorScheme.destructive),
+                      Text(
+                        summary.totalSpent.toCompactCurrency(),
+                      ).semiBold(color: theme.colorScheme.destructive),
                     ],
                   ),
                 ],

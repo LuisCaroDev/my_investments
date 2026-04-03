@@ -8,8 +8,6 @@ import 'package:my_investments/core/widgets/stat_card.dart';
 import 'package:my_investments/projects/data/datasources/projects_local_ds.dart';
 import 'package:my_investments/projects/data/repositories/projects_repository_impl.dart';
 import 'package:my_investments/projects/domain/entities/activity.dart';
-import 'package:my_investments/projects/domain/entities/category.dart'
-    as domain;
 import 'package:my_investments/projects/domain/entities/transaction.dart';
 import 'package:my_investments/projects/presentation/bloc/project_detail_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/project_detail_state.dart';
@@ -143,46 +141,75 @@ class _ProjectDetailContent extends StatelessWidget {
           ),
           const Gap(12),
           // ── Budget Summary ───────────────────
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              SizedBox(
-                width: 200,
-                child: StatCard(
-                  label: 'Depositado',
-                  value: state.totalDeposited.toCompactCurrency(),
-                  icon: RadixIcons.arrowUp,
-                  valueColor: theme.colorScheme.primary,
-                ),
-              ),
-              SizedBox(
-                width: 200,
-                child: StatCard(
-                  label: 'Gastado',
-                  value: state.totalSpent.toCompactCurrency(),
-                  icon: RadixIcons.arrowDown,
-                  valueColor: theme.colorScheme.destructive,
-                ),
-              ),
-              SizedBox(
-                width: 200,
-                child: StatCard(
-                  label: 'Balance',
-                  value: state.balance.toCompactCurrency(),
-                  icon: RadixIcons.dimensions,
-                ),
-              ),
-              if (state.totalBudget > 0)
-                SizedBox(
-                  width: 200,
-                  child: StatCard(
-                    label: 'Presupuesto',
-                    value: state.totalBudget.toCompactCurrency(),
-                    icon: RadixIcons.target,
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const spacing = 12.0;
+              const minCardWidth = 150.0;
+              int columns = (constraints.maxWidth / minCardWidth).floor();
+              if (columns < 2) columns = 2;
+              final cardWidth = (constraints.maxWidth - (spacing * (columns - 1))) / columns;
+
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: [
+                  SizedBox(
+                    width: cardWidth,
+                    child: StatCard(
+                      label: 'Depositado',
+                      value: state.totalDeposited.toCompactCurrency(),
+                      icon: RadixIcons.arrowUp,
+                      valueColor: theme.colorScheme.primary,
+                    ),
                   ),
-                ),
-            ],
+                  SizedBox(
+                    width: cardWidth,
+                    child: StatCard(
+                      label: 'Gastado',
+                      value: state.totalSpent.toCompactCurrency(),
+                      icon: RadixIcons.arrowDown,
+                      valueColor: theme.colorScheme.destructive,
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: StatCard(
+                      label: 'Balance Operativo',
+                      value: state.operatingBalance.toCompactCurrency(),
+                      icon: RadixIcons.dimensions,
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: StatCard(
+                      label: 'Capital Inyectado',
+                      value: state.totalCapitalInjected.toCompactCurrency(),
+                      icon: RadixIcons.drawingPinSolid,
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: StatCard(
+                      label: 'Balance Neto',
+                      value: state.netBalance.toCompactCurrency(),
+                      icon: RadixIcons.barChart,
+                      valueColor: state.netBalance < 0 
+                          ? theme.colorScheme.destructive 
+                          : theme.colorScheme.primary,
+                    ),
+                  ),
+                  if (state.totalBudget > 0)
+                    SizedBox(
+                      width: cardWidth,
+                      child: StatCard(
+                        label: 'Presupuesto',
+                        value: state.totalBudget.toCompactCurrency(),
+                        icon: RadixIcons.target,
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
 
           if (state.totalBudget > 0) ...[
@@ -224,7 +251,9 @@ class _ProjectDetailContent extends StatelessWidget {
             const EmptyState(
               icon: RadixIcons.cardStack,
               title: 'Sin transacciones',
-              subtitle: 'Agrega gastos o depósitos para este proyecto.',
+              subtitle:
+                  'Agrega gastos, depósitos o inyecciones de capital '
+                  'para este proyecto.',
             )
           else
             ..._latestTransactions(state.projectLevelTransactions).map(

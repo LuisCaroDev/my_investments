@@ -63,6 +63,7 @@ class _ActivityDetailState {
   final double budget;
   final double deposited;
   final double spent;
+  final double capitalInjected;
   final List<Transaction> transactions;
   final List<domain.Category> categories;
 
@@ -72,11 +73,13 @@ class _ActivityDetailState {
     this.budget = 0,
     this.deposited = 0,
     this.spent = 0,
+    this.capitalInjected = 0,
     this.transactions = const [],
     this.categories = const [],
   });
 
-  double get balance => deposited - spent;
+  double get operatingBalance => deposited - spent;
+  double get netBalance => operatingBalance + capitalInjected;
 }
 
 class _ActivityDetailCubit extends Cubit<_ActivityDetailState> {
@@ -107,6 +110,9 @@ class _ActivityDetailCubit extends Cubit<_ActivityDetailState> {
       final deposited = transactions
           .where((t) => t.type == TransactionType.deposit)
           .fold(0.0, (sum, t) => sum + t.amount);
+      final capitalInjected = transactions
+          .where((t) => t.type == TransactionType.capitalInjection)
+          .fold(0.0, (sum, t) => sum + t.amount);
 
       emit(
         _ActivityDetailState(
@@ -114,6 +120,7 @@ class _ActivityDetailCubit extends Cubit<_ActivityDetailState> {
           budget: activity.budget ?? 0,
           deposited: deposited,
           spent: spent,
+          capitalInjected: capitalInjected,
           transactions: transactions,
           categories: categories,
         ),
@@ -227,60 +234,104 @@ class _ActivityContent extends StatelessWidget {
 
           const Gap(12),
           // ── Summary ──────────────────────────
-          Wrap(
-            spacing: 12,
-            runSpacing: 12,
-            children: [
-              SizedBox(
-                width: 180,
-                child: Card(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text('Depositado').muted.small,
-                      const Gap(4),
-                      Text(
-                        state.deposited.toCompactCurrency(),
-                      ).bold(color: theme.colorScheme.primary),
-                    ],
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const spacing = 12.0;
+              const minCardWidth = 140.0;
+              int columns = (constraints.maxWidth / minCardWidth).floor();
+              if (columns < 2) columns = 2;
+              final cardWidth = (constraints.maxWidth - (spacing * (columns - 1))) / columns;
+
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: [
+                  SizedBox(
+                    width: cardWidth,
+                    child: Card(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('Depositado').muted.small,
+                          const Gap(4),
+                          Text(
+                            state.deposited.toCompactCurrency(),
+                          ).bold(color: theme.colorScheme.primary),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              SizedBox(
-                width: 180,
-                child: Card(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text('Gastado').muted.small,
-                      const Gap(4),
-                      Text(
-                        state.spent.toCompactCurrency(),
-                      ).bold(color: theme.colorScheme.destructive),
-                    ],
+                  SizedBox(
+                    width: cardWidth,
+                    child: Card(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('Gastado').muted.small,
+                          const Gap(4),
+                          Text(
+                            state.spent.toCompactCurrency(),
+                          ).bold(color: theme.colorScheme.destructive),
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-              SizedBox(
-                width: 180,
-                child: Card(
-                  padding: const EdgeInsets.all(14),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text('Balance').muted.small,
-                      const Gap(4),
-                      Text(state.balance.toCompactCurrency()).bold,
-                    ],
+                  SizedBox(
+                    width: cardWidth,
+                    child: Card(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('Balance').muted.small,
+                          const Gap(4),
+                          Text(state.operatingBalance.toCompactCurrency()).bold,
+                        ],
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ],
+                  SizedBox(
+                    width: cardWidth,
+                    child: Card(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('Capital Inyectado').muted.small,
+                          const Gap(4),
+                          Text(state.capitalInjected.toCompactCurrency()).bold,
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: cardWidth,
+                    child: Card(
+                      padding: const EdgeInsets.all(14),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text('Balance Neto').muted.small,
+                          const Gap(4),
+                          Text(state.netBalance.toCompactCurrency()).bold(
+                            color: state.netBalance < 0 
+                                ? theme.colorScheme.destructive 
+                                : theme.colorScheme.primary,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
 
           if (state.budget > 0) ...[
@@ -330,7 +381,9 @@ class _ActivityContent extends StatelessWidget {
             const EmptyState(
               icon: RadixIcons.cardStack,
               title: 'Sin transacciones',
-              subtitle: 'Agrega gastos o depósitos para esta actividad.',
+              subtitle:
+                  'Agrega gastos, depósitos o inyecciones de capital '
+                  'para esta actividad.',
             )
           else
             ..._latestTransactions(state.transactions).map(

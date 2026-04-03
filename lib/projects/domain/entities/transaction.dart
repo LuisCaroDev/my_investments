@@ -1,4 +1,4 @@
-enum TransactionType { expense, deposit }
+enum TransactionType { expense, deposit, capitalInjection }
 
 class Transaction {
   final String id;

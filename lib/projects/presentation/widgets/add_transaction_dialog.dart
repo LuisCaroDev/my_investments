@@ -52,18 +52,24 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isExpense = _type == TransactionType.expense;
     final isDeposit = _type == TransactionType.deposit;
     final isEditing = widget.initialTransaction != null;
-    return AlertDialog(
-      title: Text(
-        isEditing
-            ? (isDeposit ? 'Editar Depósito' : 'Editar Gasto')
-            : widget.depositOnly
-                ? 'Nuevo Depósito'
+    final title = isEditing
+        ? isExpense
+            ? 'Editar Gasto'
+            : isDeposit
+                ? 'Editar Depósito'
+                : 'Editar Inyección de capital'
+        : widget.depositOnly
+            ? 'Nuevo Depósito'
+            : isExpense
+                ? 'Nuevo Gasto'
                 : isDeposit
                     ? 'Nuevo Depósito'
-                    : 'Nuevo Gasto',
-      ),
+                    : 'Nueva Inyección de capital';
+    return AlertDialog(
+      title: Text(title),
       content: SizedBox(
         width: 400,
         child: Column(
@@ -100,6 +106,20 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                             child: const Text('Depósito'),
                           ),
                   ),
+                  const Gap(8),
+                  Expanded(
+                    child: _type == TransactionType.capitalInjection
+                        ? PrimaryButton(
+                            onPressed: () {},
+                            child: const Text('Capital'),
+                          )
+                        : OutlineButton(
+                            onPressed: () => setState(
+                              () => _type = TransactionType.capitalInjection,
+                            ),
+                            child: const Text('Capital'),
+                          ),
+                  ),
                 ],
               ),
               const Gap(12),
@@ -130,7 +150,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               controller: _descriptionController,
               placeholder: const Text('Detalle de la transacción...'),
             ),
-            if (!isDeposit && widget.availableCategories.isNotEmpty) ...[
+            if (isExpense && widget.availableCategories.isNotEmpty) ...[
               const Gap(12),
               const Text('Categoría (opcional)').small.medium,
               const Gap(4),
@@ -154,7 +174,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               'amount': amount,
               'date': _selectedDate,
               'description': description.isEmpty ? null : description,
-              'categoryId': isDeposit ? null : _selectedCategoryId,
+              'categoryId': isExpense ? _selectedCategoryId : null,
             });
           },
           child: Text(isEditing ? 'Guardar' : 'Agregar'),

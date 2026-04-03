@@ -27,6 +27,7 @@ class ProjectSummary {
   final double totalBudget;
   final double totalSpent;
   final double totalDeposited;
+  final double totalCapitalInjected;
   final int activityCount;
 
   const ProjectSummary({
@@ -34,11 +35,13 @@ class ProjectSummary {
     required this.totalBudget,
     required this.totalSpent,
     required this.totalDeposited,
+    required this.totalCapitalInjected,
     required this.activityCount,
   });
 
-  double get balance => totalDeposited - totalSpent;
+  double get operatingBalance => totalDeposited - totalSpent;
+  double get netBalance => operatingBalance + totalCapitalInjected;
   double get remainingBudget => totalBudget - totalDeposited;
   double get budgetProgress =>
-      totalBudget > 0 ? (totalDeposited / totalBudget).clamp(0.0, 1.0) : 0.0;
+      totalBudget > 0 ? (totalSpent / totalBudget).clamp(0.0, 1.0) : 0.0;
 }

@@ -29,6 +29,9 @@ class ProjectsCubit extends Cubit<ProjectsState> {
         final totalDeposited = allTransactions
             .where((t) => t.type == TransactionType.deposit)
             .fold(0.0, (sum, t) => sum + t.amount);
+        final totalCapitalInjected = allTransactions
+            .where((t) => t.type == TransactionType.capitalInjection)
+            .fold(0.0, (sum, t) => sum + t.amount);
 
         final totalBudget =
             project.globalBudget ??
@@ -39,6 +42,7 @@ class ProjectsCubit extends Cubit<ProjectsState> {
           totalBudget: totalBudget,
           totalSpent: totalSpent,
           totalDeposited: totalDeposited,
+          totalCapitalInjected: totalCapitalInjected,
           activityCount: activities.length,
         );
       }).toList();

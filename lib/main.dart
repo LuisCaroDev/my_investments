@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -31,6 +32,27 @@ class MyInvestmentsApp extends StatelessWidget {
         theme: AppTheme.light(),
         darkTheme: AppTheme.dark(),
         themeMode: ThemeMode.system,
+        builder: (context, child) {
+          final theme = Theme.of(context);
+          final isDark = theme.brightness == Brightness.dark;
+
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: SystemUiOverlayStyle(
+              statusBarColor: const Color(
+                0x00000000,
+              ), // Colors.transparent is Material
+              statusBarIconBrightness: isDark
+                  ? Brightness.light
+                  : Brightness.dark,
+              statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+              systemNavigationBarColor: theme.colorScheme.background,
+              systemNavigationBarIconBrightness: isDark
+                  ? Brightness.light
+                  : Brightness.dark,
+            ),
+            child: child ?? const SizedBox.shrink(),
+          );
+        },
         home: const ProjectsPage(),
       ),
     );

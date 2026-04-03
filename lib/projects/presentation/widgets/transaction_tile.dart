@@ -27,29 +27,40 @@ class TransactionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isExpense = transaction.type == TransactionType.expense;
+    final isDeposit = transaction.type == TransactionType.deposit;
     final category = transaction.categoryId != null
         ? categories.where((c) => c.id == transaction.categoryId).firstOrNull
         : null;
+    final icon = isExpense
+        ? RadixIcons.arrowDown
+        : isDeposit
+        ? RadixIcons.arrowUp
+        : RadixIcons.plus;
+    final valueColor = isExpense
+        ? theme.colorScheme.destructive
+        : isDeposit
+        ? theme.colorScheme.primary
+        : theme.colorScheme.cardForeground;
+    final label =
+        transaction.description ??
+        (isExpense
+            ? 'Gasto'
+            : isDeposit
+            ? 'Depósito'
+            : 'Inyección de capital');
+    final sign = isExpense ? '-' : '+';
 
     Widget content = Card(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
-          Icon(
-            isExpense ? RadixIcons.arrowDown : RadixIcons.arrowUp,
-            size: 14,
-            color: isExpense
-                ? theme.colorScheme.destructive
-                : theme.colorScheme.primary,
-          ),
+          Icon(icon, size: 14, color: valueColor),
           const Gap(10),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  transaction.description ?? (isExpense ? 'Gasto' : 'Depósito'),
-                ).small,
+                Text(label).small,
                 Row(
                   children: [
                     Text(
@@ -65,12 +76,8 @@ class TransactionTile extends StatelessWidget {
             ),
           ),
           Text(
-            '${isExpense ? '-' : '+'}${transaction.amount.toCompactCurrency()}',
-          ).small.semiBold(
-            color: isExpense
-                ? theme.colorScheme.destructive
-                : theme.colorScheme.primary,
-          ),
+            '$sign${transaction.amount.toCompactCurrency()}',
+          ).small.semiBold(color: valueColor),
           if (onEdit != null || onDelete != null) ...[
             const Gap(6),
             IconButton.ghost(
@@ -82,10 +89,7 @@ class TransactionTile extends StatelessWidget {
       ),
     );
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4),
-      child: content,
-    );
+    return Padding(padding: const EdgeInsets.only(bottom: 4), child: content);
   }
 
   void _showActionsMenu(BuildContext context) {
@@ -126,9 +130,7 @@ class TransactionTile extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Eliminar transacción'),
-        content: const Text(
-          '¿Seguro que quieres eliminar esta transacción?',
-        ),
+        content: const Text('¿Seguro que quieres eliminar esta transacción?'),
         actions: [
           OutlineButton(
             onPressed: () => Navigator.of(ctx).pop(false),

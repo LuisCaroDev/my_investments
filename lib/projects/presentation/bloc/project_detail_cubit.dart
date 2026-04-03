@@ -34,12 +34,16 @@ class ProjectDetailCubit extends Cubit<ProjectDetailState> {
         final deposited = activityTransactions
             .where((t) => t.type == TransactionType.deposit)
             .fold(0.0, (sum, t) => sum + t.amount);
+        final capitalInjected = activityTransactions
+            .where((t) => t.type == TransactionType.capitalInjection)
+            .fold(0.0, (sum, t) => sum + t.amount);
         final categories = _repository.getActivityCategories(activity.id);
 
         return ActivitySummary(
           activity: activity,
           spent: spent,
           deposited: deposited,
+          capitalInjected: capitalInjected,
           categories: categories,
           transactionCount: activityTransactions.length,
         );
@@ -56,6 +60,9 @@ class ProjectDetailCubit extends Cubit<ProjectDetailState> {
       final totalDeposited = allTransactions
           .where((t) => t.type == TransactionType.deposit)
           .fold(0.0, (sum, t) => sum + t.amount);
+      final totalCapitalInjected = allTransactions
+          .where((t) => t.type == TransactionType.capitalInjection)
+          .fold(0.0, (sum, t) => sum + t.amount);
       final totalBudget =
           project.globalBudget ??
           activities.fold<double>(0.0, (sum, a) => sum + (a.budget ?? 0));
@@ -69,6 +76,7 @@ class ProjectDetailCubit extends Cubit<ProjectDetailState> {
           totalBudget: totalBudget,
           totalSpent: totalSpent,
           totalDeposited: totalDeposited,
+          totalCapitalInjected: totalCapitalInjected,
         ),
       );
     } catch (e) {
