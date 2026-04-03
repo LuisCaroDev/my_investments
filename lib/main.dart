@@ -12,11 +12,34 @@ import 'package:my_investments/projects/data/datasources/projects_local_ds.dart'
 import 'package:my_investments/projects/data/repositories/projects_repository_impl.dart';
 import 'package:my_investments/projects/presentation/bloc/projects_cubit.dart';
 import 'package:my_investments/projects/presentation/pages/projects_page.dart';
+import 'package:my_investments/core/i18n/shadcn_localizations_es.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   runApp(MyInvestmentsApp(prefs: prefs));
+}
+
+class FallbackShadcnLocalizationsDelegate
+    extends LocalizationsDelegate<ShadcnLocalizations> {
+  const FallbackShadcnLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) => true;
+
+  @override
+  Future<ShadcnLocalizations> load(Locale locale) async {
+    if (locale.languageCode == 'es') {
+      return ShadcnLocalizationsEs();
+    }
+    if (ShadcnLocalizations.delegate.isSupported(locale)) {
+      return ShadcnLocalizations.delegate.load(locale);
+    }
+    return ShadcnLocalizations.delegate.load(const Locale('en'));
+  }
+
+  @override
+  bool shouldReload(FallbackShadcnLocalizationsDelegate old) => false;
 }
 
 class MyInvestmentsApp extends StatelessWidget {
@@ -31,7 +54,8 @@ class MyInvestmentsApp extends StatelessWidget {
 
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => ProjectsCubit(repository: repo)..loadProjects()),
+        BlocProvider(
+            create: (_) => ProjectsCubit(repository: repo)..loadProjects()),
         BlocProvider(create: (_) => SettingsCubit(prefs: prefs)),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
@@ -43,6 +67,7 @@ class MyInvestmentsApp extends StatelessWidget {
             darkTheme: AppTheme.dark(),
             themeMode: ThemeMode.system,
             localizationsDelegates: [
+              const FallbackShadcnLocalizationsDelegate(),
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,

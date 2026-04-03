@@ -1,6 +1,7 @@
 import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:my_investments/projects/domain/entities/category.dart' as domain;
+import 'package:my_investments/projects/domain/entities/category.dart'
+    as domain;
 import 'package:my_investments/projects/domain/entities/transaction.dart';
 
 class AddTransactionDialog extends StatefulWidget {
@@ -60,17 +61,17 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
 
     final title = isEditing
         ? isExpense
-            ? l10n.dialog_tx_edit_expense
-            : isDeposit
-                ? l10n.dialog_tx_edit_deposit
-                : l10n.dialog_tx_edit_capital
+              ? l10n.dialog_tx_edit_expense
+              : isDeposit
+              ? l10n.dialog_tx_edit_deposit
+              : l10n.dialog_tx_edit_capital
         : widget.depositOnly
-            ? l10n.dialog_tx_new_deposit
-            : isExpense
-                ? l10n.dialog_tx_new_expense
-                : isDeposit
-                    ? l10n.dialog_tx_new_deposit
-                    : l10n.dialog_tx_new_capital;
+        ? l10n.dialog_tx_new_deposit
+        : isExpense
+        ? l10n.dialog_tx_new_expense
+        : isDeposit
+        ? l10n.dialog_tx_new_deposit
+        : l10n.dialog_tx_new_capital;
     return AlertDialog(
       title: Text(title),
       content: SizedBox(
@@ -91,8 +92,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                             child: Text(l10n.dialog_tx_type_expense),
                           )
                         : OutlineButton(
-                            onPressed: () => setState(
-                                () => _type = TransactionType.expense),
+                            onPressed: () =>
+                                setState(() => _type = TransactionType.expense),
                             child: Text(l10n.dialog_tx_type_expense),
                           ),
                   ),
@@ -104,8 +105,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                             child: Text(l10n.dialog_tx_type_deposit),
                           )
                         : OutlineButton(
-                            onPressed: () => setState(
-                                () => _type = TransactionType.deposit),
+                            onPressed: () =>
+                                setState(() => _type = TransactionType.deposit),
                             child: Text(l10n.dialog_tx_type_deposit),
                           ),
                   ),
@@ -189,8 +190,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   Widget _buildCategorySelector(AppLocalizations l10n) {
     final selectedCategory = _selectedCategoryId != null
         ? widget.availableCategories
-            .where((c) => c.id == _selectedCategoryId)
-            .firstOrNull
+              .where((c) => c.id == _selectedCategoryId)
+              .firstOrNull
         : null;
 
     return OutlineButton(
