@@ -485,12 +485,8 @@ class _ActivityCard extends StatelessWidget {
                     ),
                     const Gap(4),
                     IconButton.ghost(
-                      onPressed: onEdit,
-                      icon: const Icon(RadixIcons.pencil1, size: 14),
-                    ),
-                    IconButton.ghost(
-                      onPressed: onDelete,
-                      icon: const Icon(RadixIcons.trash, size: 14),
+                      onPressed: () => _showActionsMenu(context),
+                      icon: const Icon(RadixIcons.dotsVertical, size: 16),
                     ),
                   ],
                 ),
@@ -518,6 +514,28 @@ class _ActivityCard extends StatelessWidget {
               ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showActionsMenu(BuildContext context) {
+    showDropdown<void>(
+      context: context,
+      anchorAlignment: Alignment.bottomRight,
+      alignment: Alignment.topRight,
+      builder: (ctx) => DropdownMenu(
+        children: [
+          MenuButton(
+            leading: const Icon(RadixIcons.pencil1),
+            child: const Text('Editar'),
+            onPressed: (_) => onEdit(),
+          ),
+          MenuButton(
+            leading: const Icon(RadixIcons.trash),
+            child: const Text('Eliminar'),
+            onPressed: (_) => onDelete(),
+          ),
+        ],
       ),
     );
   }

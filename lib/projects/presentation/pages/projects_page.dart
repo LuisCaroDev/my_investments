@@ -233,8 +233,18 @@ class _ProjectCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                SecondaryBadge(
-                  child: Text('${summary.activityCount} act.'),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SecondaryBadge(
+                      child: Text('${summary.activityCount} act.'),
+                    ),
+                    const Gap(4),
+                    IconButton.ghost(
+                      onPressed: () => _showActionsMenu(context),
+                      icon: const Icon(RadixIcons.dotsVertical, size: 16),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -273,5 +283,90 @@ class _ProjectCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void _showActionsMenu(BuildContext context) {
+    showDropdown<void>(
+      context: context,
+      anchorAlignment: Alignment.bottomRight,
+      alignment: Alignment.topRight,
+      builder: (ctx) => DropdownMenu(
+        children: [
+          MenuButton(
+            leading: const Icon(RadixIcons.pencil1),
+            child: const Text('Editar'),
+            onPressed: (_) => _editProject(context),
+          ),
+          MenuButton(
+            leading: const Icon(RadixIcons.trash),
+            child: const Text('Eliminar'),
+            onPressed: (_) => _confirmDeleteProject(context),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _editProject(BuildContext context) async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (ctx) => AddProjectDialog(
+        initialName: summary.project.name,
+        initialDescription: summary.project.description,
+        initialBudget: summary.project.globalBudget,
+      ),
+    );
+    if (result != null && context.mounted) {
+      final updated = summary.project.copyWith(
+        name: result['name'] as String,
+        description: result['description'] as String?,
+        globalBudget: result['budget'] as double?,
+      );
+      context.read<ProjectsCubit>().updateProject(updated);
+    }
+  }
+
+  void _confirmDeleteProject(BuildContext context) async {
+    final controller = TextEditingController();
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Eliminar proyecto'),
+        content: SizedBox(
+          width: 360,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Text(
+                'Escribe el nombre del proyecto para confirmar. '
+                'Se eliminarán sus actividades, categorías y transacciones.',
+              ).small,
+              const Gap(8),
+              TextField(
+                controller: controller,
+                placeholder: Text(summary.project.name),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          OutlineButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancelar'),
+          ),
+          PrimaryButton(
+            onPressed: () {
+              if (controller.text.trim() != summary.project.name.trim()) return;
+              Navigator.of(ctx).pop(true);
+            },
+            child: const Text('Eliminar'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true && context.mounted) {
+      context.read<ProjectsCubit>().deleteProject(summary.project.id);
+    }
   }
 }

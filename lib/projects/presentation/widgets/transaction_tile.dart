@@ -66,7 +66,7 @@ class TransactionTile extends StatelessWidget {
           ),
           Text(
             '${isExpense ? '-' : '+'}${transaction.amount.toCompactCurrency()}',
-          ).semiBold(
+          ).small.semiBold(
             color: isExpense
                 ? theme.colorScheme.destructive
                 : theme.colorScheme.primary,
