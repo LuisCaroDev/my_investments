@@ -95,6 +95,7 @@ class _TransactionListView extends StatelessWidget {
               ],
               title: Text(title),
             ),
+            Divider(height: 1),
           ],
           floatingFooter: true,
           footers: footers,
@@ -106,15 +107,19 @@ class _TransactionListView extends StatelessWidget {
 
   Widget _buildBody(BuildContext context, TransactionListState state) {
     final l10n = AppLocalizations.of(context)!;
-    return switch (state) {
-      TransactionListLoading() => const Center(
-        child: CircularProgressIndicator(),
-      ),
-      TransactionListError(message: final msg) => Center(
-        child: Text(l10n.common_error_msg(msg)),
-      ),
-      TransactionListLoaded() => _TransactionListContent(state: state),
-    };
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: switch (state) {
+        TransactionListLoading() => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        TransactionListError(message: final msg) => Center(
+          child: Text(l10n.common_error_msg(msg)),
+        ),
+        TransactionListLoaded() => _TransactionListContent(state: state),
+      },
+    );
   }
 
   void _addTransaction(

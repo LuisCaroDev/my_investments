@@ -20,6 +20,7 @@ import 'package:my_investments/projects/presentation/widgets/add_transaction_dia
 import 'package:my_investments/projects/presentation/widgets/budget_progress.dart';
 import 'package:my_investments/projects/presentation/widgets/section_header.dart';
 import 'package:my_investments/projects/presentation/widgets/transaction_tile.dart';
+import 'package:my_investments/projects/presentation/widgets/category_tile.dart';
 
 class ProjectDetailPage extends StatelessWidget {
   final String projectId;
@@ -100,6 +101,7 @@ class _ProjectDetailView extends StatelessWidget {
               ],
               title: Text(projectName),
             ),
+            Divider(height: 1),
           ],
           floatingFooter: true,
           footers: footers,
@@ -137,15 +139,19 @@ class _ProjectDetailView extends StatelessWidget {
 
   Widget _buildBody(BuildContext context, ProjectDetailState state) {
     final l10n = AppLocalizations.of(context)!;
-    return switch (state) {
-      ProjectDetailLoading() => const Center(
-        child: CircularProgressIndicator(),
-      ),
-      ProjectDetailError(message: final msg) => Center(
-        child: Text(l10n.common_error_msg(msg)),
-      ),
-      ProjectDetailLoaded() => _ProjectDetailContent(state: state),
-    };
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: switch (state) {
+        ProjectDetailLoading() => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        ProjectDetailError(message: final msg) => Center(
+          child: Text(l10n.common_error_msg(msg)),
+        ),
+        ProjectDetailLoaded() => _ProjectDetailContent(state: state),
+      },
+    );
   }
 }
 
@@ -174,7 +180,7 @@ class _ProjectDetailContent extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               const spacing = 12.0;
-              const minCardWidth = 150.0;
+              const minCardWidth = 200.0;
               int columns = (constraints.maxWidth / minCardWidth).floor();
               if (columns < 2) columns = 2;
               final cardWidth =
@@ -267,13 +273,9 @@ class _ProjectDetailContent extends StatelessWidget {
           ),
           if (state.projectCategories.isNotEmpty) ...[
             const Gap(8),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: state.projectCategories
-                  .map((cat) => Chip(child: Text(cat.name)))
-                  .toList(),
-            ),
+            ...state.projectCategories
+                .take(3)
+                .map((cat) => CategoryTile(category: cat)),
           ] else ...[
             const Gap(12),
             EmptyState(
@@ -313,7 +315,7 @@ class _ProjectDetailContent extends StatelessWidget {
           const Gap(24),
           SectionHeader(
             title: l10n.project_detail_activities_title,
-            trailing: IconButton.ghost(
+            trailing: IconButton.outline(
               onPressed: () => _addActivity(context),
               icon: const Icon(RadixIcons.plus, size: 16),
             ),
@@ -326,22 +328,33 @@ class _ProjectDetailContent extends StatelessWidget {
               subtitle: l10n.project_detail_activities_empty_info,
             )
           else
-            Wrap(
-              spacing: 16,
-              runSpacing: 16,
-              children: state.activitySummaries
-                  .map(
-                    (s) => SizedBox(
-                      width: 340,
-                      child: _ActivityCard(
-                        summary: s,
-                        onEdit: () => _editActivity(context, s.activity),
-                        onDelete: () =>
-                            _confirmDeleteActivity(context, s.activity),
-                      ),
-                    ),
-                  )
-                  .toList(),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                const spacing = 16.0;
+                const minCardWidth = 300.0;
+                int columns = (constraints.maxWidth / minCardWidth).floor();
+                final cardWidth =
+                    (constraints.maxWidth - (spacing * (columns - 1))) /
+                    columns;
+
+                return Wrap(
+                  spacing: spacing,
+                  runSpacing: spacing,
+                  children: state.activitySummaries
+                      .map(
+                        (s) => SizedBox(
+                          width: cardWidth,
+                          child: _ActivityCard(
+                            summary: s,
+                            onEdit: () => _editActivity(context, s.activity),
+                            onDelete: () =>
+                                _confirmDeleteActivity(context, s.activity),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                );
+              },
             ),
         ],
       ),
@@ -407,7 +420,7 @@ class _ProjectDetailContent extends StatelessWidget {
   List<Transaction> _latestTransactions(List<Transaction> items) {
     final sorted = List<Transaction>.from(items)
       ..sort((a, b) => b.date.compareTo(a.date));
-    return sorted.take(5).toList();
+    return sorted.take(4).toList();
   }
 
   void _addActivity(BuildContext context) async {
@@ -526,7 +539,7 @@ class _ActivityCard extends StatelessWidget {
         }
       },
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,

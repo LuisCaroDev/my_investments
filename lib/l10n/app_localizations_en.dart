@@ -257,13 +257,25 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_language_label => 'App Language';
 
   @override
+  String get settings_theme_label => 'App Theme';
+
+  @override
   String get settings_currency_label => 'Currency Type';
 
   @override
   String get settings_system_default => 'System';
 
   @override
+  String get settings_theme_light => 'Light';
+
+  @override
+  String get settings_theme_dark => 'Dark';
+
+  @override
   String get settings_language_dialog_title => 'Select Language';
+
+  @override
+  String get settings_theme_dialog_title => 'Select Theme';
 
   @override
   String get settings_data_title => 'Data';

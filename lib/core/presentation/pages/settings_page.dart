@@ -55,9 +55,7 @@ class SettingsPage extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(l10n.settings_local_mode_title).large.bold,
-                            Text(
-                              l10n.settings_local_mode_info,
-                            ).muted,
+                            Text(l10n.settings_local_mode_info).muted,
                           ],
                         ),
                       ),
@@ -95,7 +93,34 @@ class SettingsPage extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(l10n.settings_language_label).medium,
-                                  Text(_getLocaleName(context, state.appLocale)).muted,
+                                  Text(
+                                    _getLocaleName(context, state.appLocale),
+                                  ).muted,
+                                ],
+                              ),
+                            ),
+                            const Icon(RadixIcons.chevronRight),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const Gap(8),
+                    CardButton(
+                      onPressed: () => _showThemeDialog(context, state),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          children: [
+                            const Icon(RadixIcons.moon),
+                            const Gap(16),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(l10n.settings_theme_label).medium,
+                                  Text(
+                                    _getThemeModeName(context, state.themeMode),
+                                  ).muted,
                                 ],
                               ),
                             ),
@@ -181,6 +206,18 @@ class SettingsPage extends StatelessWidget {
       case 'en':
         return 'English';
       default:
+        return l10n.settings_system_default;
+    }
+  }
+
+  String _getThemeModeName(BuildContext context, ThemeMode mode) {
+    final l10n = AppLocalizations.of(context)!;
+    switch (mode) {
+      case ThemeMode.light:
+        return l10n.settings_theme_light;
+      case ThemeMode.dark:
+        return l10n.settings_theme_dark;
+      case ThemeMode.system:
         return l10n.settings_system_default;
     }
   }
@@ -276,6 +313,54 @@ class SettingsPage extends StatelessWidget {
               isSelected: currentVal == 'S/',
               onPressed: () {
                 context.read<SettingsCubit>().updateCurrency('es_PE', 'S/');
+                Navigator.of(ctx).pop();
+              },
+            ),
+          ],
+        ),
+        actions: [
+          OutlineButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.common_cancel),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showThemeDialog(BuildContext context, SettingsState state) {
+    final l10n = AppLocalizations.of(context)!;
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.settings_theme_dialog_title),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _OptionButton(
+              label: l10n.settings_system_default,
+              isSelected: state.themeMode == ThemeMode.system,
+              onPressed: () {
+                context.read<SettingsCubit>().updateThemeMode(ThemeMode.system);
+                Navigator.of(ctx).pop();
+              },
+            ),
+            const Gap(8),
+            _OptionButton(
+              label: l10n.settings_theme_light,
+              isSelected: state.themeMode == ThemeMode.light,
+              onPressed: () {
+                context.read<SettingsCubit>().updateThemeMode(ThemeMode.light);
+                Navigator.of(ctx).pop();
+              },
+            ),
+            const Gap(8),
+            _OptionButton(
+              label: l10n.settings_theme_dark,
+              isSelected: state.themeMode == ThemeMode.dark,
+              onPressed: () {
+                context.read<SettingsCubit>().updateThemeMode(ThemeMode.dark);
                 Navigator.of(ctx).pop();
               },
             ),

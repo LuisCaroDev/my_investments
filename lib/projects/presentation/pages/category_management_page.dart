@@ -10,6 +10,7 @@ import 'package:my_investments/projects/domain/entities/category.dart'
 import 'package:my_investments/projects/presentation/bloc/category_management_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/category_management_state.dart';
 import 'package:my_investments/projects/presentation/widgets/add_category_dialog.dart';
+import 'package:my_investments/projects/presentation/widgets/category_tile.dart';
 
 class CategoryManagementPage extends StatelessWidget {
   final String projectId;
@@ -68,6 +69,7 @@ class _CategoryManagementView extends StatelessWidget {
               ],
               title: Text(title),
             ),
+            Divider(height: 1),
           ],
           floatingFooter: true,
           footers: [
@@ -99,15 +101,19 @@ class _CategoryManagementView extends StatelessWidget {
 
   Widget _buildBody(BuildContext context, CategoryManagementState state) {
     final l10n = AppLocalizations.of(context)!;
-    return switch (state) {
-      CategoryManagementLoading() => const Center(
-        child: CircularProgressIndicator(),
-      ),
-      CategoryManagementError(message: final msg) => Center(
-        child: Text(l10n.common_error_msg(msg)),
-      ),
-      CategoryManagementLoaded() => _CategoryManagementContent(state: state),
-    };
+    return SafeArea(
+      top: false,
+      bottom: false,
+      child: switch (state) {
+        CategoryManagementLoading() => const Center(
+          child: CircularProgressIndicator(),
+        ),
+        CategoryManagementError(message: final msg) => Center(
+          child: Text(l10n.common_error_msg(msg)),
+        ),
+        CategoryManagementLoaded() => _CategoryManagementContent(state: state),
+      },
+    );
   }
 
   void _addCategory(BuildContext context) async {
@@ -159,7 +165,11 @@ class _CategoryManagementContent extends StatelessWidget {
               Text(l10n.category_mgmt_empty).muted
             else
               ...state.activityCategories.map(
-                (cat) => _CategoryRow(category: cat, canEdit: true),
+                (cat) => CategoryTile(
+                  category: cat,
+                  onEdit: () => _editCategory(context, cat),
+                  onDelete: () => _deleteCategory(context, cat),
+                ),
               ),
             const Gap(20),
           ],
@@ -169,68 +179,18 @@ class _CategoryManagementContent extends StatelessWidget {
             Text(l10n.category_mgmt_empty).muted
           else
             ...state.projectCategories.map(
-              (cat) => _CategoryRow(category: cat, canEdit: true),
+              (cat) => CategoryTile(
+                category: cat,
+                onEdit: () => _editCategory(context, cat),
+                onDelete: () => _deleteCategory(context, cat),
+              ),
             ),
         ],
       ),
     );
   }
-}
 
-class _CategoryRow extends StatelessWidget {
-  final domain.Category category;
-  final bool canEdit;
-
-  const _CategoryRow({required this.category, required this.canEdit});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: Card(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-        child: Row(
-          children: [
-            Expanded(child: Text(category.name)),
-            if (canEdit)
-              IconButton.ghost(
-                onPressed: () => _showActionsMenu(context),
-                icon: const Icon(RadixIcons.dotsVertical, size: 14),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _showActionsMenu(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    showDropdown<void>(
-      context: context,
-      anchorAlignment: Alignment.bottomRight,
-      alignment: Alignment.topRight,
-      builder: (ctx) => DropdownMenu(
-        children: [
-          MenuButton(
-            leading: const Icon(RadixIcons.pencil1),
-            child: Text(l10n.common_edit),
-            onPressed: (_) {
-              _editCategory(context);
-            },
-          ),
-          MenuButton(
-            leading: const Icon(RadixIcons.trash),
-            child: Text(l10n.common_delete),
-            onPressed: (_) {
-              _deleteCategory(context);
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _editCategory(BuildContext context) async {
+  void _editCategory(BuildContext context, domain.Category category) async {
     final result = await showDialog<String>(
       context: context,
       builder: (ctx) => AddCategoryDialog(
@@ -245,7 +205,7 @@ class _CategoryRow extends StatelessWidget {
     }
   }
 
-  void _deleteCategory(BuildContext context) {
+  void _deleteCategory(BuildContext context, domain.Category category) {
     context.read<CategoryManagementCubit>().deleteCategory(category.id);
   }
 }

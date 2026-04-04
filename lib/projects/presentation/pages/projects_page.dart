@@ -24,14 +24,16 @@ class ProjectsPage extends StatelessWidget {
         AppBar(
           title: Text(l10n.projects_title),
           trailing: [
-            GhostButton(
+            IconButton.outline(
               onPressed: () => _openSettings(context),
               size: ButtonSize.small,
-              child: const Icon(RadixIcons.gear),
+              icon: const Icon(RadixIcons.gear),
             ),
           ],
         ),
+        Divider(height: 1),
       ],
+      // floatingHeader: true,
       floatingFooter: true,
       footers: [
         Align(
@@ -54,25 +56,29 @@ class ProjectsPage extends StatelessWidget {
           ),
         ),
       ],
-      child: BlocBuilder<ProjectsCubit, ProjectsState>(
-        builder: (context, state) {
-          return switch (state) {
-            ProjectsInitial() || ProjectsLoading() => const Center(
-              child: CircularProgressIndicator(),
-            ),
-            ProjectsError(message: final msg) => Center(
-              child: Text(l10n.common_error_msg(msg)),
-            ),
-            ProjectsLoaded(summaries: final summaries) =>
-              summaries.isEmpty
-                  ? EmptyState(
-                      icon: RadixIcons.archive,
-                      title: l10n.projects_empty_title,
-                      subtitle: l10n.projects_empty_subtitle,
-                    )
-                  : _ProjectsList(summaries: summaries),
-          };
-        },
+      child: SafeArea(
+        top: false,
+        bottom: false,
+        child: BlocBuilder<ProjectsCubit, ProjectsState>(
+          builder: (context, state) {
+            return switch (state) {
+              ProjectsInitial() || ProjectsLoading() => const Center(
+                child: CircularProgressIndicator(),
+              ),
+              ProjectsError(message: final msg) => Center(
+                child: Text(l10n.common_error_msg(msg)),
+              ),
+              ProjectsLoaded(summaries: final summaries) =>
+                summaries.isEmpty
+                    ? EmptyState(
+                        icon: RadixIcons.archive,
+                        title: l10n.projects_empty_title,
+                        subtitle: l10n.projects_empty_subtitle,
+                      )
+                    : _ProjectsList(summaries: summaries),
+            };
+          },
+        ),
       ),
     );
   }
@@ -140,7 +146,7 @@ class _ProjectsList extends StatelessWidget {
             builder: (context, constraints) {
               final l10n = AppLocalizations.of(context)!;
               const spacing = 12.0;
-              const minCardWidth = 150.0;
+              const minCardWidth = 200.0;
               int columns = (constraints.maxWidth / minCardWidth).floor();
               if (columns < 2) columns = 2;
               final cardWidth =
@@ -248,7 +254,7 @@ class _ProjectCard extends StatelessWidget {
         );
       },
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           mainAxisSize: MainAxisSize.min,
@@ -275,7 +281,7 @@ class _ProjectCard extends StatelessWidget {
                     children: [
                       Text(summary.project.name).medium,
                       if (summary.project.description != null)
-                        Text(summary.project.description!).muted.small,
+                        OverflowMarquee(child: Text(summary.project.description!).muted.small),
                     ],
                   ),
                 ),

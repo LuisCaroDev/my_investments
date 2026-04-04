@@ -566,6 +566,12 @@ abstract class AppLocalizations {
   /// **'Idioma de la App'**
   String get settings_language_label;
 
+  /// No description provided for @settings_theme_label.
+  ///
+  /// In es, this message translates to:
+  /// **'Tema de la App'**
+  String get settings_theme_label;
+
   /// No description provided for @settings_currency_label.
   ///
   /// In es, this message translates to:
@@ -578,11 +584,29 @@ abstract class AppLocalizations {
   /// **'Sistema'**
   String get settings_system_default;
 
+  /// No description provided for @settings_theme_light.
+  ///
+  /// In es, this message translates to:
+  /// **'Claro'**
+  String get settings_theme_light;
+
+  /// No description provided for @settings_theme_dark.
+  ///
+  /// In es, this message translates to:
+  /// **'Oscuro'**
+  String get settings_theme_dark;
+
   /// No description provided for @settings_language_dialog_title.
   ///
   /// In es, this message translates to:
   /// **'Seleccionar Idioma'**
   String get settings_language_dialog_title;
+
+  /// No description provided for @settings_theme_dialog_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Seleccionar Tema'**
+  String get settings_theme_dialog_title;
 
   /// No description provided for @settings_data_title.
   ///

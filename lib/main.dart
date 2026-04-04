@@ -55,17 +55,18 @@ class MyInvestmentsApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-            create: (_) => ProjectsCubit(repository: repo)..loadProjects()),
+          create: (_) => ProjectsCubit(repository: repo)..loadProjects(),
+        ),
         BlocProvider(create: (_) => SettingsCubit(prefs: prefs)),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settingsState) {
           return ShadcnApp(
-            key: ValueKey(settingsState.props.join('-')),
+            // key: ValueKey(settingsState.props.join('-')),
             title: 'My Investments',
             theme: AppTheme.light(),
             darkTheme: AppTheme.dark(),
-            themeMode: ThemeMode.system,
+            themeMode: settingsState.themeMode,
             localizationsDelegates: [
               const FallbackShadcnLocalizationsDelegate(),
               AppLocalizations.delegate,
@@ -89,7 +90,9 @@ class MyInvestmentsApp extends StatelessWidget {
                   statusBarIconBrightness: isDark
                       ? Brightness.light
                       : Brightness.dark,
-                  statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+                  statusBarBrightness: isDark
+                      ? Brightness.dark
+                      : Brightness.light,
                   systemNavigationBarColor: theme.colorScheme.background,
                   systemNavigationBarIconBrightness: isDark
                       ? Brightness.light

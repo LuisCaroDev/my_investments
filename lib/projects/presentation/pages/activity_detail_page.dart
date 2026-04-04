@@ -16,6 +16,7 @@ import 'package:my_investments/projects/presentation/widgets/add_transaction_dia
 import 'package:my_investments/projects/presentation/widgets/budget_progress.dart';
 import 'package:my_investments/projects/presentation/widgets/section_header.dart';
 import 'package:my_investments/projects/presentation/widgets/transaction_tile.dart';
+import 'package:my_investments/projects/presentation/widgets/category_tile.dart';
 
 /// A dedicated page for viewing an Activity's details, its categories,
 /// and transactions. Uses its own Cubit scoped to the activity.
@@ -208,10 +209,15 @@ class _ActivityDetailView extends StatelessWidget {
               ],
               title: Text(activityName),
             ),
+            Divider(height: 1),
           ],
           floatingFooter: true,
           footers: footers,
-          child: _buildBody(context, state),
+          child: SafeArea(
+            top: false,
+            bottom: false,
+            child: _buildBody(context, state),
+          ),
         );
       },
     );
@@ -280,7 +286,7 @@ class _ActivityContent extends StatelessWidget {
           LayoutBuilder(
             builder: (context, constraints) {
               const spacing = 12.0;
-              const minCardWidth = 140.0;
+              const minCardWidth = 180.0;
               int columns = (constraints.maxWidth / minCardWidth).floor();
               if (columns < 2) columns = 2;
               final cardWidth =
@@ -414,20 +420,15 @@ class _ActivityContent extends StatelessWidget {
           ),
           if (state.categories.isNotEmpty) ...[
             const Gap(8),
-            Wrap(
-              spacing: 6,
-              runSpacing: 6,
-              children: [
-                ...state.categories.map((cat) {
-                  final isActivityLevel = cat.activityId != null;
-                  return Chip(
-                    child: Text(
-                      '${cat.name}${isActivityLevel ? '' : ' ${l10n.activity_detail_category_project_label}'}',
-                    ),
-                  );
-                }),
-              ],
-            ),
+            ...state.categories.take(3).map((cat) {
+              final isActivityLevel = cat.activityId != null;
+              return CategoryTile(
+                category: cat,
+                subtitle: isActivityLevel
+                    ? null
+                    : l10n.activity_detail_category_project_label,
+              );
+            }),
           ] else ...[
             const Gap(12),
             EmptyState(
@@ -527,6 +528,6 @@ class _ActivityContent extends StatelessWidget {
   List<Transaction> _latestTransactions(List<Transaction> items) {
     final sorted = List<Transaction>.from(items)
       ..sort((a, b) => b.date.compareTo(a.date));
-    return sorted.take(5).toList();
+    return sorted.take(4).toList();
   }
 }

@@ -83,10 +83,10 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             if (!widget.depositOnly) ...[
               Text(l10n.dialog_tx_type_label).small.medium,
               const Gap(4),
-              Row(
-                children: [
-                  Expanded(
-                    child: _type == TransactionType.expense
+              FittedBox(
+                child: ButtonGroup(
+                  children: [
+                    _type == TransactionType.expense
                         ? PrimaryButton(
                             onPressed: () {},
                             child: Text(l10n.dialog_tx_type_expense),
@@ -96,10 +96,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                                 setState(() => _type = TransactionType.expense),
                             child: Text(l10n.dialog_tx_type_expense),
                           ),
-                  ),
-                  const Gap(8),
-                  Expanded(
-                    child: _type == TransactionType.deposit
+                    _type == TransactionType.deposit
                         ? PrimaryButton(
                             onPressed: () {},
                             child: Text(l10n.dialog_tx_type_deposit),
@@ -109,10 +106,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                                 setState(() => _type = TransactionType.deposit),
                             child: Text(l10n.dialog_tx_type_deposit),
                           ),
-                  ),
-                  const Gap(8),
-                  Expanded(
-                    child: _type == TransactionType.capitalInjection
+                    _type == TransactionType.capitalInjection
                         ? PrimaryButton(
                             onPressed: () {},
                             child: Text(l10n.dialog_tx_type_capital),
@@ -123,8 +117,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                             ),
                             child: Text(l10n.dialog_tx_type_capital),
                           ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               const Gap(12),
             ],
