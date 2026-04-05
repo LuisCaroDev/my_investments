@@ -7,6 +7,7 @@ import 'package:my_investments/core/presentation/pages/settings_page.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/core/widgets/stat_card.dart';
 import 'package:my_investments/projects/domain/entities/project.dart';
+import 'package:my_investments/projects/domain/entities/project_summary.dart';
 import 'package:my_investments/projects/presentation/bloc/projects_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/projects_state.dart';
 import 'package:my_investments/projects/presentation/pages/project_detail_page.dart';

@@ -228,37 +228,40 @@ class SettingsPage extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.settings_language_dialog_title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _OptionButton(
-              label: l10n.settings_system_default,
-              isSelected: state.appLocale == 'system',
-              onPressed: () {
-                context.read<SettingsCubit>().updateAppLocale('system');
-                Navigator.of(ctx).pop();
-              },
-            ),
-            const Gap(8),
-            _OptionButton(
-              label: 'Español',
-              isSelected: state.appLocale == 'es',
-              onPressed: () {
-                context.read<SettingsCubit>().updateAppLocale('es');
-                Navigator.of(ctx).pop();
-              },
-            ),
-            const Gap(8),
-            _OptionButton(
-              label: 'English',
-              isSelected: state.appLocale == 'en',
-              onPressed: () {
-                context.read<SettingsCubit>().updateAppLocale('en');
-                Navigator.of(ctx).pop();
-              },
-            ),
-          ],
+        content: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 300),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _OptionButton(
+                label: l10n.settings_system_default,
+                isSelected: state.appLocale == 'system',
+                onPressed: () {
+                  context.read<SettingsCubit>().updateAppLocale('system');
+                  Navigator.of(ctx).pop();
+                },
+              ),
+              const Gap(8),
+              _OptionButton(
+                label: 'Español',
+                isSelected: state.appLocale == 'es',
+                onPressed: () {
+                  context.read<SettingsCubit>().updateAppLocale('es');
+                  Navigator.of(ctx).pop();
+                },
+              ),
+              const Gap(8),
+              _OptionButton(
+                label: 'English',
+                isSelected: state.appLocale == 'en',
+                onPressed: () {
+                  context.read<SettingsCubit>().updateAppLocale('en');
+                  Navigator.of(ctx).pop();
+                },
+              ),
+            ],
+          ),
         ),
         actions: [
           OutlineButton(
@@ -277,46 +280,49 @@ class SettingsPage extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.settings_currency_label),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _OptionButton(
-              label: l10n.settings_system_default,
-              isSelected: currentVal == 'system',
-              onPressed: () {
-                context.read<SettingsCubit>().updateCurrency(null, null);
-                Navigator.of(ctx).pop();
-              },
-            ),
-            const Gap(8),
-            _OptionButton(
-              label: 'USD (\$)',
-              isSelected: currentVal == '\$',
-              onPressed: () {
-                context.read<SettingsCubit>().updateCurrency('en_US', '\$');
-                Navigator.of(ctx).pop();
-              },
-            ),
-            const Gap(8),
-            _OptionButton(
-              label: 'EUR (€)',
-              isSelected: currentVal == '€',
-              onPressed: () {
-                context.read<SettingsCubit>().updateCurrency('es_ES', '€');
-                Navigator.of(ctx).pop();
-              },
-            ),
-            const Gap(8),
-            _OptionButton(
-              label: 'PEN (S/)',
-              isSelected: currentVal == 'S/',
-              onPressed: () {
-                context.read<SettingsCubit>().updateCurrency('es_PE', 'S/');
-                Navigator.of(ctx).pop();
-              },
-            ),
-          ],
+        content: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 300),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _OptionButton(
+                label: l10n.settings_system_default,
+                isSelected: currentVal == 'system',
+                onPressed: () {
+                  context.read<SettingsCubit>().updateCurrency(null, null);
+                  Navigator.of(ctx).pop();
+                },
+              ),
+              const Gap(8),
+              _OptionButton(
+                label: 'USD (\$)',
+                isSelected: currentVal == '\$',
+                onPressed: () {
+                  context.read<SettingsCubit>().updateCurrency('en_US', '\$');
+                  Navigator.of(ctx).pop();
+                },
+              ),
+              const Gap(8),
+              _OptionButton(
+                label: 'EUR (€)',
+                isSelected: currentVal == '€',
+                onPressed: () {
+                  context.read<SettingsCubit>().updateCurrency('es_ES', '€');
+                  Navigator.of(ctx).pop();
+                },
+              ),
+              const Gap(8),
+              _OptionButton(
+                label: 'PEN (S/)',
+                isSelected: currentVal == 'S/',
+                onPressed: () {
+                  context.read<SettingsCubit>().updateCurrency('es_PE', 'S/');
+                  Navigator.of(ctx).pop();
+                },
+              ),
+            ],
+          ),
         ),
         actions: [
           OutlineButton(
@@ -334,37 +340,44 @@ class SettingsPage extends StatelessWidget {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.settings_theme_dialog_title),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _OptionButton(
-              label: l10n.settings_system_default,
-              isSelected: state.themeMode == ThemeMode.system,
-              onPressed: () {
-                context.read<SettingsCubit>().updateThemeMode(ThemeMode.system);
-                Navigator.of(ctx).pop();
-              },
-            ),
-            const Gap(8),
-            _OptionButton(
-              label: l10n.settings_theme_light,
-              isSelected: state.themeMode == ThemeMode.light,
-              onPressed: () {
-                context.read<SettingsCubit>().updateThemeMode(ThemeMode.light);
-                Navigator.of(ctx).pop();
-              },
-            ),
-            const Gap(8),
-            _OptionButton(
-              label: l10n.settings_theme_dark,
-              isSelected: state.themeMode == ThemeMode.dark,
-              onPressed: () {
-                context.read<SettingsCubit>().updateThemeMode(ThemeMode.dark);
-                Navigator.of(ctx).pop();
-              },
-            ),
-          ],
+        content: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 300),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _OptionButton(
+                label: l10n.settings_system_default,
+                isSelected: state.themeMode == ThemeMode.system,
+                onPressed: () {
+                  context.read<SettingsCubit>().updateThemeMode(
+                    ThemeMode.system,
+                  );
+                  Navigator.of(ctx).pop();
+                },
+              ),
+              const Gap(8),
+              _OptionButton(
+                label: l10n.settings_theme_light,
+                isSelected: state.themeMode == ThemeMode.light,
+                onPressed: () {
+                  context.read<SettingsCubit>().updateThemeMode(
+                    ThemeMode.light,
+                  );
+                  Navigator.of(ctx).pop();
+                },
+              ),
+              const Gap(8),
+              _OptionButton(
+                label: l10n.settings_theme_dark,
+                isSelected: state.themeMode == ThemeMode.dark,
+                onPressed: () {
+                  context.read<SettingsCubit>().updateThemeMode(ThemeMode.dark);
+                  Navigator.of(ctx).pop();
+                },
+              ),
+            ],
+          ),
         ),
         actions: [
           OutlineButton(

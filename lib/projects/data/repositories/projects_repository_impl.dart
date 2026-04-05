@@ -7,6 +7,10 @@ import 'package:my_investments/projects/domain/entities/project.dart';
 import 'package:my_investments/projects/domain/entities/activity.dart';
 import 'package:my_investments/projects/domain/entities/category.dart';
 import 'package:my_investments/projects/domain/entities/transaction.dart';
+import 'package:my_investments/projects/domain/entities/activity_summary.dart';
+import 'package:my_investments/projects/domain/entities/project_summary.dart';
+import 'package:my_investments/projects/domain/entities/project_detail.dart';
+import 'package:my_investments/projects/domain/entities/activity_detail.dart';
 
 class ProjectsRepository {
   final ProjectsLocalDataSource _localDataSource;
@@ -17,6 +21,151 @@ class ProjectsRepository {
   // ── Projects ──────────────────────────────────────────────
 
   List<Project> getProjects() => _localDataSource.getProjects();
+
+  List<ProjectSummary> getProjectSummaries() {
+    final projects = _localDataSource.getProjects();
+    final allActivities = _localDataSource.getActivities();
+    final allTransactions = _localDataSource.getTransactions();
+
+    return projects.map((project) {
+      final projectActivities =
+          allActivities.where((a) => a.projectId == project.id).toList();
+      final projectTransactions =
+          allTransactions.where((t) => t.projectId == project.id).toList();
+
+      final totalSpent = projectTransactions
+          .where((t) => t.type == TransactionType.expense)
+          .fold(0.0, (sum, t) => sum + t.amount);
+      final totalDeposited = projectTransactions
+          .where((t) => t.type == TransactionType.deposit)
+          .fold(0.0, (sum, t) => sum + t.amount);
+      final totalCapitalInjected = projectTransactions
+          .where((t) => t.type == TransactionType.capitalInjection)
+          .fold(0.0, (sum, t) => sum + t.amount);
+
+      final totalBudget =
+          project.globalBudget ??
+          projectActivities.fold<double>(
+            0.0,
+            (sum, a) => sum + (a.budget ?? 0),
+          );
+
+      return ProjectSummary(
+        project: project,
+        totalBudget: totalBudget,
+        totalSpent: totalSpent,
+        totalDeposited: totalDeposited,
+        totalCapitalInjected: totalCapitalInjected,
+        activityCount: projectActivities.length,
+      );
+    }).toList();
+  }
+
+  ProjectDetail getProjectDetail(String projectId) {
+    final projects = _localDataSource.getProjects();
+    final project = projects.firstWhere((p) => p.id == projectId);
+    final allActivities = _localDataSource.getActivities();
+    final projectActivities =
+        allActivities.where((a) => a.projectId == projectId).toList();
+    final allTransactions = _localDataSource.getTransactions();
+    final projectTransactions =
+        allTransactions.where((t) => t.projectId == projectId).toList();
+    final allCategories = _localDataSource.getCategories();
+
+    // Map activity summaries
+    final activitySummaries = projectActivities.map((activity) {
+      final activityTransactions =
+          projectTransactions.where((t) => t.activityId == activity.id).toList();
+      final spent = activityTransactions
+          .where((t) => t.type == TransactionType.expense)
+          .fold(0.0, (sum, t) => sum + t.amount);
+      final deposited = activityTransactions
+          .where((t) => t.type == TransactionType.deposit)
+          .fold(0.0, (sum, t) => sum + t.amount);
+      final capitalInjected = activityTransactions
+          .where((t) => t.type == TransactionType.capitalInjection)
+          .fold(0.0, (sum, t) => sum + t.amount);
+      final categories = allCategories
+          .where((c) => c.activityId == activity.id)
+          .toList();
+
+      return ActivitySummary(
+        activity: activity,
+        spent: spent,
+        deposited: deposited,
+        capitalInjected: capitalInjected,
+        categories: categories,
+        transactionCount: activityTransactions.length,
+      );
+    }).toList();
+
+    // Project-level details
+    final projectLevelTransactions = projectTransactions
+        .where((t) => t.activityId == null)
+        .toList();
+    final projectCategories = allCategories
+        .where((c) => c.projectId == projectId && c.activityId == null)
+        .toList();
+
+    final totalSpent = projectTransactions
+        .where((t) => t.type == TransactionType.expense)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final totalDeposited = projectTransactions
+        .where((t) => t.type == TransactionType.deposit)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final totalCapitalInjected = projectTransactions
+        .where((t) => t.type == TransactionType.capitalInjection)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final totalBudget =
+        project.globalBudget ??
+        projectActivities.fold<double>(0.0, (sum, a) => sum + (a.budget ?? 0));
+
+    return ProjectDetail(
+      project: project,
+      activitySummaries: activitySummaries,
+      projectLevelTransactions: projectLevelTransactions,
+      projectCategories: projectCategories,
+      totalBudget: totalBudget,
+      totalSpent: totalSpent,
+      totalDeposited: totalDeposited,
+      totalCapitalInjected: totalCapitalInjected,
+    );
+  }
+
+  ActivityDetail getActivityDetail(String projectId, String activityId) {
+    final activities = _localDataSource.getActivities();
+    final activity = activities.firstWhere((a) => a.id == activityId);
+    final transactions = _localDataSource
+        .getTransactions()
+        .where((t) => t.activityId == activityId)
+        .toList();
+    final categories = getAvailableCategories(projectId, activityId);
+
+    final spent = transactions
+        .where((t) => t.type == TransactionType.expense)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final deposited = transactions
+        .where((t) => t.type == TransactionType.deposit)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final capitalInjected = transactions
+        .where((t) => t.type == TransactionType.capitalInjection)
+        .fold(0.0, (sum, t) => sum + t.amount);
+
+    final activitySummary = ActivitySummary(
+      activity: activity,
+      spent: spent,
+      deposited: deposited,
+      capitalInjected: capitalInjected,
+      categories: _localDataSource.getCategories().where((c) => c.activityId == activityId).toList(),
+      transactionCount: transactions.length,
+    );
+
+    return ActivityDetail(
+      summary: activitySummary,
+      transactions: transactions,
+      categories: categories,
+    );
+  }
 
   Future<void> addProject(Project project) async {
     final projects = _localDataSource.getProjects();

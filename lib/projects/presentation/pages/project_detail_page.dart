@@ -10,6 +10,7 @@ import 'package:my_investments/projects/data/datasources/projects_local_ds.dart'
 import 'package:my_investments/projects/data/repositories/projects_repository_impl.dart';
 import 'package:my_investments/projects/domain/entities/activity.dart';
 import 'package:my_investments/projects/domain/entities/transaction.dart';
+import 'package:my_investments/projects/domain/entities/activity_summary.dart';
 import 'package:my_investments/projects/presentation/bloc/project_detail_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/project_detail_state.dart';
 import 'package:my_investments/projects/presentation/pages/activity_detail_page.dart';
@@ -119,7 +120,7 @@ class _ProjectDetailView extends StatelessWidget {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (ctx) =>
-          AddTransactionDialog(availableCategories: state.projectCategories),
+          AddTransactionDialog(availableCategories: state.detail.projectCategories),
     );
 
     if (result != null && context.mounted) {
@@ -194,7 +195,7 @@ class _ProjectDetailContent extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.project_detail_summary_deposited,
-                      value: state.totalDeposited.toCompactCurrency(context),
+                      value: state.detail.totalDeposited.toCompactCurrency(context),
                       icon: RadixIcons.arrowUp,
                       valueColor: theme.colorScheme.primary,
                     ),
@@ -203,7 +204,7 @@ class _ProjectDetailContent extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.project_detail_summary_spent,
-                      value: state.totalSpent.toCompactCurrency(context),
+                      value: state.detail.totalSpent.toCompactCurrency(context),
                       icon: RadixIcons.arrowDown,
                       valueColor: theme.colorScheme.destructive,
                     ),
@@ -212,7 +213,7 @@ class _ProjectDetailContent extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.project_detail_summary_operating,
-                      value: state.operatingBalance.toCompactCurrency(context),
+                      value: state.detail.operatingBalance.toCompactCurrency(context),
                       icon: RadixIcons.dimensions,
                     ),
                   ),
@@ -220,7 +221,7 @@ class _ProjectDetailContent extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.project_detail_summary_capital,
-                      value: state.totalCapitalInjected.toCompactCurrency(
+                      value: state.detail.totalCapitalInjected.toCompactCurrency(
                         context,
                       ),
                       icon: RadixIcons.drawingPinSolid,
@@ -230,19 +231,19 @@ class _ProjectDetailContent extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.project_detail_summary_net_balance,
-                      value: state.netBalance.toCompactCurrency(context),
+                      value: state.detail.netBalance.toCompactCurrency(context),
                       icon: RadixIcons.barChart,
-                      valueColor: state.netBalance < 0
+                      valueColor: state.detail.netBalance < 0
                           ? theme.colorScheme.destructive
                           : theme.colorScheme.primary,
                     ),
                   ),
-                  if (state.totalBudget > 0)
+                  if (state.detail.totalBudget > 0)
                     SizedBox(
                       width: cardWidth,
                       child: StatCard(
                         label: l10n.project_detail_summary_budget,
-                        value: state.totalBudget.toCompactCurrency(context),
+                        value: state.detail.totalBudget.toCompactCurrency(context),
                         icon: RadixIcons.target,
                       ),
                     ),
@@ -251,14 +252,14 @@ class _ProjectDetailContent extends StatelessWidget {
             },
           ),
 
-          if (state.totalBudget > 0) ...[
+          if (state.detail.totalBudget > 0) ...[
             const Gap(16),
             Card(
               padding: const EdgeInsets.all(16),
               child: BudgetProgress(
-                budget: state.totalBudget,
-                deposited: state.totalDeposited,
-                spent: state.totalSpent,
+                budget: state.detail.totalBudget,
+                deposited: state.detail.totalDeposited,
+                spent: state.detail.totalSpent,
                 formatCurrency: (v) => v.toCompactCurrency(context),
               ),
             ),
@@ -271,9 +272,9 @@ class _ProjectDetailContent extends StatelessWidget {
             actionLabel: l10n.project_detail_transactions_see_more,
             onAction: () => _openCategoryManagement(context),
           ),
-          if (state.projectCategories.isNotEmpty) ...[
+          if (state.detail.projectCategories.isNotEmpty) ...[
             const Gap(8),
-            ...state.projectCategories
+            ...state.detail.projectCategories
                 .take(3)
                 .map((cat) => CategoryTile(category: cat)),
           ] else ...[
@@ -293,17 +294,17 @@ class _ProjectDetailContent extends StatelessWidget {
             actionLabel: l10n.project_detail_transactions_see_more,
             onAction: () => _openTransactionList(context),
           ),
-          if (state.projectLevelTransactions.isEmpty)
+          if (state.detail.projectLevelTransactions.isEmpty)
             EmptyState(
               icon: RadixIcons.cardStack,
               title: l10n.project_detail_transactions_empty,
               subtitle: l10n.project_detail_transactions_empty_info,
             )
           else
-            ..._latestTransactions(state.projectLevelTransactions).map(
+            ..._latestTransactions(state.detail.projectLevelTransactions).map(
               (t) => TransactionTile(
                 transaction: t,
-                categories: state.projectCategories,
+                categories: state.detail.projectCategories,
                 onEdit: () => _editTransaction(context, t),
                 onDelete: () {
                   context.read<ProjectDetailCubit>().deleteTransaction(t.id);
@@ -321,7 +322,7 @@ class _ProjectDetailContent extends StatelessWidget {
             ),
           ),
           const Gap(8),
-          if (state.activitySummaries.isEmpty)
+          if (state.detail.activitySummaries.isEmpty)
             EmptyState(
               icon: RadixIcons.layers,
               title: l10n.project_detail_activities_empty,
@@ -340,7 +341,7 @@ class _ProjectDetailContent extends StatelessWidget {
                 return Wrap(
                   spacing: spacing,
                   runSpacing: spacing,
-                  children: state.activitySummaries
+                  children: state.detail.activitySummaries
                       .map(
                         (s) => SizedBox(
                           width: cardWidth,
@@ -400,7 +401,7 @@ class _ProjectDetailContent extends StatelessWidget {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (ctx) => AddTransactionDialog(
-        availableCategories: state.projectCategories,
+        availableCategories: state.detail.projectCategories,
         initialTransaction: transaction,
       ),
     );

@@ -1,4 +1,4 @@
-import 'package:my_investments/projects/domain/entities/project.dart';
+import 'package:my_investments/projects/domain/entities/project_summary.dart';
 
 sealed class ProjectsState {
   const ProjectsState();
@@ -20,28 +20,4 @@ class ProjectsLoaded extends ProjectsState {
 class ProjectsError extends ProjectsState {
   final String message;
   const ProjectsError({required this.message});
-}
-
-class ProjectSummary {
-  final Project project;
-  final double totalBudget;
-  final double totalSpent;
-  final double totalDeposited;
-  final double totalCapitalInjected;
-  final int activityCount;
-
-  const ProjectSummary({
-    required this.project,
-    required this.totalBudget,
-    required this.totalSpent,
-    required this.totalDeposited,
-    required this.totalCapitalInjected,
-    required this.activityCount,
-  });
-
-  double get operatingBalance => totalDeposited - totalSpent;
-  double get netBalance => operatingBalance + totalCapitalInjected;
-  double get remainingBudget => totalBudget - totalDeposited;
-  double get budgetProgress =>
-      totalBudget > 0 ? (totalSpent / totalBudget).clamp(0.0, 1.0) : 0.0;
 }

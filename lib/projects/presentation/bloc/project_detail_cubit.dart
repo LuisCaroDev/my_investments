@@ -17,68 +17,8 @@ class ProjectDetailCubit extends Cubit<ProjectDetailState> {
 
   void load() {
     try {
-      final projects = _repository.getProjects();
-      final project = projects.firstWhere((p) => p.id == projectId);
-      final activities = _repository.getActivitiesForProject(projectId);
-      final allTransactions = _repository.getTransactionsForProject(projectId);
-      final projectCategories = _repository.getProjectCategories(projectId);
-
-      // Build activity summaries
-      final activitySummaries = activities.map((activity) {
-        final activityTransactions = allTransactions
-            .where((t) => t.activityId == activity.id)
-            .toList();
-        final spent = activityTransactions
-            .where((t) => t.type == TransactionType.expense)
-            .fold(0.0, (sum, t) => sum + t.amount);
-        final deposited = activityTransactions
-            .where((t) => t.type == TransactionType.deposit)
-            .fold(0.0, (sum, t) => sum + t.amount);
-        final capitalInjected = activityTransactions
-            .where((t) => t.type == TransactionType.capitalInjection)
-            .fold(0.0, (sum, t) => sum + t.amount);
-        final categories = _repository.getActivityCategories(activity.id);
-
-        return ActivitySummary(
-          activity: activity,
-          spent: spent,
-          deposited: deposited,
-          capitalInjected: capitalInjected,
-          categories: categories,
-          transactionCount: activityTransactions.length,
-        );
-      }).toList();
-
-      // Project-level transactions (no activity)
-      final projectLevelTransactions = _repository.getProjectLevelTransactions(
-        projectId,
-      );
-
-      final totalSpent = allTransactions
-          .where((t) => t.type == TransactionType.expense)
-          .fold(0.0, (sum, t) => sum + t.amount);
-      final totalDeposited = allTransactions
-          .where((t) => t.type == TransactionType.deposit)
-          .fold(0.0, (sum, t) => sum + t.amount);
-      final totalCapitalInjected = allTransactions
-          .where((t) => t.type == TransactionType.capitalInjection)
-          .fold(0.0, (sum, t) => sum + t.amount);
-      final totalBudget =
-          project.globalBudget ??
-          activities.fold<double>(0.0, (sum, a) => sum + (a.budget ?? 0));
-
-      emit(
-        ProjectDetailLoaded(
-          project: project,
-          activitySummaries: activitySummaries,
-          projectLevelTransactions: projectLevelTransactions,
-          projectCategories: projectCategories,
-          totalBudget: totalBudget,
-          totalSpent: totalSpent,
-          totalDeposited: totalDeposited,
-          totalCapitalInjected: totalCapitalInjected,
-        ),
-      );
+      final detail = _repository.getProjectDetail(projectId);
+      emit(ProjectDetailLoaded(detail: detail));
     } catch (e) {
       emit(ProjectDetailError(message: e.toString()));
     }

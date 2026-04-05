@@ -1,5 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_investments/l10n/app_localizations.dart';
+import 'package:my_investments/projects/presentation/bloc/activity_detail_cubit.dart';
+import 'package:my_investments/projects/presentation/bloc/activity_detail_state.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,8 +9,7 @@ import 'package:my_investments/core/extensions/currency_ext.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/projects/data/datasources/projects_local_ds.dart';
 import 'package:my_investments/projects/data/repositories/projects_repository_impl.dart';
-import 'package:my_investments/projects/domain/entities/category.dart'
-    as domain;
+
 import 'package:my_investments/projects/domain/entities/transaction.dart';
 import 'package:my_investments/projects/presentation/pages/category_management_page.dart';
 import 'package:my_investments/projects/presentation/pages/transaction_list_page.dart';
@@ -45,7 +46,7 @@ class ActivityDetailPage extends StatelessWidget {
         final ds = ProjectsLocalDataSource(prefs: snapshot.data!);
         final repo = ProjectsRepository(localDataSource: ds);
         return BlocProvider(
-          create: (_) => _ActivityDetailCubit(
+          create: (_) => ActivityDetailCubit(
             repository: repo,
             projectId: projectId,
             activityId: activityId,
@@ -59,110 +60,6 @@ class ActivityDetailPage extends StatelessWidget {
 
 // ── Private Cubit for Activity Detail ─────────────────────────
 
-class _ActivityDetailState {
-  final bool loading;
-  final String? error;
-  final double budget;
-  final double deposited;
-  final double spent;
-  final double capitalInjected;
-  final List<Transaction> transactions;
-  final List<domain.Category> categories;
-
-  const _ActivityDetailState({
-    this.loading = true,
-    this.error,
-    this.budget = 0,
-    this.deposited = 0,
-    this.spent = 0,
-    this.capitalInjected = 0,
-    this.transactions = const [],
-    this.categories = const [],
-  });
-
-  double get operatingBalance => deposited - spent;
-  double get netBalance => operatingBalance + capitalInjected;
-}
-
-class _ActivityDetailCubit extends Cubit<_ActivityDetailState> {
-  final ProjectsRepository _repository;
-  final String projectId;
-  final String activityId;
-
-  _ActivityDetailCubit({
-    required ProjectsRepository repository,
-    required this.projectId,
-    required this.activityId,
-  }) : _repository = repository,
-       super(const _ActivityDetailState());
-
-  void load() {
-    try {
-      final activities = _repository.getActivitiesForProject(projectId);
-      final activity = activities.firstWhere((a) => a.id == activityId);
-      final transactions = _repository.getTransactionsForActivity(activityId);
-      final categories = _repository.getAvailableCategories(
-        projectId,
-        activityId,
-      );
-
-      final spent = transactions
-          .where((t) => t.type == TransactionType.expense)
-          .fold(0.0, (sum, t) => sum + t.amount);
-      final deposited = transactions
-          .where((t) => t.type == TransactionType.deposit)
-          .fold(0.0, (sum, t) => sum + t.amount);
-      final capitalInjected = transactions
-          .where((t) => t.type == TransactionType.capitalInjection)
-          .fold(0.0, (sum, t) => sum + t.amount);
-
-      emit(
-        _ActivityDetailState(
-          loading: false,
-          budget: activity.budget ?? 0,
-          deposited: deposited,
-          spent: spent,
-          capitalInjected: capitalInjected,
-          transactions: transactions,
-          categories: categories,
-        ),
-      );
-    } catch (e) {
-      emit(_ActivityDetailState(loading: false, error: e.toString()));
-    }
-  }
-
-  Future<void> addTransaction(Transaction transaction) async {
-    await _repository.addTransaction(transaction);
-    load();
-  }
-
-  Future<void> deleteTransaction(String transactionId) async {
-    await _repository.deleteTransaction(transactionId);
-    load();
-  }
-
-  Future<void> updateTransaction(Transaction transaction) async {
-    await _repository.updateTransaction(transaction);
-    load();
-  }
-
-  Future<void> addCategory(domain.Category category) async {
-    await _repository.addCategory(category);
-    load();
-  }
-
-  Future<void> updateCategory(domain.Category category) async {
-    await _repository.updateCategory(category);
-    load();
-  }
-
-  Future<void> deleteCategory(String categoryId) async {
-    await _repository.deleteCategory(categoryId);
-    load();
-  }
-}
-
 // ── View ──────────────────────────────────────────────────────
 
 class _ActivityDetailView extends StatelessWidget {
@@ -173,7 +70,7 @@ class _ActivityDetailView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return BlocBuilder<_ActivityDetailCubit, _ActivityDetailState>(
+    return BlocBuilder<ActivityDetailCubit, ActivityDetailState>(
       builder: (context, state) {
         final footers = [
           if (!state.loading && state.error == null)
@@ -224,13 +121,13 @@ class _ActivityDetailView extends StatelessWidget {
   }
 
   void _addTransaction(BuildContext context) async {
-    final cubit = context.read<_ActivityDetailCubit>();
+    final cubit = context.read<ActivityDetailCubit>();
     final state = cubit.state;
 
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (ctx) =>
-          AddTransactionDialog(availableCategories: state.categories),
+          AddTransactionDialog(availableCategories: state.detail!.categories),
     );
 
     if (result != null && context.mounted) {
@@ -249,7 +146,7 @@ class _ActivityDetailView extends StatelessWidget {
     }
   }
 
-  Widget _buildBody(BuildContext context, _ActivityDetailState state) {
+  Widget _buildBody(BuildContext context, ActivityDetailState state) {
     if (state.loading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -262,7 +159,7 @@ class _ActivityDetailView extends StatelessWidget {
 }
 
 class _ActivityContent extends StatelessWidget {
-  final _ActivityDetailState state;
+  final ActivityDetailState state;
 
   const _ActivityContent({required this.state});
 
@@ -309,7 +206,9 @@ class _ActivityContent extends StatelessWidget {
                           ).muted.small,
                           const Gap(4),
                           Text(
-                            state.deposited.toCompactCurrency(context),
+                            state.detail!.summary.deposited.toCompactCurrency(
+                              context,
+                            ),
                           ).bold(color: theme.colorScheme.primary),
                         ],
                       ),
@@ -326,7 +225,9 @@ class _ActivityContent extends StatelessWidget {
                           Text(l10n.activity_detail_summary_spent).muted.small,
                           const Gap(4),
                           Text(
-                            state.spent.toCompactCurrency(context),
+                            state.detail!.summary.spent.toCompactCurrency(
+                              context,
+                            ),
                           ).bold(color: theme.colorScheme.destructive),
                         ],
                       ),
@@ -345,7 +246,8 @@ class _ActivityContent extends StatelessWidget {
                           ).muted.small,
                           const Gap(4),
                           Text(
-                            state.operatingBalance.toCompactCurrency(context),
+                            state.detail!.summary.operatingBalance
+                                .toCompactCurrency(context),
                           ).bold,
                         ],
                       ),
@@ -364,7 +266,8 @@ class _ActivityContent extends StatelessWidget {
                           ).muted.small,
                           const Gap(4),
                           Text(
-                            state.capitalInjected.toCompactCurrency(context),
+                            state.detail!.summary.capitalInjected
+                                .toCompactCurrency(context),
                           ).bold,
                         ],
                       ),
@@ -383,9 +286,11 @@ class _ActivityContent extends StatelessWidget {
                           ).muted.small,
                           const Gap(4),
                           Text(
-                            state.netBalance.toCompactCurrency(context),
+                            state.detail!.summary.netBalance.toCompactCurrency(
+                              context,
+                            ),
                           ).bold(
-                            color: state.netBalance < 0
+                            color: state.detail!.summary.netBalance < 0
                                 ? theme.colorScheme.destructive
                                 : theme.colorScheme.primary,
                           ),
@@ -398,14 +303,14 @@ class _ActivityContent extends StatelessWidget {
             },
           ),
 
-          if (state.budget > 0) ...[
+          if (state.detail!.summary.budget > 0) ...[
             const Gap(16),
             Card(
               padding: const EdgeInsets.all(16),
               child: BudgetProgress(
-                budget: state.budget,
-                deposited: state.deposited,
-                spent: state.spent,
+                budget: state.detail!.summary.budget,
+                deposited: state.detail!.summary.deposited,
+                spent: state.detail!.summary.spent,
                 formatCurrency: (v) => v.toCompactCurrency(context),
               ),
             ),
@@ -418,9 +323,9 @@ class _ActivityContent extends StatelessWidget {
             actionLabel: l10n.activity_detail_transactions_see_more,
             onAction: () => _openCategoryManagement(context),
           ),
-          if (state.categories.isNotEmpty) ...[
+          if (state.detail!.categories.isNotEmpty) ...[
             const Gap(8),
-            ...state.categories.take(3).map((cat) {
+            ...state.detail!.categories.take(3).map((cat) {
               final isActivityLevel = cat.activityId != null;
               return CategoryTile(
                 category: cat,
@@ -447,20 +352,20 @@ class _ActivityContent extends StatelessWidget {
           ),
           const Gap(12),
 
-          if (state.transactions.isEmpty)
+          if (state.detail!.transactions.isEmpty)
             EmptyState(
               icon: RadixIcons.cardStack,
               title: l10n.activity_detail_transactions_empty,
               subtitle: l10n.activity_detail_transactions_empty_info,
             )
           else
-            ..._latestTransactions(state.transactions).map(
+            ..._latestTransactions(state.detail!.transactions).map(
               (t) => TransactionTile(
                 transaction: t,
-                categories: state.categories,
+                categories: state.detail!.categories,
                 onEdit: () => _editTransaction(context, t),
                 onDelete: () {
-                  context.read<_ActivityDetailCubit>().deleteTransaction(t.id);
+                  context.read<ActivityDetailCubit>().deleteTransaction(t.id);
                 },
               ),
             ),
@@ -471,7 +376,7 @@ class _ActivityContent extends StatelessWidget {
 
   void _openCategoryManagement(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    final cubit = context.read<_ActivityDetailCubit>();
+    final cubit = context.read<ActivityDetailCubit>();
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => CategoryManagementPage(
@@ -488,7 +393,7 @@ class _ActivityContent extends StatelessWidget {
 
   void _openTransactionList(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    final cubit = context.read<_ActivityDetailCubit>();
+    final cubit = context.read<ActivityDetailCubit>();
     await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => TransactionListPage(
@@ -504,12 +409,12 @@ class _ActivityContent extends StatelessWidget {
   }
 
   void _editTransaction(BuildContext context, Transaction transaction) async {
-    final cubit = context.read<_ActivityDetailCubit>();
+    final cubit = context.read<ActivityDetailCubit>();
     final state = cubit.state;
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (ctx) => AddTransactionDialog(
-        availableCategories: state.categories,
+        availableCategories: state.detail!.categories,
         initialTransaction: transaction,
       ),
     );
