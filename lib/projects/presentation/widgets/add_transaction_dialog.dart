@@ -70,6 +70,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     final isExpense = _type == TransactionType.expense;
     final isEditing = widget.initialTransaction != null;
     final l10n = AppLocalizations.of(context)!;
+    final media = MediaQuery.of(context);
 
     final title = isEditing
         ? isExpense
@@ -80,107 +81,118 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
         : isExpense
         ? l10n.dialog_tx_new_expense
         : l10n.dialog_tx_new_deposit;
-    return AlertDialog(
-      title: Text(title),
-      content: SizedBox(
-        width: 400,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            if (!widget.depositOnly) ...[
-              Text(l10n.dialog_tx_type_label).small.medium,
-              const Gap(4),
-              FittedBox(
-                child: ButtonGroup(
-                  children: [
-                    _type == TransactionType.expense
-                        ? PrimaryButton(
-                            onPressed: () {},
-                            child: Text(l10n.dialog_tx_type_expense),
-                          )
-                        : OutlineButton(
-                            onPressed: () =>
-                                setState(() => _type = TransactionType.expense),
-                            child: Text(l10n.dialog_tx_type_expense),
-                          ),
-                    _type == TransactionType.deposit
-                        ? PrimaryButton(
-                            onPressed: () {},
-                            child: Text(l10n.dialog_tx_type_deposit),
-                          )
-                        : OutlineButton(
-                            onPressed: () =>
-                                setState(() => _type = TransactionType.deposit),
-                            child: Text(l10n.dialog_tx_type_deposit),
-                          ),
-
-                  ],
-                ),
-              ),
-              const Gap(12),
-            ],
-            Text(l10n.dialog_tx_account_select).small.medium,
-            const Gap(4),
-            _buildAccountSelector(l10n),
-            const Gap(12),
-            Text(l10n.dialog_tx_amount_label).small.medium,
-            const Gap(4),
-            TextField(
-              controller: _amountController,
-              placeholder: const Text('0.00'),
-              keyboardType: TextInputType.number,
-            ),
-            const Gap(12),
-            Text(l10n.dialog_tx_date_label).small.medium,
-            const Gap(4),
-            DatePicker(
-              value: _selectedDate,
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() => _selectedDate = value);
-                }
-              },
-              mode: PromptMode.dialog,
-            ),
-            const Gap(12),
-            Text(l10n.common_description_label).small.medium,
-            const Gap(4),
-            TextField(
-              controller: _descriptionController,
-              placeholder: Text(l10n.dialog_tx_description_placeholder),
-            ),
-            if (isExpense && widget.availableCategories.isNotEmpty) ...[
-              const Gap(12),
-              Text(l10n.dialog_tx_category_label).small.medium,
-              const Gap(4),
-              _buildCategorySelector(l10n),
-            ],
-          ],
-        ),
+    return AnimatedPadding(
+      padding: EdgeInsets.only(
+        bottom: media.viewInsets.bottom,
       ),
-      actions: [
-        OutlineButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.common_cancel),
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+      child: AlertDialog(
+        title: Text(title),
+        padding: EdgeInsets.all(26),
+        content: ConstrainedBox(
+          constraints: BoxConstraints(
+            minWidth: 400,
+            maxWidth: 400,
+            maxHeight: (media.size.height - media.viewInsets.bottom - 250).clamp(
+              200,
+              media.size.height - media.viewInsets.bottom,
+            ),
+          ),
+          child: SingleChildScrollView(
+            padding: EdgeInsets.all(4),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                if (!widget.depositOnly) ...[
+                  Text(l10n.dialog_tx_type_label).small.medium,
+                  const Gap(4),
+                  ButtonGroup(
+                    children: [
+                      SelectedButton(
+                        value: _type == TransactionType.expense,
+                        style: const ButtonStyle.outline(),
+                        selectedStyle: const ButtonStyle.primary(),
+                        child: Text(l10n.dialog_tx_type_expense),
+                        onPressed: () =>
+                            setState(() => _type = TransactionType.expense),
+                      ),
+                      SelectedButton(
+                        value: _type == TransactionType.deposit,
+                        style: const ButtonStyle.outline(),
+                        selectedStyle: const ButtonStyle.primary(),
+                        child: Text(l10n.dialog_tx_type_deposit),
+                        onPressed: () =>
+                            setState(() => _type = TransactionType.deposit),
+                      ),
+                    ],
+                  ),
+                  const Gap(12),
+                ],
+                Text(l10n.dialog_tx_account_select).small.medium,
+                const Gap(4),
+                _buildAccountSelector(l10n),
+                const Gap(12),
+                Text(l10n.dialog_tx_amount_label).small.medium,
+                const Gap(4),
+                TextField(
+                  controller: _amountController,
+                  placeholder: const Text('0.00'),
+                  keyboardType: TextInputType.number,
+                ),
+                const Gap(12),
+                Text(l10n.dialog_tx_date_label).small.medium,
+                const Gap(4),
+                DatePicker(
+                  value: _selectedDate,
+                  onChanged: (value) {
+                    if (value != null) {
+                      setState(() => _selectedDate = value);
+                    }
+                  },
+                  mode: PromptMode.dialog,
+                ),
+                const Gap(12),
+                Text(l10n.common_description_label).small.medium,
+                const Gap(4),
+                TextField(
+                  controller: _descriptionController,
+                  placeholder: Text(l10n.dialog_tx_description_placeholder),
+                ),
+                if (isExpense && widget.availableCategories.isNotEmpty) ...[
+                  const Gap(12),
+                  Text(l10n.dialog_tx_category_label).small.medium,
+                  const Gap(4),
+                  _buildCategorySelector(l10n),
+                ],
+              ],
+            ),
+          ),
         ),
-        PrimaryButton(
-          onPressed: () {
-            final amount = double.tryParse(_amountController.text.trim());
-            if (amount == null || amount <= 0) return;
-            final description = _descriptionController.text.trim();
-            Navigator.of(context).pop({
-              'type': _type,
-              'amount': amount,
-              'date': _selectedDate,
-              'description': description.isEmpty ? null : description,
-              'categoryId': isExpense ? _selectedCategoryId : null,
-              'accountId': _selectedAccountId,
-            });
-          },
-          child: Text(isEditing ? l10n.common_save : l10n.common_add),
-        ),
-      ],
+        actions: [
+          OutlineButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.common_cancel),
+          ),
+          PrimaryButton(
+            onPressed: () {
+              final amount = double.tryParse(_amountController.text.trim());
+              if (amount == null || amount <= 0) return;
+              final description = _descriptionController.text.trim();
+              Navigator.of(context).pop({
+                'type': _type,
+                'amount': amount,
+                'date': _selectedDate,
+                'description': description.isEmpty ? null : description,
+                'categoryId': isExpense ? _selectedCategoryId : null,
+                'accountId': _selectedAccountId,
+              });
+            },
+            child: Text(isEditing ? l10n.common_save : l10n.common_add),
+          ),
+        ],
+      ),
     );
   }
 

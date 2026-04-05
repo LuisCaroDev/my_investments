@@ -45,59 +45,70 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
   Widget build(BuildContext context) {
     final isEditing = widget.initialName != null;
     final l10n = AppLocalizations.of(context)!;
-    return AlertDialog(
-      title: Text(isEditing ? l10n.dialog_project_edit_title : l10n.dialog_project_new_title),
-      content: SizedBox(
-        width: 400,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(l10n.common_name_label).small.medium,
-            const Gap(4),
-            TextField(
-              controller: _nameController,
-              placeholder: Text(l10n.dialog_project_name_placeholder),
-            ),
-            const Gap(12),
-            Text(l10n.common_description_label).small.medium,
-            const Gap(4),
-            TextField(
-              controller: _descriptionController,
-              placeholder: Text(l10n.dialog_project_description_placeholder),
-              maxLines: 3,
-            ),
-            const Gap(12),
-            Text(l10n.dialog_project_budget_label).small.medium,
-            const Gap(4),
-            TextField(
-              controller: _budgetController,
-              placeholder: const Text('0.00'),
-              keyboardType: TextInputType.number,
-            ),
-          ],
-        ),
+    return AnimatedPadding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      actions: [
-        OutlineButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.common_cancel),
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+      child: AlertDialog(
+        title: Text(
+          isEditing ? l10n.dialog_project_edit_title : l10n.dialog_project_new_title,
         ),
-        PrimaryButton(
-          onPressed: () {
-            final name = _nameController.text.trim();
-            if (name.isEmpty) return;
-            final budget = double.tryParse(_budgetController.text.trim());
-            final description = _descriptionController.text.trim();
-            Navigator.of(context).pop({
-              'name': name,
-              'description': description.isEmpty ? null : description,
-              'budget': budget,
-            });
-          },
-          child: Text(isEditing ? l10n.common_save : l10n.common_create),
+        content: SizedBox(
+          width: 400,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(l10n.common_name_label).small.medium,
+                const Gap(4),
+                TextField(
+                  controller: _nameController,
+                  placeholder: Text(l10n.dialog_project_name_placeholder),
+                ),
+                const Gap(12),
+                Text(l10n.common_description_label).small.medium,
+                const Gap(4),
+                TextField(
+                  controller: _descriptionController,
+                  placeholder: Text(l10n.dialog_project_description_placeholder),
+                  maxLines: 3,
+                ),
+                const Gap(12),
+                Text(l10n.dialog_project_budget_label).small.medium,
+                const Gap(4),
+                TextField(
+                  controller: _budgetController,
+                  placeholder: const Text('0.00'),
+                  keyboardType: TextInputType.number,
+                ),
+              ],
+            ),
+          ),
         ),
-      ],
+        actions: [
+          OutlineButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.common_cancel),
+          ),
+          PrimaryButton(
+            onPressed: () {
+              final name = _nameController.text.trim();
+              if (name.isEmpty) return;
+              final budget = double.tryParse(_budgetController.text.trim());
+              final description = _descriptionController.text.trim();
+              Navigator.of(context).pop({
+                'name': name,
+                'description': description.isEmpty ? null : description,
+                'budget': budget,
+              });
+            },
+            child: Text(isEditing ? l10n.common_save : l10n.common_create),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:my_investments/projects/presentation/pages/accounts_page.dart';
 import 'package:my_investments/projects/presentation/pages/goals_page.dart';
 import 'package:my_investments/projects/presentation/pages/investments_page.dart';
+import 'package:my_investments/core/presentation/pages/settings_page.dart';
 import 'package:my_investments/projects/presentation/bloc/accounts_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/accounts_state.dart';
 import 'package:my_investments/projects/presentation/bloc/goals_cubit.dart';
@@ -29,6 +30,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
       const InvestmentsPage(),
       const GoalsPage(),
       const AccountsPage(),
+      const SettingsPage(),
     ];
 
     // const buttonStyle = ButtonStyle.ghost(density: ButtonDensity.icon);
@@ -81,6 +83,14 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                         child: const Icon(RadixIcons.pieChart),
                       ),
                     ),
+                    Gap(4),
+                    Expanded(
+                      child: NavigationItem(
+                        key: const ValueKey<int>(3),
+                        label: Text(l10n.settings_title),
+                        child: const Icon(RadixIcons.gear),
+                      ),
+                    ),
                   ],
                 ),
                 Gap(MediaQuery.of(context).padding.bottom),
@@ -126,6 +136,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
                         key: const ValueKey<int>(2),
                         label: Text(l10n.nav_accounts),
                         child: const Icon(RadixIcons.pieChart),
+                      ),
+                      NavigationItem(
+                        key: const ValueKey<int>(3),
+                        label: Text(l10n.settings_title),
+                        child: const Icon(RadixIcons.gear),
                       ),
                     ],
                   ),

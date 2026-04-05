@@ -45,98 +45,99 @@ class _AddFinancialAccountDialogState extends State<AddFinancialAccountDialog> {
     final isEditing = widget.initialAccount != null;
     final title = isEditing ? 'Edit Account' : l10n.dialog_account_title;
 
-    return AlertDialog(
-      title: Text(title),
-      content: SizedBox(
-        width: 400,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(l10n.dialog_account_type).small.medium,
-            const Gap(4),
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                children: [
-                  _type == FinancialAccountType.bank
-                      ? PrimaryButton(
-                          onPressed: () {},
-                          child: Text(l10n.dialog_account_type_bank),
-                        )
-                      : OutlineButton(
-                          onPressed: () => setState(
-                              () => _type = FinancialAccountType.bank),
-                          child: Text(l10n.dialog_account_type_bank),
-                        ),
-                  const Gap(8),
-                  _type == FinancialAccountType.loan
-                      ? PrimaryButton(
-                          onPressed: () {},
-                          child: Text(l10n.dialog_account_type_loan),
-                        )
-                      : OutlineButton(
-                          onPressed: () => setState(
-                              () => _type = FinancialAccountType.loan),
-                          child: Text(l10n.dialog_account_type_loan),
-                        ),
-                ],
-              ),
-            ),
-            const Gap(12),
-            Text(l10n.dialog_account_name).small.medium,
-            const Gap(4),
-            TextField(
-              controller: _nameController,
-              placeholder: const Text('Checking, Saving...'),
-              autofocus: true,
-            ),
-            const Gap(12),
-            Text(l10n.dialog_account_balance_label).small.medium,
-            const Gap(4),
-            TextField(
-              controller: _balanceController,
-              keyboardType: TextInputType.number,
-              placeholder: const Text('0.00'),
-            ),
-          ],
-        ),
+    return AnimatedPadding(
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.of(context).viewInsets.bottom,
       ),
-      actions: [
-        OutlineButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: Text(l10n.common_cancel),
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOut,
+      child: AlertDialog(
+        title: Text(title),
+        content: SizedBox(
+          width: 400,
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Text(l10n.dialog_account_type).small.medium,
+                const Gap(4),
+                ButtonGroup(
+                  children: [
+                    SelectedButton(
+                      value: _type == FinancialAccountType.bank,
+                      style: const ButtonStyle.outline(),
+                      selectedStyle: const ButtonStyle.primary(),
+                      child: Text(l10n.dialog_account_type_bank),
+                      onPressed: () =>
+                          setState(() => _type = FinancialAccountType.bank),
+                    ),
+                    SelectedButton(
+                      value: _type == FinancialAccountType.loan,
+                      style: const ButtonStyle.outline(),
+                      selectedStyle: const ButtonStyle.primary(),
+                      child: Text(l10n.dialog_account_type_loan),
+                      onPressed: () =>
+                          setState(() => _type = FinancialAccountType.loan),
+                    ),
+                  ],
+                ),
+                const Gap(12),
+                Text(l10n.dialog_account_name).small.medium,
+                const Gap(4),
+                TextField(
+                  controller: _nameController,
+                  placeholder: const Text('Checking, Saving...'),
+                  autofocus: true,
+                ),
+                const Gap(12),
+                Text(l10n.dialog_account_balance_label).small.medium,
+                const Gap(4),
+                TextField(
+                  controller: _balanceController,
+                  keyboardType: TextInputType.number,
+                  placeholder: const Text('0.00'),
+                ),
+              ],
+            ),
+          ),
         ),
-        PrimaryButton(
-          onPressed: () {
-            final name = _nameController.text.trim();
-            final balance = double.tryParse(_balanceController.text) ?? 0.0;
-            if (name.isEmpty) return;
+        actions: [
+          OutlineButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.common_cancel),
+          ),
+          PrimaryButton(
+            onPressed: () {
+              final name = _nameController.text.trim();
+              final balance = double.tryParse(_balanceController.text) ?? 0.0;
+              if (name.isEmpty) return;
 
-            if (isEditing) {
-              context.read<AccountsCubit>().updateAccount(
-                    widget.initialAccount!.copyWith(
-                      name: name,
-                      balance: balance,
-                      type: _type,
-                    ),
-                  );
-            } else {
-              context.read<AccountsCubit>().addAccount(
-                    FinancialAccount(
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      name: name,
-                      balance: balance,
-                      type: _type,
-                      createdAt: DateTime.now(),
-                    ),
-                  );
-            }
-            Navigator.of(context).pop();
-          },
-          child: Text(l10n.common_save),
-        ),
-      ],
+              if (isEditing) {
+                context.read<AccountsCubit>().updateAccount(
+                  widget.initialAccount!.copyWith(
+                    name: name,
+                    balance: balance,
+                    type: _type,
+                  ),
+                );
+              } else {
+                context.read<AccountsCubit>().addAccount(
+                  FinancialAccount(
+                    id: DateTime.now().millisecondsSinceEpoch.toString(),
+                    name: name,
+                    balance: balance,
+                    type: _type,
+                    createdAt: DateTime.now(),
+                  ),
+                );
+              }
+              Navigator.of(context).pop();
+            },
+            child: Text(l10n.common_save),
+          ),
+        ],
+      ),
     );
   }
 }

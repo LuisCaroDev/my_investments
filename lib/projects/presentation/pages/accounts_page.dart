@@ -3,6 +3,7 @@ import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'package:my_investments/core/extensions/currency_ext.dart';
+import 'package:my_investments/core/router/app_router.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/core/widgets/stat_card.dart';
 import 'package:my_investments/projects/domain/entities/financial_account.dart';
@@ -14,7 +15,6 @@ import 'package:my_investments/projects/presentation/bloc/goals_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/goals_state.dart';
 import 'package:my_investments/projects/presentation/bloc/investments_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/investments_state.dart';
-import 'package:my_investments/projects/presentation/pages/account_transactions_page.dart';
 import 'package:my_investments/projects/presentation/widgets/add_financial_account_dialog.dart';
 import 'package:flutter/material.dart'
     show ReorderableDragStartListener, ReorderableListView, WidgetsBinding;
@@ -30,8 +30,10 @@ class AccountsPage extends StatelessWidget {
         AppBar(
           title: Text(l10n.nav_accounts),
           trailing: [
-            IconButton.ghost(
+            IconButton.outline(
               onPressed: () => _showPriorityDialog(context),
+              size: ButtonSize.small,
+              density: ButtonDensity.icon,
               icon: const Icon(RadixIcons.mixerHorizontal),
             ),
           ],
@@ -51,7 +53,9 @@ class AccountsPage extends StatelessWidget {
                 children: [
                   Icon(RadixIcons.plus, size: 16),
                   Gap(6),
-                  Text(l10n.common_add), // l10n.accounts_add_button ? fallback to common_add for now
+                  Text(
+                    l10n.common_add,
+                  ), // l10n.accounts_add_button ? fallback to common_add for now
                 ],
               ),
             ),
@@ -127,7 +131,8 @@ class _PriorityDialogState extends State<_PriorityDialog> {
       builder: (context, invState) {
         return BlocBuilder<GoalsCubit, GoalsState>(
           builder: (context, goalState) {
-            final loaded = invState is InvestmentsLoaded && goalState is GoalsLoaded;
+            final loaded =
+                invState is InvestmentsLoaded && goalState is GoalsLoaded;
             if (loaded) {
               final nextItems = _buildPriorityItems(
                 invState.summaries,
@@ -145,36 +150,31 @@ class _PriorityDialogState extends State<_PriorityDialog> {
               title: Text(l10n.dialog_priority_title),
               content: SizedBox(
                 width: 440,
-                child:
-                    !loaded
-                        ? const Center(child: CircularProgressIndicator())
-                        : _items.isEmpty
-                            ? Text(l10n.accounts_empty)
-                            : ReorderableListView(
-                                buildDefaultDragHandles: false,
-                                shrinkWrap: true,
-                                onReorder: (oldIndex, newIndex) {
-                                  setState(() {
-                                    if (newIndex > oldIndex) newIndex -= 1;
-                                    final item = _items.removeAt(oldIndex);
-                                    _items.insert(newIndex, item);
-                                  });
-                                },
-                                children:
-                                    [
-                                      for (int i = 0; i < _items.length; i++)
-                                        Padding(
-                                          key: ValueKey(_items[i].id),
-                                          padding:  EdgeInsets.only(
-                                            bottom: i == _items.length - 1 ? 0 : 8,
-                                          ),
-                                          child: _PriorityTile(
-                                            item: _items[i],
-                                            index: i,
-                                          ),
-                                        ),
-                                    ],
+                child: !loaded
+                    ? const Center(child: CircularProgressIndicator())
+                    : _items.isEmpty
+                    ? Text(l10n.accounts_empty)
+                    : ReorderableListView(
+                        buildDefaultDragHandles: false,
+                        shrinkWrap: true,
+                        onReorder: (oldIndex, newIndex) {
+                          setState(() {
+                            if (newIndex > oldIndex) newIndex -= 1;
+                            final item = _items.removeAt(oldIndex);
+                            _items.insert(newIndex, item);
+                          });
+                        },
+                        children: [
+                          for (int i = 0; i < _items.length; i++)
+                            Padding(
+                              key: ValueKey(_items[i].id),
+                              padding: EdgeInsets.only(
+                                bottom: i == _items.length - 1 ? 0 : 8,
                               ),
+                              child: _PriorityTile(item: _items[i], index: i),
+                            ),
+                        ],
+                      ),
               ),
               actions: [
                 OutlineButton(
@@ -182,22 +182,21 @@ class _PriorityDialogState extends State<_PriorityDialog> {
                   child: Text(l10n.common_cancel),
                 ),
                 PrimaryButton(
-                  onPressed:
-                      _items.isEmpty
-                          ? null
-                          : () async {
-                              final ids = _items.map((e) => e.id).toList();
-                              final accountsCubit = context.read<AccountsCubit>();
-                              final investmentsCubit =
-                                  context.read<InvestmentsCubit>();
-                              final goalsCubit = context.read<GoalsCubit>();
-                              final navigator = Navigator.of(context);
-                              await accountsCubit.reorderProjectPriorities(ids);
-                              if (!context.mounted) return;
-                              investmentsCubit.loadInvestments();
-                              goalsCubit.loadGoals();
-                              navigator.pop();
-                            },
+                  onPressed: _items.isEmpty
+                      ? null
+                      : () async {
+                          final ids = _items.map((e) => e.id).toList();
+                          final accountsCubit = context.read<AccountsCubit>();
+                          final investmentsCubit = context
+                              .read<InvestmentsCubit>();
+                          final goalsCubit = context.read<GoalsCubit>();
+                          final navigator = Navigator.of(context);
+                          await accountsCubit.reorderProjectPriorities(ids);
+                          if (!context.mounted) return;
+                          investmentsCubit.loadInvestments();
+                          goalsCubit.loadGoals();
+                          navigator.pop();
+                        },
                   child: Text(l10n.common_save),
                 ),
               ],
@@ -258,10 +257,9 @@ class _PriorityTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final typeLabel =
-        item.type == ProjectType.investment
-            ? l10n.nav_investments
-            : l10n.nav_goals;
+    final typeLabel = item.type == ProjectType.investment
+        ? l10n.nav_investments
+        : l10n.nav_goals;
 
     return Card(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -275,10 +273,7 @@ class _PriorityTile extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(item.name).medium,
-                Text(typeLabel).muted.small,
-              ],
+              children: [Text(item.name).medium, Text(typeLabel).muted.small],
             ),
           ),
         ],
@@ -310,7 +305,6 @@ class _AccountsList extends StatelessWidget {
           // ── Summary ─────────────────
           LayoutBuilder(
             builder: (context, constraints) {
-
               const spacing = 12.0;
               const minCardWidth = 200.0;
               int columns = (constraints.maxWidth / minCardWidth).floor();
@@ -325,7 +319,8 @@ class _AccountsList extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: l10n.project_detail_summary_net_balance, // generic "Balance"
+                      label: l10n
+                          .project_detail_summary_net_balance, // generic "Balance"
                       value: totalBalance.toCompactCurrency(context),
                       icon: RadixIcons.barChart,
                       valueColor: totalBalance < 0
@@ -377,9 +372,7 @@ class _AccountCard extends StatelessWidget {
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(account.name).medium,
-                    ],
+                    children: [Text(account.name).medium],
                   ),
                 ),
                 IconButton.ghost(
@@ -390,9 +383,9 @@ class _AccountCard extends StatelessWidget {
             ),
             const Gap(16),
             Text('Balance').muted.small,
-            Text(account.balance.toCompactCurrency(context)).semiBold(
-              color: theme.colorScheme.primary,
-            ),
+            Text(
+              account.balance.toCompactCurrency(context),
+            ).semiBold(color: theme.colorScheme.primary),
           ],
         ),
       ),
@@ -400,11 +393,7 @@ class _AccountCard extends StatelessWidget {
   }
 
   void _openTransactions(BuildContext context) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => AccountTransactionsPage(account: account),
-      ),
-    );
+    context.appRouter.push(AccountTransactionsRoute(account: account));
   }
 
   void _showActionsMenu(BuildContext context) {

@@ -8,12 +8,12 @@ import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
 import 'package:my_investments/core/presentation/bloc/settings_state.dart';
 import 'package:my_investments/core/theme/app_theme.dart';
+import 'package:my_investments/core/router/app_router.dart';
 import 'package:my_investments/projects/data/datasources/projects_local_ds.dart';
 import 'package:my_investments/projects/data/repositories/projects_repository_impl.dart';
 import 'package:my_investments/projects/presentation/bloc/accounts_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/goals_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/investments_cubit.dart';
-import 'package:my_investments/projects/presentation/pages/main_navigation_shell.dart';
 import 'package:my_investments/core/i18n/shadcn_localizations_es.dart';
 
 void main() async {
@@ -49,7 +49,7 @@ class FallbackShadcnLocalizationsDelegate
   bool shouldReload(FallbackShadcnLocalizationsDelegate old) => false;
 }
 
-class MyInvestmentsApp extends StatelessWidget {
+class MyInvestmentsApp extends StatefulWidget {
   final SharedPreferences prefs;
   final ProjectsRepository repository;
 
@@ -60,28 +60,40 @@ class MyInvestmentsApp extends StatelessWidget {
   });
 
   @override
+  State<MyInvestmentsApp> createState() => _MyInvestmentsAppState();
+}
+
+class _MyInvestmentsAppState extends State<MyInvestmentsApp> {
+  late final AppRouter _router = AppRouter();
+  late final AppRouteParser _routeParser = AppRouteParser();
+
+  @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => InvestmentsCubit(repository: repository)..loadInvestments(),
+          create: (_) =>
+              InvestmentsCubit(repository: widget.repository)..loadInvestments(),
         ),
         BlocProvider(
-          create: (_) => GoalsCubit(repository: repository)..loadGoals(),
+          create: (_) => GoalsCubit(repository: widget.repository)..loadGoals(),
         ),
         BlocProvider(
-          create: (_) => AccountsCubit(repository: repository)..loadAccounts(),
+          create: (_) =>
+              AccountsCubit(repository: widget.repository)..loadAccounts(),
         ),
-        BlocProvider(create: (_) => SettingsCubit(prefs: prefs)),
+        BlocProvider(create: (_) => SettingsCubit(prefs: widget.prefs)),
       ],
       child: BlocBuilder<SettingsCubit, SettingsState>(
         builder: (context, settingsState) {
-          return ShadcnApp(
+          return ShadcnApp.router(
             // key: ValueKey(settingsState.props.join('-')),
             title: 'My Investments',
             theme: AppTheme.light(),
             darkTheme: AppTheme.dark(),
             themeMode: settingsState.themeMode,
+            routerDelegate: _router,
+            routeInformationParser: _routeParser,
             localizationsDelegates: [
               const FallbackShadcnLocalizationsDelegate(),
               AppLocalizations.delegate,
@@ -116,7 +128,6 @@ class MyInvestmentsApp extends StatelessWidget {
                 child: child ?? const SizedBox.shrink(),
               );
             },
-            home: const MainNavigationShell(),
           );
         },
       ),

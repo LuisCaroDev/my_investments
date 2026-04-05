@@ -4,7 +4,8 @@ import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
 import 'package:my_investments/core/presentation/bloc/settings_state.dart';
-import 'package:my_investments/projects/presentation/pages/import_export_page.dart';
+import 'package:my_investments/core/router/app_router.dart';
+import 'package:my_investments/core/widgets/app_back_button.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -19,12 +20,10 @@ class SettingsPage extends StatelessWidget {
         AppBar(
           title: Text(l10n.settings_title),
           leading: [
-            GhostButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Icon(RadixIcons.chevronLeft),
-            ),
+             ...AppBackButton.render(context),
           ],
         ),
+        Divider(height: 1),
       ],
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -168,9 +167,7 @@ class SettingsPage extends StatelessWidget {
             const Gap(16),
             CardButton(
               onPressed: () {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const ImportExportPage()),
-                );
+                context.appRouter.push(const ImportExportRoute());
               },
               child: Padding(
                 padding: const EdgeInsets.all(8.0),

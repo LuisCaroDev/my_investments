@@ -52,23 +52,23 @@ class TransactionTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label).small,
-                Row(
-                  children: [
-                    Text(
-                      '${transaction.date.day}/${transaction.date.month}/${transaction.date.year}',
-                    ).muted.xSmall,
-                    if (category != null) ...[
-                      const Gap(6),
-                      Text('• ${category.name}').muted.xSmall,
-                    ],
-                  ],
-                ),
+                if (category != null) ...[
+                  const Gap(2),
+                  Text(category.name).muted.xSmall,
+                ],
               ],
             ),
           ),
-          Text(
-            '$sign${transaction.amount.toCompactCurrency(context)}',
-          ).small.semiBold(color: valueColor),
+          Column(
+            children: [
+              Text(
+                '${transaction.date.day}/${transaction.date.month}/${transaction.date.year}',
+              ).muted.xSmall,
+              Text(
+                '$sign${transaction.amount.toCompactCurrency(context)}',
+              ).small.semiBold(color: valueColor),
+            ],
+          ),
           if (onEdit != null || onDelete != null) ...[
             const Gap(6),
             IconButton.ghost(
@@ -107,7 +107,10 @@ class TransactionTile extends StatelessWidget {
     );
   }
 
-  Future<void> _handleMenuDelete(BuildContext context, AppLocalizations l10n) async {
+  Future<void> _handleMenuDelete(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) async {
     if (onDelete == null) return;
     if (confirmDelete) {
       final confirmed = await _confirmDelete(context, l10n);

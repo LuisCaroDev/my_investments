@@ -2,6 +2,7 @@ import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/projects/data/datasources/projects_local_ds.dart';
 import 'package:my_investments/projects/data/repositories/projects_repository_impl.dart';
@@ -62,10 +63,7 @@ class _AccountTransactionsView extends StatelessWidget {
       headers: [
         AppBar(
           leading: [
-            IconButton.ghost(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: const Icon(RadixIcons.arrowLeft),
-            ),
+            ...AppBackButton.render(context),
           ],
           title: Text(account.name),
         ),

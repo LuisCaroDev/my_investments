@@ -3,14 +3,13 @@ import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'package:my_investments/core/extensions/currency_ext.dart';
-import 'package:my_investments/core/presentation/pages/settings_page.dart';
+import 'package:my_investments/core/router/app_router.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/core/widgets/stat_card.dart';
 import 'package:my_investments/projects/domain/entities/project.dart';
 import 'package:my_investments/projects/domain/entities/project_summary.dart';
 import 'package:my_investments/projects/presentation/bloc/investments_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/investments_state.dart';
-import 'package:my_investments/projects/presentation/pages/project_detail_page.dart';
 import 'package:my_investments/projects/presentation/widgets/add_project_dialog.dart';
 import 'package:my_investments/projects/presentation/widgets/budget_progress.dart';
 
@@ -24,13 +23,6 @@ class InvestmentsPage extends StatelessWidget {
       headers: [
         AppBar(
           title: Text(l10n.nav_investments),
-          trailing: [
-            IconButton.outline(
-              onPressed: () => _openSettings(context),
-              size: ButtonSize.small,
-              icon: const Icon(RadixIcons.gear),
-            ),
-          ],
         ),
         Divider(height: 1),
       ],
@@ -98,11 +90,6 @@ class InvestmentsPage extends StatelessWidget {
     }
   }
 
-  void _openSettings(BuildContext context) {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => const SettingsPage()));
-  }
 }
 
 class _ProjectsList extends StatelessWidget {
@@ -244,12 +231,10 @@ class _ProjectCard extends StatelessWidget {
 
     return CardButton(
       onPressed: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => ProjectDetailPage(
-              projectId: summary.project.id,
-              projectName: summary.project.name,
-            ),
+        context.appRouter.push(
+          ProjectDetailRoute(
+            projectId: summary.project.id,
+            projectName: summary.project.name,
           ),
         );
       },

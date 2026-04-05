@@ -4,7 +4,9 @@ import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:my_investments/core/extensions/currency_ext.dart';
+import 'package:my_investments/core/router/app_router.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
+import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/core/widgets/stat_card.dart';
 import 'package:my_investments/projects/data/datasources/projects_local_ds.dart';
 import 'package:my_investments/projects/data/repositories/projects_repository_impl.dart';
@@ -16,9 +18,6 @@ import 'package:my_investments/projects/presentation/bloc/project_detail_cubit.d
 import 'package:my_investments/projects/presentation/bloc/project_detail_state.dart';
 import 'package:my_investments/projects/presentation/bloc/accounts_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/accounts_state.dart';
-import 'package:my_investments/projects/presentation/pages/activity_detail_page.dart';
-import 'package:my_investments/projects/presentation/pages/category_management_page.dart';
-import 'package:my_investments/projects/presentation/pages/transaction_list_page.dart';
 import 'package:my_investments/projects/presentation/widgets/add_activity_dialog.dart';
 import 'package:my_investments/projects/presentation/widgets/add_transaction_dialog.dart';
 import 'package:my_investments/projects/presentation/widgets/budget_progress.dart';
@@ -104,10 +103,7 @@ class _ProjectDetailView extends StatelessWidget {
           headers: [
             AppBar(
               leading: [
-                IconButton.ghost(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(RadixIcons.arrowLeft),
-                ),
+                ...AppBackButton.render(context),
               ],
               title: Text(projectName),
             ),
@@ -377,12 +373,10 @@ class _ProjectDetailContent extends StatelessWidget {
   void _openCategoryManagement(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     final cubit = context.read<ProjectDetailCubit>();
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => CategoryManagementPage(
-          projectId: cubit.projectId,
-          title: l10n.category_mgmt_project_title,
-        ),
+    await context.appRouter.pushForResult(
+      CategoryManagementRoute(
+        projectId: cubit.projectId,
+        title: l10n.category_mgmt_project_title,
       ),
     );
     if (context.mounted) {
@@ -393,12 +387,10 @@ class _ProjectDetailContent extends StatelessWidget {
   void _openTransactionList(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     final cubit = context.read<ProjectDetailCubit>();
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => TransactionListPage(
-          projectId: cubit.projectId,
-          title: l10n.transaction_list_page_title,
-        ),
+    await context.appRouter.pushForResult(
+      TransactionListRoute(
+        projectId: cubit.projectId,
+        title: l10n.transaction_list_page_title,
       ),
     );
     if (context.mounted) {
@@ -540,13 +532,11 @@ class _ActivityCard extends StatelessWidget {
 
     return CardButton(
       onPressed: () async {
-        await Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => ActivityDetailPage(
-              projectId: cubit.projectId,
-              activityId: summary.activity.id,
-              activityName: summary.activity.name,
-            ),
+        await context.appRouter.pushForResult(
+          ActivityDetailRoute(
+            projectId: cubit.projectId,
+            activityId: summary.activity.id,
+            activityName: summary.activity.name,
           ),
         );
         if (context.mounted) {

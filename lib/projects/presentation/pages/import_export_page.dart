@@ -4,6 +4,7 @@ import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/projects/data/datasources/projects_local_ds.dart';
 import 'package:my_investments/projects/data/models/activity_model.dart';
 import 'package:my_investments/projects/data/models/category_model.dart';
@@ -71,13 +72,10 @@ class _ImportExportPageState extends State<ImportExportPage> {
         return Scaffold(
           headers: [
             AppBar(
-              leading: [
-                IconButton.ghost(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(RadixIcons.arrowLeft),
-                ),
-              ],
-              title: Text(AppLocalizations.of(context)!.settings_import_export_label),
+              leading: [...AppBackButton.render(context)],
+              title: Text(
+                AppLocalizations.of(context)!.settings_import_export_label,
+              ),
             ),
           ],
           child: SingleChildScrollView(
@@ -85,7 +83,9 @@ class _ImportExportPageState extends State<ImportExportPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(AppLocalizations.of(context)!.import_export_export_tab).large.bold,
+                Text(
+                  AppLocalizations.of(context)!.import_export_export_tab,
+                ).large.bold,
                 const Gap(8),
                 Text(
                   AppLocalizations.of(context)!.import_export_export_info,
@@ -103,13 +103,17 @@ class _ImportExportPageState extends State<ImportExportPage> {
                     onPressed: () async {
                       await Clipboard.setData(ClipboardData(text: exportText));
                     },
-                    child: Text(AppLocalizations.of(context)!.import_export_copy_button),
+                    child: Text(
+                      AppLocalizations.of(context)!.import_export_copy_button,
+                    ),
                   ),
                 ),
                 const Gap(28),
                 const Divider(),
                 const Gap(20),
-                Text(AppLocalizations.of(context)!.import_export_import_tab).large.bold,
+                Text(
+                  AppLocalizations.of(context)!.import_export_import_tab,
+                ).large.bold,
                 const Gap(8),
                 Text(
                   AppLocalizations.of(context)!.import_export_import_info,
@@ -118,7 +122,9 @@ class _ImportExportPageState extends State<ImportExportPage> {
                 TextArea(
                   controller: _importController,
                   placeholder: Text(
-                    AppLocalizations.of(context)!.import_export_import_placeholder,
+                    AppLocalizations.of(
+                      context,
+                    )!.import_export_import_placeholder,
                   ),
                   minHeight: 240,
                 ),
@@ -129,7 +135,9 @@ class _ImportExportPageState extends State<ImportExportPage> {
                     onPressed: _importing
                         ? null
                         : () => _importData(context, ds),
-                    child: Text(AppLocalizations.of(context)!.import_export_import_tab),
+                    child: Text(
+                      AppLocalizations.of(context)!.import_export_import_tab,
+                    ),
                   ),
                 ),
               ],
@@ -203,14 +211,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
 
     buffer.writeln();
     buffer.writeln('## categories.csv');
-    buffer.writeln(
-      [
-        'id',
-        'project_id',
-        'activity_id',
-        'name',
-      ].join(','),
-    );
+    buffer.writeln(['id', 'project_id', 'activity_id', 'name'].join(','));
     for (final c in categories) {
       buffer.writeln(
         [
@@ -257,15 +258,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
 
     buffer.writeln();
     buffer.writeln('## accounts.csv');
-    buffer.writeln(
-      [
-        'id',
-        'name',
-        'type',
-        'balance',
-        'created_at',
-      ].join(','),
-    );
+    buffer.writeln(['id', 'name', 'type', 'balance', 'created_at'].join(','));
     for (final a in accounts) {
       buffer.writeln(
         [
@@ -299,9 +292,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: Text(l10n.import_export_confirm_title),
-        content: Text(
-          l10n.import_export_confirm_info,
-        ),
+        content: Text(l10n.import_export_confirm_info),
         actions: [
           OutlineButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -330,34 +321,34 @@ class _ImportExportPageState extends State<ImportExportPage> {
         context.read<GoalsCubit>().loadGoals();
         context.read<AccountsCubit>().loadAccounts();
         await showDialog<void>(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: Text(l10n.import_export_success_title),
-              content: Text(l10n.import_export_success_info),
-              actions: [
-                PrimaryButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  child: Text(l10n.common_close),
-                ),
-              ],
-            ),
-          );
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(l10n.import_export_success_title),
+            content: Text(l10n.import_export_success_info),
+            actions: [
+              PrimaryButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(l10n.common_close),
+              ),
+            ],
+          ),
+        );
       }
     } catch (e) {
       if (context.mounted) {
-          await showDialog<void>(
-            context: context,
-            builder: (ctx) => AlertDialog(
-              title: Text(l10n.import_export_error_title),
-              content: Text(l10n.common_error_msg(e.toString())),
-              actions: [
-                PrimaryButton(
-                  onPressed: () => Navigator.of(ctx).pop(),
-                  child: Text(l10n.common_close),
-                ),
-              ],
-            ),
-          );
+        await showDialog<void>(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text(l10n.import_export_error_title),
+            content: Text(l10n.common_error_msg(e.toString())),
+            actions: [
+              PrimaryButton(
+                onPressed: () => Navigator.of(ctx).pop(),
+                child: Text(l10n.common_close),
+              ),
+            ],
+          ),
+        );
       }
     } finally {
       if (mounted) setState(() => _importing = false);
@@ -424,7 +415,9 @@ class _ImportExportPageState extends State<ImportExportPage> {
         globalBudget: _toDouble(map['global_budget']),
         type: type,
         priority: _toInt(map['priority']) ?? 0,
-        createdAt: DateTime.parse(map['created_at'] ?? DateTime.now().toString()),
+        createdAt: DateTime.parse(
+          map['created_at'] ?? DateTime.now().toString(),
+        ),
       );
     }).toList();
   }
@@ -442,7 +435,9 @@ class _ImportExportPageState extends State<ImportExportPage> {
         description: _nullIfEmpty(map['description']),
         year: _toInt(map['year']),
         budget: _toDouble(map['budget']),
-        createdAt: DateTime.parse(map['created_at'] ?? DateTime.now().toString()),
+        createdAt: DateTime.parse(
+          map['created_at'] ?? DateTime.now().toString(),
+        ),
       );
     }).toList();
   }
@@ -478,7 +473,9 @@ class _ImportExportPageState extends State<ImportExportPage> {
         amount: _toDouble(map['amount']) ?? 0,
         date: DateTime.parse(map['date'] ?? DateTime.now().toString()),
         description: _nullIfEmpty(map['description']),
-        createdAt: DateTime.parse(map['created_at'] ?? DateTime.now().toString()),
+        createdAt: DateTime.parse(
+          map['created_at'] ?? DateTime.now().toString(),
+        ),
       );
     }).toList();
   }
@@ -490,14 +487,17 @@ class _ImportExportPageState extends State<ImportExportPage> {
     return rows.skip(1).where((r) => r.length == header.length).map((r) {
       final map = _rowToMap(header, r);
       final typeRaw = (map['type'] ?? 'bank').trim();
-      final type =
-          FinancialAccountType.values.byName(typeRaw == 'loan_account' ? 'loan' : typeRaw);
+      final type = FinancialAccountType.values.byName(
+        typeRaw == 'loan_account' ? 'loan' : typeRaw,
+      );
       return FinancialAccountModel(
         id: map['id'] ?? '',
         name: map['name'] ?? '',
         type: type,
         balance: _toDouble(map['balance']) ?? 0,
-        createdAt: DateTime.parse(map['created_at'] ?? DateTime.now().toString()),
+        createdAt: DateTime.parse(
+          map['created_at'] ?? DateTime.now().toString(),
+        ),
       );
     }).toList();
   }
