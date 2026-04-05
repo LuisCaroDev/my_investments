@@ -11,8 +11,11 @@ import 'package:my_investments/projects/data/repositories/projects_repository_im
 import 'package:my_investments/projects/domain/entities/activity.dart';
 import 'package:my_investments/projects/domain/entities/transaction.dart';
 import 'package:my_investments/projects/domain/entities/activity_summary.dart';
+import 'package:my_investments/projects/domain/entities/financial_account.dart';
 import 'package:my_investments/projects/presentation/bloc/project_detail_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/project_detail_state.dart';
+import 'package:my_investments/projects/presentation/bloc/accounts_cubit.dart';
+import 'package:my_investments/projects/presentation/bloc/accounts_state.dart';
 import 'package:my_investments/projects/presentation/pages/activity_detail_page.dart';
 import 'package:my_investments/projects/presentation/pages/category_management_page.dart';
 import 'package:my_investments/projects/presentation/pages/transaction_list_page.dart';
@@ -22,6 +25,12 @@ import 'package:my_investments/projects/presentation/widgets/budget_progress.dar
 import 'package:my_investments/projects/presentation/widgets/section_header.dart';
 import 'package:my_investments/projects/presentation/widgets/transaction_tile.dart';
 import 'package:my_investments/projects/presentation/widgets/category_tile.dart';
+
+List<FinancialAccount> _getAccountsFromContext(BuildContext context) {
+  final state = context.read<AccountsCubit>().state;
+  if (state is AccountsLoaded) return state.accounts;
+  return const [];
+}
 
 class ProjectDetailPage extends StatelessWidget {
   final String projectId;
@@ -119,14 +128,17 @@ class _ProjectDetailView extends StatelessWidget {
 
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (ctx) =>
-          AddTransactionDialog(availableCategories: state.detail.projectCategories),
+      builder: (ctx) => AddTransactionDialog(
+        availableCategories: state.detail.projectCategories,
+        availableAccounts: _getAccountsFromContext(context),
+      ),
     );
 
     if (result != null && context.mounted) {
       final transaction = Transaction(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         projectId: cubit.projectId,
+        accountId: result['accountId'] as String? ?? 'initial_statement',
         type: result['type'] as TransactionType,
         amount: result['amount'] as double,
         date: result['date'] as DateTime,
@@ -220,8 +232,8 @@ class _ProjectDetailContent extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: l10n.project_detail_summary_capital,
-                      value: state.detail.totalCapitalInjected.toCompactCurrency(
+                      label: l10n.projects_summary_funded,
+                      value: state.detail.fundedAmount.toCompactCurrency(
                         context,
                       ),
                       icon: RadixIcons.drawingPinSolid,
@@ -258,7 +270,7 @@ class _ProjectDetailContent extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: BudgetProgress(
                 budget: state.detail.totalBudget,
-                deposited: state.detail.totalDeposited,
+                fundedAmount: state.detail.fundedAmount,
                 spent: state.detail.totalSpent,
                 formatCurrency: (v) => v.toCompactCurrency(context),
               ),
@@ -402,6 +414,7 @@ class _ProjectDetailContent extends StatelessWidget {
       context: context,
       builder: (ctx) => AddTransactionDialog(
         availableCategories: state.detail.projectCategories,
+        availableAccounts: _getAccountsFromContext(context),
         initialTransaction: transaction,
       ),
     );
@@ -409,6 +422,7 @@ class _ProjectDetailContent extends StatelessWidget {
       final cubit = context.read<ProjectDetailCubit>();
       final updated = transaction.copyWith(
         type: result['type'] as TransactionType,
+        accountId: result['accountId'] as String? ?? transaction.accountId,
         amount: result['amount'] as double,
         date: result['date'] as DateTime,
         description: result['description'] as String?,
@@ -598,7 +612,7 @@ class _ActivityCard extends StatelessWidget {
             if (summary.budget > 0)
               BudgetProgress(
                 budget: summary.budget,
-                deposited: summary.deposited,
+                fundedAmount: summary.deposited,
                 spent: summary.spent,
                 formatCurrency: (v) => v.toCompactCurrency(context),
               )

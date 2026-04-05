@@ -78,7 +78,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get projects_summary_budget => 'Presupuesto';
 
   @override
-  String get projects_summary_capital => 'Capital Inyectado';
+  String get projects_summary_funded => 'Financiado';
 
   @override
   String get projects_summary_net_balance => 'Balance Neto';
@@ -106,9 +106,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get project_detail_summary_operating => 'Balance Operativo';
-
-  @override
-  String get project_detail_summary_capital => 'Capital Inyectado';
 
   @override
   String get project_detail_summary_net_balance => 'Balance Neto';
@@ -163,9 +160,6 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get activity_detail_summary_operating => 'Balance';
-
-  @override
-  String get activity_detail_summary_capital => 'Capital Inyectado';
 
   @override
   String get activity_detail_summary_net_balance => 'Balance Neto';
@@ -379,16 +373,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dialog_tx_edit_deposit => 'Editar Depósito';
 
   @override
-  String get dialog_tx_edit_capital => 'Editar Inyección de capital';
-
-  @override
   String get dialog_tx_new_deposit => 'Nuevo Depósito';
 
   @override
   String get dialog_tx_new_expense => 'Nuevo Gasto';
-
-  @override
-  String get dialog_tx_new_capital => 'Nueva Inyección de capital';
 
   @override
   String get dialog_tx_type_label => 'Tipo';
@@ -400,9 +388,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dialog_tx_type_deposit => 'Depósito';
 
   @override
-  String get dialog_tx_type_capital => 'Capital';
-
-  @override
   String get dialog_tx_amount_label => 'Monto';
 
   @override
@@ -411,6 +396,9 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get dialog_tx_description_placeholder =>
       'Detalle de la transacción...';
+
+  @override
+  String get dialog_tx_account_select => 'Seleccionar Cuenta';
 
   @override
   String get dialog_tx_category_label => 'Categoría (opcional)';
@@ -458,5 +446,54 @@ class AppLocalizationsEs extends AppLocalizations {
   String get widget_budget_progress_spent => 'Gastado:';
 
   @override
+  String get widget_budget_progress_funded => 'Financiado:';
+
+  @override
+  String get widget_budget_progress_remaining => 'Por Financiar:';
+
+  @override
   String get widget_tx_tile_project_label => '(proyecto)';
+
+  @override
+  String get nav_investments => 'Inversiones';
+
+  @override
+  String get nav_goals => 'Metas';
+
+  @override
+  String get nav_accounts => 'Cuentas';
+
+  @override
+  String get goals_title => 'Metas de Ahorro';
+
+  @override
+  String get goals_empty =>
+      'Aún no hay metas de ahorro. ¡Agrega tu primera meta!';
+
+  @override
+  String get accounts_title => 'Cuentas Financieras';
+
+  @override
+  String get accounts_empty => 'Aún no hay cuentas agregadas.';
+
+  @override
+  String get dialog_priority_title => 'Prioridades de Proyectos';
+
+  @override
+  String get dialog_account_title => 'Agregar Cuenta';
+
+  @override
+  String get dialog_account_name => 'Nombre de la Cuenta';
+
+  @override
+  String get dialog_account_type => 'Tipo de Cuenta';
+
+  @override
+  String get dialog_account_type_bank => 'Banco';
+
+  @override
+  String get dialog_account_type_loan => 'Préstamo';
+
+  @override
+  String get dialog_account_balance_label => 'Saldo';
 }

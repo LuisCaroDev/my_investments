@@ -8,14 +8,14 @@ import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/core/widgets/stat_card.dart';
 import 'package:my_investments/projects/domain/entities/project.dart';
 import 'package:my_investments/projects/domain/entities/project_summary.dart';
-import 'package:my_investments/projects/presentation/bloc/projects_cubit.dart';
-import 'package:my_investments/projects/presentation/bloc/projects_state.dart';
+import 'package:my_investments/projects/presentation/bloc/investments_cubit.dart';
+import 'package:my_investments/projects/presentation/bloc/investments_state.dart';
 import 'package:my_investments/projects/presentation/pages/project_detail_page.dart';
 import 'package:my_investments/projects/presentation/widgets/add_project_dialog.dart';
 import 'package:my_investments/projects/presentation/widgets/budget_progress.dart';
 
-class ProjectsPage extends StatelessWidget {
-  const ProjectsPage({super.key});
+class InvestmentsPage extends StatelessWidget {
+  const InvestmentsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,7 +23,7 @@ class ProjectsPage extends StatelessWidget {
     return Scaffold(
       headers: [
         AppBar(
-          title: Text(l10n.projects_title),
+          title: Text(l10n.nav_investments),
           trailing: [
             IconButton.outline(
               onPressed: () => _openSettings(context),
@@ -34,24 +34,21 @@ class ProjectsPage extends StatelessWidget {
         ),
         Divider(height: 1),
       ],
-      // floatingHeader: true,
       floatingFooter: true,
       footers: [
         Align(
           alignment: Alignment.bottomRight,
-          child: SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: PrimaryButton(
-                onPressed: () => _showAddProjectDialog(context),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(RadixIcons.plus, size: 16),
-                    Gap(6),
-                    Text(l10n.projects_add_button),
-                  ],
-                ),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: PrimaryButton(
+              onPressed: () => _showAddProjectDialog(context),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(RadixIcons.plus, size: 16),
+                  Gap(6),
+                  Text(l10n.projects_add_button),
+                ],
               ),
             ),
           ),
@@ -60,16 +57,16 @@ class ProjectsPage extends StatelessWidget {
       child: SafeArea(
         top: false,
         bottom: false,
-        child: BlocBuilder<ProjectsCubit, ProjectsState>(
+        child: BlocBuilder<InvestmentsCubit, InvestmentsState>(
           builder: (context, state) {
             return switch (state) {
-              ProjectsInitial() || ProjectsLoading() => const Center(
+              InvestmentsInitial() || InvestmentsLoading() => const Center(
                 child: CircularProgressIndicator(),
               ),
-              ProjectsError(message: final msg) => Center(
+              InvestmentsError(message: final msg) => Center(
                 child: Text(l10n.common_error_msg(msg)),
               ),
-              ProjectsLoaded(summaries: final summaries) =>
+              InvestmentsLoaded(summaries: final summaries) =>
                 summaries.isEmpty
                     ? EmptyState(
                         icon: RadixIcons.archive,
@@ -97,7 +94,7 @@ class ProjectsPage extends StatelessWidget {
         globalBudget: result['budget'] as double?,
         createdAt: DateTime.now(),
       );
-      context.read<ProjectsCubit>().addProject(project);
+      context.read<InvestmentsCubit>().addInvestment(project);
     }
   }
 
@@ -123,13 +120,11 @@ class _ProjectsList extends StatelessWidget {
       0.0,
       (sum, s) => sum + s.totalDeposited,
     );
-
-    final totalCapitalInjected = summaries.fold(
+    final totalFundedAmount = summaries.fold(
       0.0,
-      (sum, s) => sum + s.totalCapitalInjected,
+      (sum, s) => sum + s.fundedAmount,
     );
-    final totalOperatingBalance = totalDeposited - totalSpent;
-    final totalNetBalance = totalOperatingBalance + totalCapitalInjected;
+    final totalNetBalance = summaries.fold(0.0, (sum, s) => sum + s.netBalance);
 
     final theme = Theme.of(context);
     return SingleChildScrollView(
@@ -185,8 +180,8 @@ class _ProjectsList extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: l10n.projects_summary_capital,
-                      value: totalCapitalInjected.toCompactCurrency(context),
+                      label: l10n.projects_summary_funded,
+                      value: totalFundedAmount.toCompactCurrency(context),
                       icon: RadixIcons.drawingPinSolid,
                     ),
                   ),
@@ -221,11 +216,15 @@ class _ProjectsList extends StatelessWidget {
           Wrap(
             spacing: 16,
             runSpacing: 16,
-            children: summaries
-                .map(
-                  (s) => SizedBox(width: 340, child: _ProjectCard(summary: s)),
-                )
-                .toList(),
+            children:
+                summaries
+                    .map(
+                      (s) => SizedBox(
+                        width: 340,
+                        child: _ProjectCard(summary: s),
+                      ),
+                    )
+                    .toList(),
           ),
         ],
       ),
@@ -282,7 +281,9 @@ class _ProjectCard extends StatelessWidget {
                     children: [
                       Text(summary.project.name).medium,
                       if (summary.project.description != null)
-                        OverflowMarquee(child: Text(summary.project.description!).muted.small),
+                        OverflowMarquee(
+                          child: Text(summary.project.description!).muted.small,
+                        ),
                     ],
                   ),
                 ),
@@ -309,7 +310,7 @@ class _ProjectCard extends StatelessWidget {
             if (summary.totalBudget > 0)
               BudgetProgress(
                 budget: summary.totalBudget,
-                deposited: summary.totalDeposited,
+                fundedAmount: summary.fundedAmount,
                 spent: summary.totalSpent,
                 formatCurrency: (v) => v.toCompactCurrency(context),
               ),
@@ -332,7 +333,7 @@ class _ProjectCard extends StatelessWidget {
                       Text(l10n.projects_summary_spent).muted.small,
                       Text(
                         summary.totalSpent.toCompactCurrency(context),
-                      ).semiBold(color: theme.colorScheme.destructive),
+                      ).semiBold(color: theme.colorScheme.muted),
                     ],
                   ),
                 ],
@@ -382,7 +383,7 @@ class _ProjectCard extends StatelessWidget {
         description: result['description'] as String?,
         globalBudget: result['budget'] as double?,
       );
-      context.read<ProjectsCubit>().updateProject(updated);
+      context.read<InvestmentsCubit>().updateInvestment(updated);
     }
   }
 
@@ -424,7 +425,7 @@ class _ProjectCard extends StatelessWidget {
       ),
     );
     if (confirmed == true && context.mounted) {
-      context.read<ProjectsCubit>().deleteProject(summary.project.id);
+      context.read<InvestmentsCubit>().deleteInvestment(summary.project.id);
     }
   }
 }

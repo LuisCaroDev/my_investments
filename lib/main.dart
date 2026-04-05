@@ -10,14 +10,21 @@ import 'package:my_investments/core/presentation/bloc/settings_state.dart';
 import 'package:my_investments/core/theme/app_theme.dart';
 import 'package:my_investments/projects/data/datasources/projects_local_ds.dart';
 import 'package:my_investments/projects/data/repositories/projects_repository_impl.dart';
-import 'package:my_investments/projects/presentation/bloc/projects_cubit.dart';
-import 'package:my_investments/projects/presentation/pages/projects_page.dart';
+import 'package:my_investments/projects/presentation/bloc/accounts_cubit.dart';
+import 'package:my_investments/projects/presentation/bloc/goals_cubit.dart';
+import 'package:my_investments/projects/presentation/bloc/investments_cubit.dart';
+import 'package:my_investments/projects/presentation/pages/main_navigation_shell.dart';
 import 'package:my_investments/core/i18n/shadcn_localizations_es.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
-  runApp(MyInvestmentsApp(prefs: prefs));
+  
+  final ds = ProjectsLocalDataSource(prefs: prefs);
+  final repo = ProjectsRepository(localDataSource: ds);
+  await repo.migrateIfNeeded();
+
+  runApp(MyInvestmentsApp(prefs: prefs, repository: repo));
 }
 
 class FallbackShadcnLocalizationsDelegate
@@ -44,18 +51,26 @@ class FallbackShadcnLocalizationsDelegate
 
 class MyInvestmentsApp extends StatelessWidget {
   final SharedPreferences prefs;
+  final ProjectsRepository repository;
 
-  const MyInvestmentsApp({super.key, required this.prefs});
+  const MyInvestmentsApp({
+    super.key,
+    required this.prefs,
+    required this.repository,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final ds = ProjectsLocalDataSource(prefs: prefs);
-    final repo = ProjectsRepository(localDataSource: ds);
-
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => ProjectsCubit(repository: repo)..loadProjects(),
+          create: (_) => InvestmentsCubit(repository: repository)..loadInvestments(),
+        ),
+        BlocProvider(
+          create: (_) => GoalsCubit(repository: repository)..loadGoals(),
+        ),
+        BlocProvider(
+          create: (_) => AccountsCubit(repository: repository)..loadAccounts(),
         ),
         BlocProvider(create: (_) => SettingsCubit(prefs: prefs)),
       ],
@@ -101,7 +116,7 @@ class MyInvestmentsApp extends StatelessWidget {
                 child: child ?? const SizedBox.shrink(),
               );
             },
-            home: const ProjectsPage(),
+            home: const MainNavigationShell(),
           );
         },
       ),

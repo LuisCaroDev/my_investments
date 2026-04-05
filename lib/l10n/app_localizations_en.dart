@@ -78,7 +78,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get projects_summary_budget => 'Budget';
 
   @override
-  String get projects_summary_capital => 'Capital Injected';
+  String get projects_summary_funded => 'Funded';
 
   @override
   String get projects_summary_net_balance => 'Net Balance';
@@ -106,9 +106,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get project_detail_summary_operating => 'Operating Balance';
-
-  @override
-  String get project_detail_summary_capital => 'Capital Injected';
 
   @override
   String get project_detail_summary_net_balance => 'Net Balance';
@@ -163,9 +160,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get activity_detail_summary_operating => 'Balance';
-
-  @override
-  String get activity_detail_summary_capital => 'Capital Injected';
 
   @override
   String get activity_detail_summary_net_balance => 'Net Balance';
@@ -378,16 +372,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dialog_tx_edit_deposit => 'Edit Deposit';
 
   @override
-  String get dialog_tx_edit_capital => 'Edit Capital Injection';
-
-  @override
   String get dialog_tx_new_deposit => 'New Deposit';
 
   @override
   String get dialog_tx_new_expense => 'New Expense';
-
-  @override
-  String get dialog_tx_new_capital => 'New Capital Injection';
 
   @override
   String get dialog_tx_type_label => 'Type';
@@ -399,9 +387,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dialog_tx_type_deposit => 'Deposit';
 
   @override
-  String get dialog_tx_type_capital => 'Capital';
-
-  @override
   String get dialog_tx_amount_label => 'Amount';
 
   @override
@@ -409,6 +394,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dialog_tx_description_placeholder => 'Transaction detail...';
+
+  @override
+  String get dialog_tx_account_select => 'Select Account';
 
   @override
   String get dialog_tx_category_label => 'Category (optional)';
@@ -455,5 +443,53 @@ class AppLocalizationsEn extends AppLocalizations {
   String get widget_budget_progress_spent => 'Spent:';
 
   @override
+  String get widget_budget_progress_funded => 'Funded:';
+
+  @override
+  String get widget_budget_progress_remaining => 'Remaining to Fund:';
+
+  @override
   String get widget_tx_tile_project_label => '(project)';
+
+  @override
+  String get nav_investments => 'Investments';
+
+  @override
+  String get nav_goals => 'Goals';
+
+  @override
+  String get nav_accounts => 'Accounts';
+
+  @override
+  String get goals_title => 'Savings Goals';
+
+  @override
+  String get goals_empty => 'No savings goals yet. Add your first goal!';
+
+  @override
+  String get accounts_title => 'Financial Accounts';
+
+  @override
+  String get accounts_empty => 'No accounts added yet.';
+
+  @override
+  String get dialog_priority_title => 'Project Priorities';
+
+  @override
+  String get dialog_account_title => 'Add Account';
+
+  @override
+  String get dialog_account_name => 'Account Name';
+
+  @override
+  String get dialog_account_type => 'Account Type';
+
+  @override
+  String get dialog_account_type_bank => 'Bank';
+
+  @override
+  String get dialog_account_type_loan => 'Loan';
+
+  @override
+  String get dialog_account_balance_label => 'Balance';
 }

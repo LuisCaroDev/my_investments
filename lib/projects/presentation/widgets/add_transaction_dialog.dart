@@ -2,16 +2,19 @@ import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:my_investments/projects/domain/entities/category.dart'
     as domain;
+import 'package:my_investments/projects/domain/entities/financial_account.dart';
 import 'package:my_investments/projects/domain/entities/transaction.dart';
 
 class AddTransactionDialog extends StatefulWidget {
   final List<domain.Category> availableCategories;
+  final List<FinancialAccount> availableAccounts;
   final bool depositOnly;
   final Transaction? initialTransaction;
 
   const AddTransactionDialog({
     super.key,
     required this.availableCategories,
+    required this.availableAccounts,
     this.depositOnly = false,
     this.initialTransaction,
   });
@@ -26,6 +29,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   late final TextEditingController _descriptionController;
   DateTime _selectedDate = DateTime.now();
   String? _selectedCategoryId;
+  String? _selectedAccountId;
 
   @override
   void initState() {
@@ -43,6 +47,15 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
     );
     _selectedDate = widget.initialTransaction?.date ?? DateTime.now();
     _selectedCategoryId = widget.initialTransaction?.categoryId;
+    final initialAccountId = widget.initialTransaction?.accountId;
+    if (initialAccountId != null &&
+        widget.availableAccounts.any((a) => a.id == initialAccountId)) {
+      _selectedAccountId = initialAccountId;
+    } else if (widget.availableAccounts.isNotEmpty) {
+      _selectedAccountId = widget.availableAccounts.first.id;
+    } else {
+      _selectedAccountId = 'initial_statement';
+    }
   }
 
   @override
@@ -55,23 +68,18 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   @override
   Widget build(BuildContext context) {
     final isExpense = _type == TransactionType.expense;
-    final isDeposit = _type == TransactionType.deposit;
     final isEditing = widget.initialTransaction != null;
     final l10n = AppLocalizations.of(context)!;
 
     final title = isEditing
         ? isExpense
               ? l10n.dialog_tx_edit_expense
-              : isDeposit
-              ? l10n.dialog_tx_edit_deposit
-              : l10n.dialog_tx_edit_capital
+              : l10n.dialog_tx_edit_deposit
         : widget.depositOnly
         ? l10n.dialog_tx_new_deposit
         : isExpense
         ? l10n.dialog_tx_new_expense
-        : isDeposit
-        ? l10n.dialog_tx_new_deposit
-        : l10n.dialog_tx_new_capital;
+        : l10n.dialog_tx_new_deposit;
     return AlertDialog(
       title: Text(title),
       content: SizedBox(
@@ -106,22 +114,16 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                                 setState(() => _type = TransactionType.deposit),
                             child: Text(l10n.dialog_tx_type_deposit),
                           ),
-                    _type == TransactionType.capitalInjection
-                        ? PrimaryButton(
-                            onPressed: () {},
-                            child: Text(l10n.dialog_tx_type_capital),
-                          )
-                        : OutlineButton(
-                            onPressed: () => setState(
-                              () => _type = TransactionType.capitalInjection,
-                            ),
-                            child: Text(l10n.dialog_tx_type_capital),
-                          ),
+
                   ],
                 ),
               ),
               const Gap(12),
             ],
+            Text(l10n.dialog_tx_account_select).small.medium,
+            const Gap(4),
+            _buildAccountSelector(l10n),
+            const Gap(12),
             Text(l10n.dialog_tx_amount_label).small.medium,
             const Gap(4),
             TextField(
@@ -173,11 +175,67 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
               'date': _selectedDate,
               'description': description.isEmpty ? null : description,
               'categoryId': isExpense ? _selectedCategoryId : null,
+              'accountId': _selectedAccountId,
             });
           },
           child: Text(isEditing ? l10n.common_save : l10n.common_add),
         ),
       ],
+    );
+  }
+
+  Widget _buildAccountSelector(AppLocalizations l10n) {
+    final accounts = widget.availableAccounts;
+    final selected = _selectedAccountId != null
+        ? accounts.where((a) => a.id == _selectedAccountId).firstOrNull
+        : null;
+
+    return OutlineButton(
+      onPressed: accounts.isEmpty ? null : () => _showAccountPicker(l10n),
+      child: Row(
+        children: [
+          Expanded(
+            child: selected != null
+                ? Text(selected.name)
+                : Text('Initial Statement').muted,
+          ),
+          const Icon(RadixIcons.chevronDown, size: 14),
+        ],
+      ),
+    );
+  }
+
+  void _showAccountPicker(AppLocalizations l10n) {
+    final accounts = widget.availableAccounts;
+    showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.dialog_tx_account_select),
+        content: SizedBox(
+          width: 300,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ...accounts.map(
+                (acc) => GhostButton(
+                  onPressed: () {
+                    setState(() => _selectedAccountId = acc.id);
+                    Navigator.of(ctx).pop();
+                  },
+                  child: Row(
+                    children: [
+                      Expanded(child: Text(acc.name)),
+                      if (_selectedAccountId == acc.id)
+                        const Icon(RadixIcons.check, size: 14),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

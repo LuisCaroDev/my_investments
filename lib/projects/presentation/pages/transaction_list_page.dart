@@ -6,11 +6,20 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/projects/data/datasources/projects_local_ds.dart';
 import 'package:my_investments/projects/data/repositories/projects_repository_impl.dart';
+import 'package:my_investments/projects/domain/entities/financial_account.dart';
 import 'package:my_investments/projects/domain/entities/transaction.dart';
+import 'package:my_investments/projects/presentation/bloc/accounts_cubit.dart';
+import 'package:my_investments/projects/presentation/bloc/accounts_state.dart';
 import 'package:my_investments/projects/presentation/bloc/transaction_list_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/transaction_list_state.dart';
 import 'package:my_investments/projects/presentation/widgets/add_transaction_dialog.dart';
 import 'package:my_investments/projects/presentation/widgets/transaction_tile.dart';
+
+List<FinancialAccount> _getAccountsFromContext(BuildContext context) {
+  final state = context.read<AccountsCubit>().state;
+  if (state is AccountsLoaded) return state.accounts;
+  return const [];
+}
 
 class TransactionListPage extends StatelessWidget {
   final String projectId;
@@ -129,14 +138,17 @@ class _TransactionListView extends StatelessWidget {
     final cubit = context.read<TransactionListCubit>();
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (ctx) =>
-          AddTransactionDialog(availableCategories: state.categories),
+      builder: (ctx) => AddTransactionDialog(
+        availableCategories: state.categories,
+        availableAccounts: _getAccountsFromContext(context),
+      ),
     );
     if (result != null && context.mounted) {
       final transaction = Transaction(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         projectId: cubit.projectId,
         activityId: cubit.activityId,
+        accountId: result['accountId'] as String? ?? 'initial_statement',
         type: result['type'] as TransactionType,
         amount: result['amount'] as double,
         date: result['date'] as DateTime,
@@ -147,6 +159,7 @@ class _TransactionListView extends StatelessWidget {
       cubit.addTransaction(transaction);
     }
   }
+
 }
 
 class _TransactionListContent extends StatelessWidget {
@@ -304,12 +317,14 @@ class _TransactionListContent extends StatelessWidget {
       context: context,
       builder: (ctx) => AddTransactionDialog(
         availableCategories: state.categories,
+        availableAccounts: _getAccountsFromContext(context),
         initialTransaction: transaction,
       ),
     );
     if (result != null && context.mounted) {
       final updated = transaction.copyWith(
         type: result['type'] as TransactionType,
+        accountId: result['accountId'] as String? ?? transaction.accountId,
         amount: result['amount'] as double,
         date: result['date'] as DateTime,
         description: result['description'] as String?,

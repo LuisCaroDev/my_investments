@@ -28,28 +28,17 @@ class TransactionTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isExpense = transaction.type == TransactionType.expense;
-    final isDeposit = transaction.type == TransactionType.deposit;
     final category = transaction.categoryId != null
         ? categories.where((c) => c.id == transaction.categoryId).firstOrNull
         : null;
-    final icon = isExpense
-        ? RadixIcons.arrowDown
-        : isDeposit
-        ? RadixIcons.arrowUp
-        : RadixIcons.plus;
+    final icon = isExpense ? RadixIcons.arrowDown : RadixIcons.arrowUp;
     final valueColor = isExpense
         ? theme.colorScheme.destructive
-        : isDeposit
-        ? theme.colorScheme.primary
-        : theme.colorScheme.cardForeground;
+        : theme.colorScheme.primary;
     final l10n = AppLocalizations.of(context)!;
     final label =
         transaction.description ??
-        (isExpense
-            ? l10n.dialog_tx_type_expense
-            : isDeposit
-            ? l10n.dialog_tx_type_deposit
-            : l10n.dialog_tx_type_capital);
+        (isExpense ? l10n.dialog_tx_type_expense : l10n.dialog_tx_type_deposit);
     final sign = isExpense ? '-' : '+';
 
     Widget content = Card(

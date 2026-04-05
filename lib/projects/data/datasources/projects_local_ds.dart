@@ -6,12 +6,14 @@ import 'package:my_investments/projects/data/models/project_model.dart';
 import 'package:my_investments/projects/data/models/activity_model.dart';
 import 'package:my_investments/projects/data/models/category_model.dart';
 import 'package:my_investments/projects/data/models/transaction_model.dart';
+import 'package:my_investments/projects/data/models/financial_account_model.dart';
 
 class ProjectsLocalDataSource {
   static const _projectsKey = 'projects';
   static const _activitiesKey = 'activities';
   static const _categoriesKey = 'categories';
   static const _transactionsKey = 'transactions';
+  static const _financialAccountsKey = 'financial_accounts';
 
   final SharedPreferences _prefs;
 
@@ -80,5 +82,25 @@ class ProjectsLocalDataSource {
   Future<void> saveTransactions(List<TransactionModel> transactions) async {
     final data = jsonEncode(transactions.map((e) => e.toJson()).toList());
     await _prefs.setString(_transactionsKey, data);
+  }
+
+  // ── Financial Accounts ────────────────────────────────────
+
+  bool hasFinancialAccounts() {
+    return _prefs.containsKey(_financialAccountsKey);
+  }
+
+  List<FinancialAccountModel> getFinancialAccounts() {
+    final data = _prefs.getString(_financialAccountsKey);
+    if (data == null) return [];
+    final list = jsonDecode(data) as List;
+    return list
+        .map((e) => FinancialAccountModel.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<void> saveFinancialAccounts(List<FinancialAccountModel> accounts) async {
+    final data = jsonEncode(accounts.map((e) => e.toJson()).toList());
+    await _prefs.setString(_financialAccountsKey, data);
   }
 }

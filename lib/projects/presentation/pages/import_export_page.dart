@@ -7,14 +7,17 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:my_investments/projects/data/datasources/projects_local_ds.dart';
 import 'package:my_investments/projects/data/models/activity_model.dart';
 import 'package:my_investments/projects/data/models/category_model.dart';
+import 'package:my_investments/projects/data/models/financial_account_model.dart';
 import 'package:my_investments/projects/data/models/project_model.dart';
 import 'package:my_investments/projects/data/models/transaction_model.dart';
-import 'package:my_investments/projects/data/repositories/projects_repository_impl.dart';
 import 'package:my_investments/projects/domain/entities/activity.dart';
 import 'package:my_investments/projects/domain/entities/category.dart';
+import 'package:my_investments/projects/domain/entities/financial_account.dart';
 import 'package:my_investments/projects/domain/entities/project.dart';
 import 'package:my_investments/projects/domain/entities/transaction.dart';
-import 'package:my_investments/projects/presentation/bloc/projects_cubit.dart';
+import 'package:my_investments/projects/presentation/bloc/accounts_cubit.dart';
+import 'package:my_investments/projects/presentation/bloc/goals_cubit.dart';
+import 'package:my_investments/projects/presentation/bloc/investments_cubit.dart';
 
 class ImportExportPage extends StatefulWidget {
   const ImportExportPage({super.key});
@@ -50,18 +53,19 @@ class _ImportExportPageState extends State<ImportExportPage> {
           );
         }
         final ds = ProjectsLocalDataSource(prefs: snapshot.data!);
-        final repo = ProjectsRepository(localDataSource: ds);
 
-        final projects = repo.getProjects();
-        final activities = repo.getAllActivities();
-        final categories = repo.getAllCategories();
-        final transactions = repo.getAllTransactions();
+        final projects = ds.getProjects();
+        final activities = ds.getActivities();
+        final categories = ds.getCategories();
+        final transactions = ds.getTransactions();
+        final accounts = ds.getFinancialAccounts();
 
         final exportText = _buildExportText(
           projects: projects,
           activities: activities,
           categories: categories,
           transactions: transactions,
+          accounts: accounts,
         );
 
         return Scaffold(
@@ -141,6 +145,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
     required List<Activity> activities,
     required List<Category> categories,
     required List<Transaction> transactions,
+    required List<FinancialAccount> accounts,
   }) {
     final buffer = StringBuffer();
     buffer.writeln('## projects.csv');
@@ -150,6 +155,8 @@ class _ImportExportPageState extends State<ImportExportPage> {
         'name',
         'description',
         'global_budget',
+        'type',
+        'priority',
         'created_at',
       ].join(','),
     );
@@ -160,6 +167,8 @@ class _ImportExportPageState extends State<ImportExportPage> {
           _csv(p.name),
           _csv(p.description),
           _csv(p.globalBudget),
+          _csv(p.type.name),
+          _csv(p.priority),
           _csv(p.createdAt.toIso8601String()),
         ].join(','),
       );
@@ -219,6 +228,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
       [
         'id',
         'project_id',
+        'account_id',
         'activity_id',
         'type',
         'amount',
@@ -233,6 +243,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
         [
           _csv(t.id),
           _csv(t.projectId),
+          _csv(t.accountId),
           _csv(t.activityId),
           _csv(t.type.name),
           _csv(t.amount),
@@ -240,6 +251,29 @@ class _ImportExportPageState extends State<ImportExportPage> {
           _csv(t.description),
           _csv(t.categoryId),
           _csv(t.createdAt.toIso8601String()),
+        ].join(','),
+      );
+    }
+
+    buffer.writeln();
+    buffer.writeln('## accounts.csv');
+    buffer.writeln(
+      [
+        'id',
+        'name',
+        'type',
+        'balance',
+        'created_at',
+      ].join(','),
+    );
+    for (final a in accounts) {
+      buffer.writeln(
+        [
+          _csv(a.id),
+          _csv(a.name),
+          _csv(a.type.name),
+          _csv(a.balance),
+          _csv(a.createdAt.toIso8601String()),
         ].join(','),
       );
     }
@@ -289,10 +323,13 @@ class _ImportExportPageState extends State<ImportExportPage> {
       await ds.saveActivities(parsed.activities);
       await ds.saveCategories(parsed.categories);
       await ds.saveTransactions(parsed.transactions);
+      await ds.saveFinancialAccounts(parsed.accounts);
 
       if (context.mounted) {
-          context.read<ProjectsCubit>().loadProjects();
-          await showDialog<void>(
+        context.read<InvestmentsCubit>().loadInvestments();
+        context.read<GoalsCubit>().loadGoals();
+        context.read<AccountsCubit>().loadAccounts();
+        await showDialog<void>(
             context: context,
             builder: (ctx) => AlertDialog(
               title: Text(l10n.import_export_success_title),
@@ -333,12 +370,14 @@ class _ImportExportPageState extends State<ImportExportPage> {
     final activities = _parseActivities(sections['activities.csv'] ?? '');
     final categories = _parseCategories(sections['categories.csv'] ?? '');
     final transactions = _parseTransactions(sections['transactions.csv'] ?? '');
+    final accounts = _parseAccounts(sections['accounts.csv'] ?? '');
 
     return _ParsedExport(
       projects: projects,
       activities: activities,
       categories: categories,
       transactions: transactions,
+      accounts: accounts,
     );
   }
 
@@ -374,11 +413,17 @@ class _ImportExportPageState extends State<ImportExportPage> {
     final header = rows.first;
     return rows.skip(1).where((r) => r.length == header.length).map((r) {
       final map = _rowToMap(header, r);
+      final typeRaw = (map['type'] ?? 'investment').trim();
+      final type = ProjectType.values.byName(
+        typeRaw == 'savings_goal' ? 'savingsGoal' : typeRaw,
+      );
       return ProjectModel(
         id: map['id'] ?? '',
         name: map['name'] ?? '',
         description: _nullIfEmpty(map['description']),
         globalBudget: _toDouble(map['global_budget']),
+        type: type,
+        priority: _toInt(map['priority']) ?? 0,
         createdAt: DateTime.parse(map['created_at'] ?? DateTime.now().toString()),
       );
     }).toList();
@@ -426,12 +471,32 @@ class _ImportExportPageState extends State<ImportExportPage> {
       return TransactionModel(
         id: map['id'] ?? '',
         projectId: map['project_id'] ?? '',
+        accountId: map['account_id'] ?? 'initial_statement',
         activityId: _nullIfEmpty(map['activity_id']),
         categoryId: _nullIfEmpty(map['category_id']),
         type: _parseTransactionType(map['type']),
         amount: _toDouble(map['amount']) ?? 0,
         date: DateTime.parse(map['date'] ?? DateTime.now().toString()),
         description: _nullIfEmpty(map['description']),
+        createdAt: DateTime.parse(map['created_at'] ?? DateTime.now().toString()),
+      );
+    }).toList();
+  }
+
+  List<FinancialAccountModel> _parseAccounts(String csv) {
+    final rows = _parseCsv(csv);
+    if (rows.isEmpty) return [];
+    final header = rows.first;
+    return rows.skip(1).where((r) => r.length == header.length).map((r) {
+      final map = _rowToMap(header, r);
+      final typeRaw = (map['type'] ?? 'bank').trim();
+      final type =
+          FinancialAccountType.values.byName(typeRaw == 'loan_account' ? 'loan' : typeRaw);
+      return FinancialAccountModel(
+        id: map['id'] ?? '',
+        name: map['name'] ?? '',
+        type: type,
+        balance: _toDouble(map['balance']) ?? 0,
         createdAt: DateTime.parse(map['created_at'] ?? DateTime.now().toString()),
       );
     }).toList();
@@ -502,7 +567,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
     final v = value?.trim();
     return switch (v) {
       'deposit' => TransactionType.deposit,
-      'capitalInjection' => TransactionType.capitalInjection,
+      'capitalInjection' => TransactionType.deposit, // Legacy migration
       _ => TransactionType.expense,
     };
   }
@@ -513,11 +578,13 @@ class _ParsedExport {
   final List<ActivityModel> activities;
   final List<CategoryModel> categories;
   final List<TransactionModel> transactions;
+  final List<FinancialAccountModel> accounts;
 
   const _ParsedExport({
     required this.projects,
     required this.activities,
     required this.categories,
     required this.transactions,
+    required this.accounts,
   });
 }

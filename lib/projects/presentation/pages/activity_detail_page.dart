@@ -10,7 +10,10 @@ import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/projects/data/datasources/projects_local_ds.dart';
 import 'package:my_investments/projects/data/repositories/projects_repository_impl.dart';
 
+import 'package:my_investments/projects/domain/entities/financial_account.dart';
 import 'package:my_investments/projects/domain/entities/transaction.dart';
+import 'package:my_investments/projects/presentation/bloc/accounts_cubit.dart';
+import 'package:my_investments/projects/presentation/bloc/accounts_state.dart';
 import 'package:my_investments/projects/presentation/pages/category_management_page.dart';
 import 'package:my_investments/projects/presentation/pages/transaction_list_page.dart';
 import 'package:my_investments/projects/presentation/widgets/add_transaction_dialog.dart';
@@ -18,6 +21,12 @@ import 'package:my_investments/projects/presentation/widgets/budget_progress.dar
 import 'package:my_investments/projects/presentation/widgets/section_header.dart';
 import 'package:my_investments/projects/presentation/widgets/transaction_tile.dart';
 import 'package:my_investments/projects/presentation/widgets/category_tile.dart';
+
+List<FinancialAccount> _getAccountsFromContext(BuildContext context) {
+  final state = context.read<AccountsCubit>().state;
+  if (state is AccountsLoaded) return state.accounts;
+  return const [];
+}
 
 /// A dedicated page for viewing an Activity's details, its categories,
 /// and transactions. Uses its own Cubit scoped to the activity.
@@ -126,8 +135,10 @@ class _ActivityDetailView extends StatelessWidget {
 
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
-      builder: (ctx) =>
-          AddTransactionDialog(availableCategories: state.detail!.categories),
+      builder: (ctx) => AddTransactionDialog(
+        availableCategories: state.detail!.categories,
+        availableAccounts: _getAccountsFromContext(context),
+      ),
     );
 
     if (result != null && context.mounted) {
@@ -135,6 +146,7 @@ class _ActivityDetailView extends StatelessWidget {
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         projectId: cubit.projectId,
         activityId: cubit.activityId,
+        accountId: result['accountId'] as String? ?? 'initial_statement',
         type: result['type'] as TransactionType,
         amount: result['amount'] as double,
         date: result['date'] as DateTime,
@@ -262,26 +274,6 @@ class _ActivityContent extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
-                            l10n.activity_detail_summary_capital,
-                          ).muted.small,
-                          const Gap(4),
-                          Text(
-                            state.detail!.summary.capitalInjected
-                                .toCompactCurrency(context),
-                          ).bold,
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: Card(
-                      padding: const EdgeInsets.all(14),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
                             l10n.activity_detail_summary_net_balance,
                           ).muted.small,
                           const Gap(4),
@@ -309,7 +301,7 @@ class _ActivityContent extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: BudgetProgress(
                 budget: state.detail!.summary.budget,
-                deposited: state.detail!.summary.deposited,
+                fundedAmount: state.detail!.summary.deposited,
                 spent: state.detail!.summary.spent,
                 formatCurrency: (v) => v.toCompactCurrency(context),
               ),
@@ -415,12 +407,14 @@ class _ActivityContent extends StatelessWidget {
       context: context,
       builder: (ctx) => AddTransactionDialog(
         availableCategories: state.detail!.categories,
+        availableAccounts: _getAccountsFromContext(context),
         initialTransaction: transaction,
       ),
     );
     if (result != null && context.mounted) {
       final updated = transaction.copyWith(
         type: result['type'] as TransactionType,
+        accountId: result['accountId'] as String? ?? transaction.accountId,
         amount: result['amount'] as double,
         date: result['date'] as DateTime,
         description: result['description'] as String?,

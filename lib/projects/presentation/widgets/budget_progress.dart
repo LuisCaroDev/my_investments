@@ -3,14 +3,14 @@ import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class BudgetProgress extends StatelessWidget {
   final double budget;
-  final double deposited;
+  final double fundedAmount;
   final double spent;
   final String Function(num) formatCurrency;
 
   const BudgetProgress({
     super.key,
     required this.budget,
-    required this.deposited,
+    required this.fundedAmount,
     required this.spent,
     required this.formatCurrency,
   });
@@ -19,7 +19,7 @@ class BudgetProgress extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
-    final progress = budget > 0 ? (deposited / budget).clamp(0.0, 1.0) : 0.0;
+    final fundingProgress = budget > 0 ? (fundedAmount / budget).clamp(0.0, 1.0) : 0.0;
     final spentProgress = budget > 0 ? (spent / budget).clamp(0.0, 1.0) : 0.0;
 
     return Column(
@@ -29,7 +29,7 @@ class BudgetProgress extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('${l10n.widget_budget_progress_budget} ${formatCurrency(budget)}').muted.small,
-            Text('${(progress * 100).toStringAsFixed(0)}%').muted.small,
+            Text('${(fundingProgress * 100).toStringAsFixed(0)}%').muted.small,
           ],
         ),
         const Gap(6),
@@ -46,9 +46,9 @@ class BudgetProgress extends StatelessWidget {
                     borderRadius: BorderRadius.circular(4),
                   ),
                 ),
-                // Deposited (green)
+                // Funded (primary color)
                 FractionallySizedBox(
-                  widthFactor: progress,
+                  widthFactor: fundingProgress,
                   child: Container(
                     decoration: BoxDecoration(
                       color: theme.colorScheme.primary,
@@ -74,10 +74,13 @@ class BudgetProgress extends StatelessWidget {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('${l10n.widget_budget_progress_deposited} ${formatCurrency(deposited)}')
+            Text('${l10n.widget_budget_progress_funded} ${formatCurrency(fundedAmount)}')
                 .small(color: theme.colorScheme.primary),
             Text('${l10n.widget_budget_progress_spent} ${formatCurrency(spent)}')
                 .small(color: theme.colorScheme.destructive),
+            if (budget > 0)
+              Text('${l10n.widget_budget_progress_remaining} ${formatCurrency(budget - fundedAmount)}')
+                  .muted.small,
           ],
         ),
       ],

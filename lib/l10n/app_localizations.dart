@@ -230,11 +230,11 @@ abstract class AppLocalizations {
   /// **'Presupuesto'**
   String get projects_summary_budget;
 
-  /// No description provided for @projects_summary_capital.
+  /// No description provided for @projects_summary_funded.
   ///
   /// In es, this message translates to:
-  /// **'Capital Inyectado'**
-  String get projects_summary_capital;
+  /// **'Financiado'**
+  String get projects_summary_funded;
 
   /// No description provided for @projects_summary_net_balance.
   ///
@@ -283,12 +283,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Balance Operativo'**
   String get project_detail_summary_operating;
-
-  /// No description provided for @project_detail_summary_capital.
-  ///
-  /// In es, this message translates to:
-  /// **'Capital Inyectado'**
-  String get project_detail_summary_capital;
 
   /// No description provided for @project_detail_summary_net_balance.
   ///
@@ -385,12 +379,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Balance'**
   String get activity_detail_summary_operating;
-
-  /// No description provided for @activity_detail_summary_capital.
-  ///
-  /// In es, this message translates to:
-  /// **'Capital Inyectado'**
-  String get activity_detail_summary_capital;
 
   /// No description provided for @activity_detail_summary_net_balance.
   ///
@@ -794,12 +782,6 @@ abstract class AppLocalizations {
   /// **'Editar Depósito'**
   String get dialog_tx_edit_deposit;
 
-  /// No description provided for @dialog_tx_edit_capital.
-  ///
-  /// In es, this message translates to:
-  /// **'Editar Inyección de capital'**
-  String get dialog_tx_edit_capital;
-
   /// No description provided for @dialog_tx_new_deposit.
   ///
   /// In es, this message translates to:
@@ -811,12 +793,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Nuevo Gasto'**
   String get dialog_tx_new_expense;
-
-  /// No description provided for @dialog_tx_new_capital.
-  ///
-  /// In es, this message translates to:
-  /// **'Nueva Inyección de capital'**
-  String get dialog_tx_new_capital;
 
   /// No description provided for @dialog_tx_type_label.
   ///
@@ -836,12 +812,6 @@ abstract class AppLocalizations {
   /// **'Depósito'**
   String get dialog_tx_type_deposit;
 
-  /// No description provided for @dialog_tx_type_capital.
-  ///
-  /// In es, this message translates to:
-  /// **'Capital'**
-  String get dialog_tx_type_capital;
-
   /// No description provided for @dialog_tx_amount_label.
   ///
   /// In es, this message translates to:
@@ -859,6 +829,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Detalle de la transacción...'**
   String get dialog_tx_description_placeholder;
+
+  /// No description provided for @dialog_tx_account_select.
+  ///
+  /// In es, this message translates to:
+  /// **'Seleccionar Cuenta'**
+  String get dialog_tx_account_select;
 
   /// No description provided for @dialog_tx_category_label.
   ///
@@ -944,11 +920,107 @@ abstract class AppLocalizations {
   /// **'Gastado:'**
   String get widget_budget_progress_spent;
 
+  /// No description provided for @widget_budget_progress_funded.
+  ///
+  /// In es, this message translates to:
+  /// **'Financiado:'**
+  String get widget_budget_progress_funded;
+
+  /// No description provided for @widget_budget_progress_remaining.
+  ///
+  /// In es, this message translates to:
+  /// **'Por Financiar:'**
+  String get widget_budget_progress_remaining;
+
   /// No description provided for @widget_tx_tile_project_label.
   ///
   /// In es, this message translates to:
   /// **'(proyecto)'**
   String get widget_tx_tile_project_label;
+
+  /// No description provided for @nav_investments.
+  ///
+  /// In es, this message translates to:
+  /// **'Inversiones'**
+  String get nav_investments;
+
+  /// No description provided for @nav_goals.
+  ///
+  /// In es, this message translates to:
+  /// **'Metas'**
+  String get nav_goals;
+
+  /// No description provided for @nav_accounts.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuentas'**
+  String get nav_accounts;
+
+  /// No description provided for @goals_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Metas de Ahorro'**
+  String get goals_title;
+
+  /// No description provided for @goals_empty.
+  ///
+  /// In es, this message translates to:
+  /// **'Aún no hay metas de ahorro. ¡Agrega tu primera meta!'**
+  String get goals_empty;
+
+  /// No description provided for @accounts_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuentas Financieras'**
+  String get accounts_title;
+
+  /// No description provided for @accounts_empty.
+  ///
+  /// In es, this message translates to:
+  /// **'Aún no hay cuentas agregadas.'**
+  String get accounts_empty;
+
+  /// No description provided for @dialog_priority_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Prioridades de Proyectos'**
+  String get dialog_priority_title;
+
+  /// No description provided for @dialog_account_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Agregar Cuenta'**
+  String get dialog_account_title;
+
+  /// No description provided for @dialog_account_name.
+  ///
+  /// In es, this message translates to:
+  /// **'Nombre de la Cuenta'**
+  String get dialog_account_name;
+
+  /// No description provided for @dialog_account_type.
+  ///
+  /// In es, this message translates to:
+  /// **'Tipo de Cuenta'**
+  String get dialog_account_type;
+
+  /// No description provided for @dialog_account_type_bank.
+  ///
+  /// In es, this message translates to:
+  /// **'Banco'**
+  String get dialog_account_type_bank;
+
+  /// No description provided for @dialog_account_type_loan.
+  ///
+  /// In es, this message translates to:
+  /// **'Préstamo'**
+  String get dialog_account_type_loan;
+
+  /// No description provided for @dialog_account_balance_label.
+  ///
+  /// In es, this message translates to:
+  /// **'Saldo'**
+  String get dialog_account_balance_label;
 }
 
 class _AppLocalizationsDelegate

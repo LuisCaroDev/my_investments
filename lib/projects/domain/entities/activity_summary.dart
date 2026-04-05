@@ -5,7 +5,6 @@ class ActivitySummary {
   final Activity activity;
   final double spent;
   final double deposited;
-  final double capitalInjected;
   final List<Category> categories;
   final int transactionCount;
 
@@ -13,14 +12,14 @@ class ActivitySummary {
     required this.activity,
     required this.spent,
     required this.deposited,
-    required this.capitalInjected,
     required this.categories,
     required this.transactionCount,
   });
 
   double get budget => activity.budget ?? 0;
   double get operatingBalance => deposited - spent;
-  double get netBalance => operatingBalance + capitalInjected;
+  // Activities only care about their operating balance now
+  double get netBalance => operatingBalance;
   double get remainingBudget => budget - deposited;
   double get budgetProgress =>
       budget > 0 ? (spent / budget).clamp(0.0, 1.0) : 0.0;

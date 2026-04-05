@@ -6,6 +6,7 @@ class TransactionModel extends Transaction {
     required super.projectId,
     super.activityId,
     super.categoryId,
+    required super.accountId,
     required super.type,
     required super.amount,
     required super.date,
@@ -14,12 +15,19 @@ class TransactionModel extends Transaction {
   });
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
+    // For migration: if type is 'capitalInjection' (legacy), convert to 'deposit'
+    final rawType = json['type'] as String;
+    final type = rawType == 'capitalInjection'
+        ? TransactionType.deposit
+        : TransactionType.values.byName(rawType);
+
     return TransactionModel(
       id: json['id'] as String,
       projectId: json['projectId'] as String,
       activityId: json['activityId'] as String?,
       categoryId: json['categoryId'] as String?,
-      type: TransactionType.values.byName(json['type'] as String),
+      accountId: json['accountId'] as String? ?? 'initial_statement',
+      type: type,
       amount: (json['amount'] as num).toDouble(),
       date: DateTime.parse(json['date'] as String),
       description: json['description'] as String?,
@@ -33,6 +41,7 @@ class TransactionModel extends Transaction {
       'projectId': projectId,
       'activityId': activityId,
       'categoryId': categoryId,
+      'accountId': accountId,
       'type': type.name,
       'amount': amount,
       'date': date.toIso8601String(),
@@ -47,6 +56,7 @@ class TransactionModel extends Transaction {
       projectId: entity.projectId,
       activityId: entity.activityId,
       categoryId: entity.categoryId,
+      accountId: entity.accountId,
       type: entity.type,
       amount: entity.amount,
       date: entity.date,

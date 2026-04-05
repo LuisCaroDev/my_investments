@@ -1,10 +1,11 @@
-enum TransactionType { expense, deposit, capitalInjection }
+enum TransactionType { expense, deposit }
 
 class Transaction {
   final String id;
   final String projectId;
   final String? activityId;
   final String? categoryId;
+  final String accountId;
   final TransactionType type;
   final double amount;
   final DateTime date;
@@ -16,6 +17,7 @@ class Transaction {
     required this.projectId,
     this.activityId,
     this.categoryId,
+    required this.accountId,
     required this.type,
     required this.amount,
     required this.date,
@@ -28,6 +30,7 @@ class Transaction {
     String? projectId,
     String? activityId,
     String? categoryId,
+    String? accountId,
     TransactionType? type,
     double? amount,
     DateTime? date,
@@ -39,6 +42,7 @@ class Transaction {
       projectId: projectId ?? this.projectId,
       activityId: activityId ?? this.activityId,
       categoryId: categoryId ?? this.categoryId,
+      accountId: accountId ?? this.accountId,
       type: type ?? this.type,
       amount: amount ?? this.amount,
       date: date ?? this.date,
