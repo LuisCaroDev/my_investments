@@ -298,7 +298,7 @@ class _ActivityContent extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: BudgetProgress(
                 budget: state.detail!.summary.budget,
-                fundedAmount: state.detail!.summary.deposited,
+                fundedAmount: state.detail!.summary.fundedAmount,
                 spent: state.detail!.summary.spent,
                 formatCurrency: (v) => v.toCompactCurrency(context),
               ),

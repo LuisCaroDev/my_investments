@@ -602,7 +602,7 @@ class _ActivityCard extends StatelessWidget {
             if (summary.budget > 0)
               BudgetProgress(
                 budget: summary.budget,
-                fundedAmount: summary.deposited,
+                fundedAmount: summary.fundedAmount,
                 spent: summary.spent,
                 formatCurrency: (v) => v.toCompactCurrency(context),
               )

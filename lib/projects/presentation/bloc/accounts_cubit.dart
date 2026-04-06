@@ -35,6 +35,19 @@ class AccountsCubit extends Cubit<AccountsState> {
     loadAccounts();
   }
 
+  Future<void> addAccountDeposit({
+    required String accountId,
+    required double amount,
+    String? description,
+  }) async {
+    await _repository.addAccountDeposit(
+      accountId: accountId,
+      amount: amount,
+      description: description,
+    );
+    loadAccounts();
+  }
+
   Future<void> reorderProjectPriorities(List<String> orderedIds) async {
     await _repository.reorderProjects(orderedIds);
   }

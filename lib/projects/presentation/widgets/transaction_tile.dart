@@ -13,6 +13,7 @@ class TransactionTile extends StatelessWidget {
   final VoidCallback? onDelete;
   final bool confirmSwipeDelete;
   final bool confirmDelete;
+  final bool showActionsOnTap;
 
   const TransactionTile({
     super.key,
@@ -22,6 +23,7 @@ class TransactionTile extends StatelessWidget {
     this.onDelete,
     this.confirmSwipeDelete = true,
     this.confirmDelete = true,
+    this.showActionsOnTap = false,
   });
 
   @override
@@ -69,7 +71,7 @@ class TransactionTile extends StatelessWidget {
               ).small.semiBold(color: valueColor),
             ],
           ),
-          if (onEdit != null || onDelete != null) ...[
+          if ((onEdit != null || onDelete != null) && !showActionsOnTap) ...[
             const Gap(6),
             IconButton.ghost(
               onPressed: () => _showActionsMenu(context, l10n),
@@ -79,6 +81,14 @@ class TransactionTile extends StatelessWidget {
         ],
       ),
     );
+
+    if (showActionsOnTap && (onEdit != null || onDelete != null)) {
+      content = GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => _showActionsMenu(context, l10n),
+        child: content,
+      );
+    }
 
     return Padding(padding: const EdgeInsets.only(bottom: 4), child: content);
   }

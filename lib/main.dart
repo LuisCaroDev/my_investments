@@ -22,7 +22,6 @@ void main() async {
   
   final ds = ProjectsLocalDataSource(prefs: prefs);
   final repo = ProjectsRepository(localDataSource: ds);
-  await repo.migrateIfNeeded();
 
   runApp(MyInvestmentsApp(prefs: prefs, repository: repo));
 }

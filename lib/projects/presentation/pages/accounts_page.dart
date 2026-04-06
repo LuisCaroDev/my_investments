@@ -16,6 +16,7 @@ import 'package:my_investments/projects/presentation/bloc/goals_state.dart';
 import 'package:my_investments/projects/presentation/bloc/investments_cubit.dart';
 import 'package:my_investments/projects/presentation/bloc/investments_state.dart';
 import 'package:my_investments/projects/presentation/widgets/add_financial_account_dialog.dart';
+import 'package:my_investments/projects/presentation/widgets/add_account_deposit_dialog.dart';
 import 'package:flutter/material.dart'
     show ReorderableDragStartListener, ReorderableListView, WidgetsBinding;
 
@@ -404,6 +405,23 @@ class _AccountCard extends StatelessWidget {
       alignment: Alignment.topRight,
       builder: (ctx) => DropdownMenu(
         children: [
+          MenuButton(
+            leading: const Icon(RadixIcons.download),
+            child: Text(l10n.dialog_tx_new_deposit),
+            onPressed: (_) async {
+              final result = await showDialog<Map<String, dynamic>>(
+                context: context,
+                builder: (ctx) => const AddAccountDepositDialog(),
+              );
+              if (result != null && context.mounted) {
+                await context.read<AccountsCubit>().addAccountDeposit(
+                  accountId: account.id,
+                  amount: result['amount'] as double,
+                  description: result['description'] as String?,
+                );
+              }
+            },
+          ),
           MenuButton(
             leading: const Icon(RadixIcons.pencil1),
             child: Text(l10n.common_edit),

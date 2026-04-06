@@ -16,59 +16,51 @@ import 'package:my_investments/projects/domain/entities/financial_account.dart';
 
 class ProjectsRepository {
   final ProjectsLocalDataSource _localDataSource;
+  static const String systemAccountProjectId = '__accounts__';
 
   const ProjectsRepository({required ProjectsLocalDataSource localDataSource})
       : _localDataSource = localDataSource;
-
-  // ── Data Migration ──────────────────────────────────────────
-  
-  Future<void> migrateIfNeeded() async {
-    if (!_localDataSource.hasFinancialAccounts()) {
-      // Create Initial Statement account
-      final initialAccount = FinancialAccount(
-        id: 'initial_statement',
-        name: 'Initial Statement',
-        type: FinancialAccountType.bank,
-        balance: 0,
-        createdAt: DateTime.now(),
-      );
-      await addAccount(initialAccount);
-      
-      // We also update projects default type/priority when reading since the constructor sets defaults
-      final projects = _localDataSource.getProjects();
-      await _localDataSource.saveProjects(projects);
-
-      // Backfill transactions / convert capital injections
-      final transactions = _localDataSource.getTransactions();
-      bool txChanged = false;
-      for (int i = 0; i < transactions.length; i++) {
-        // Since TransactionModel.fromJson already converts capitalInjection -> deposit
-        // and assigns 'initial_statement' to missing accountId, we just resave them!
-        txChanged = true;
-      }
-      if (txChanged) {
-        await _localDataSource.saveTransactions(transactions);
-      }
-    }
-  }
-
   // ── Financial Accounts ────────────────────────────────────
 
   List<FinancialAccount> getAccounts() {
-    return _localDataSource.getFinancialAccounts();
+    final accounts = _localDataSource.getFinancialAccounts();
+    final transactions = _localDataSource.getTransactions();
+    return _withComputedBalances(accounts, transactions);
   }
 
   Future<void> addAccount(FinancialAccount account) async {
+    final initialDeposit = account.balance > 0 ? account.balance : 0.0;
     final accounts = _localDataSource.getFinancialAccounts();
-    accounts.add(FinancialAccountModel.fromEntity(account));
+    accounts.add(
+      FinancialAccountModel.fromEntity(account.copyWith(balance: 0)),
+    );
     await _localDataSource.saveFinancialAccounts(accounts);
+    if (initialDeposit > 0) {
+      await addTransaction(
+        Transaction(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          projectId: systemAccountProjectId,
+          activityId: null,
+          categoryId: null,
+          accountId: account.id,
+          type: TransactionType.deposit,
+          amount: initialDeposit,
+          date: DateTime.now(),
+          description: 'Initial balance',
+          createdAt: DateTime.now(),
+        ),
+      );
+    }
   }
 
   Future<void> updateAccount(FinancialAccount account) async {
     final accounts = _localDataSource.getFinancialAccounts();
     final index = accounts.indexWhere((a) => a.id == account.id);
     if (index != -1) {
-      accounts[index] = FinancialAccountModel.fromEntity(account);
+      final current = accounts[index];
+      accounts[index] = FinancialAccountModel.fromEntity(
+        account.copyWith(balance: current.balance),
+      );
       await _localDataSource.saveFinancialAccounts(accounts);
     }
   }
@@ -85,10 +77,10 @@ class ProjectsRepository {
     var allProjects = _localDataSource.getProjects();
     final allActivities = _localDataSource.getActivities();
     final allTransactions = _localDataSource.getTransactions();
-    final allAccounts = _localDataSource.getFinancialAccounts();
 
-    // 1. Calculate Total Liquidity
-    double totalLiquidity = allAccounts.fold(0.0, (sum, acc) => sum + acc.balance);
+    // 1. Calculate Total Funding from account deposits
+    double totalLiquidity =
+        _calculateTotalFundingFromAccountDeposits(allTransactions);
 
     // 2. Sort all projects by priority ASC
     allProjects.sort((a, b) => a.priority.compareTo(b.priority));
@@ -249,7 +241,42 @@ class ProjectsRepository {
     final projectTransactions =
         allTransactions.where((t) => t.projectId == projectId).toList();
     final allCategories = _localDataSource.getCategories();
-    final allAccounts = _localDataSource.getFinancialAccounts();
+    // Funding is based on account deposits only.
+
+    // Project-level details
+    final projectLevelTransactions = projectTransactions
+        .where((t) => t.activityId == null)
+        .toList();
+    final projectLevelSpent = projectLevelTransactions
+        .where((t) => t.type == TransactionType.expense)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final projectCategories = allCategories
+        .where((c) => c.projectId == projectId && c.activityId == null)
+        .toList();
+
+    final totalSpent = projectTransactions
+        .where((t) => t.type == TransactionType.expense)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final totalDeposited = projectTransactions
+        .where((t) => t.type == TransactionType.deposit)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final totalBudget =
+        project.globalBudget ??
+        projectActivities.fold<double>(0.0, (sum, a) => sum + (a.budget ?? 0));
+
+    final myFundedAmount = _calculateFundedAmountForProject(
+      project: project,
+      projects: projects,
+      allActivities: allActivities,
+      allTransactions: allTransactions,
+    );
+
+    final availableFundingForActivities =
+        (myFundedAmount - projectLevelSpent).clamp(0.0, myFundedAmount);
+    final activityFunding = _allocateFundingSequentially(
+      activities: projectActivities,
+      fundedAmount: availableFundingForActivities,
+    );
 
     // Map activity summaries
     final activitySummaries = projectActivities.map((activity) {
@@ -269,50 +296,11 @@ class ProjectsRepository {
         activity: activity,
         spent: spent,
         deposited: deposited,
+        fundedAmount: activityFunding[activity.id] ?? 0.0,
         categories: categories,
         transactionCount: activityTransactions.length,
       );
     }).toList();
-
-    // Project-level details
-    final projectLevelTransactions = projectTransactions
-        .where((t) => t.activityId == null)
-        .toList();
-    final projectCategories = allCategories
-        .where((c) => c.projectId == projectId && c.activityId == null)
-        .toList();
-
-    final totalSpent = projectTransactions
-        .where((t) => t.type == TransactionType.expense)
-        .fold(0.0, (sum, t) => sum + t.amount);
-    final totalDeposited = projectTransactions
-        .where((t) => t.type == TransactionType.deposit)
-        .fold(0.0, (sum, t) => sum + t.amount);
-    final totalBudget =
-        project.globalBudget ??
-        projectActivities.fold<double>(0.0, (sum, a) => sum + (a.budget ?? 0));
-
-    // Calculate Funding (needs global liquidity context)
-    double totalLiquidity = allAccounts.fold(0.0, (sum, acc) => sum + acc.balance);
-    var sortedProjects = List.of(projects)..sort((a, b) => a.priority.compareTo(b.priority));
-    
-    double myFundedAmount = 0.0;
-    for(var p in sortedProjects) {
-        final pActivities = allActivities.where((a) => a.projectId == p.id).toList();
-        final pBudget = p.globalBudget ?? pActivities.fold<double>(0.0, (sum, a) => sum + (a.budget ?? 0));
-        
-        double pFundedAmount = 0.0;
-        if (pBudget > 0) {
-            pFundedAmount = pBudget < totalLiquidity ? pBudget : totalLiquidity;
-            if (pFundedAmount < 0) pFundedAmount = 0;
-            totalLiquidity -= pFundedAmount;
-        }
-
-        if (p.id == project.id) {
-            myFundedAmount = pFundedAmount;
-            break; // Stop once we calculated our target
-        }
-    }
     
     final remainingToFund = totalBudget > 0 ? (totalBudget - myFundedAmount) : 0.0;
 
@@ -363,10 +351,11 @@ class ProjectsRepository {
   ActivityDetail getActivityDetail(String projectId, String activityId) {
     final activities = _localDataSource.getActivities();
     final activity = activities.firstWhere((a) => a.id == activityId);
-    final transactions = _localDataSource
-        .getTransactions()
-        .where((t) => t.activityId == activityId)
-        .toList();
+    final projects = _localDataSource.getProjects();
+    final project = projects.firstWhere((p) => p.id == projectId);
+    final allTransactions = _localDataSource.getTransactions();
+    final transactions =
+        allTransactions.where((t) => t.activityId == activityId).toList();
     final categories = getAvailableCategories(projectId, activityId);
 
     final spent = transactions
@@ -376,11 +365,36 @@ class ProjectsRepository {
         .where((t) => t.type == TransactionType.deposit)
         .fold(0.0, (sum, t) => sum + t.amount);
 
+    // Funding is based on account deposits only.
+    final projectActivities =
+        activities.where((a) => a.projectId == projectId).toList();
+    final projectLevelSpent = allTransactions
+        .where((t) => t.projectId == projectId && t.activityId == null)
+        .where((t) => t.type == TransactionType.expense)
+        .fold(0.0, (sum, t) => sum + t.amount);
+    final projectFundedAmount = _calculateFundedAmountForProject(
+      project: project,
+      projects: projects,
+      allActivities: activities,
+      allTransactions: allTransactions,
+    );
+    final availableFundingForActivities =
+        (projectFundedAmount - projectLevelSpent)
+            .clamp(0.0, projectFundedAmount);
+    final activityFunding = _allocateFundingSequentially(
+      activities: projectActivities,
+      fundedAmount: availableFundingForActivities,
+    );
+
     final activitySummary = ActivitySummary(
       activity: activity,
       spent: spent,
       deposited: deposited,
-      categories: _localDataSource.getCategories().where((c) => c.activityId == activityId).toList(),
+      fundedAmount: activityFunding[activityId] ?? 0.0,
+      categories: _localDataSource
+          .getCategories()
+          .where((c) => c.activityId == activityId)
+          .toList(),
       transactionCount: transactions.length,
     );
 
@@ -389,6 +403,77 @@ class ProjectsRepository {
       transactions: transactions,
       categories: categories,
     );
+  }
+
+  double _calculateFundedAmountForProject({
+    required Project project,
+    required List<Project> projects,
+    required List<Activity> allActivities,
+    required List<Transaction> allTransactions,
+  }) {
+    double totalLiquidity =
+        _calculateTotalFundingFromAccountDeposits(allTransactions);
+    final sortedProjects =
+        List.of(projects)..sort((a, b) => a.priority.compareTo(b.priority));
+
+    double fundedAmount = 0.0;
+    for (final p in sortedProjects) {
+      final pActivities =
+          allActivities.where((a) => a.projectId == p.id).toList();
+      final pBudget = p.globalBudget ??
+          pActivities.fold<double>(0.0, (sum, a) => sum + (a.budget ?? 0));
+
+      double pFundedAmount = 0.0;
+      if (pBudget > 0) {
+        pFundedAmount = pBudget < totalLiquidity ? pBudget : totalLiquidity;
+        if (pFundedAmount < 0) pFundedAmount = 0;
+        totalLiquidity -= pFundedAmount;
+      }
+
+      if (p.id == project.id) {
+        fundedAmount = pFundedAmount;
+        break;
+      }
+    }
+
+    return fundedAmount;
+  }
+
+  double _calculateTotalFundingFromAccountDeposits(
+    List<Transaction> transactions,
+  ) {
+    return transactions
+        .where(
+          (t) =>
+              t.projectId == systemAccountProjectId &&
+              t.type == TransactionType.deposit,
+        )
+        .fold(0.0, (sum, t) => sum + t.amount);
+  }
+
+  Map<String, double> _allocateFundingSequentially({
+    required List<Activity> activities,
+    required double fundedAmount,
+  }) {
+    final remaining = fundedAmount < 0 ? 0.0 : fundedAmount;
+    final allocations = <String, double>{};
+    var balance = remaining;
+
+    final sorted = List<Activity>.from(activities)
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
+
+    for (final activity in sorted) {
+      final budget = activity.budget ?? 0.0;
+      if (budget <= 0 || balance <= 0) {
+        allocations[activity.id] = 0.0;
+        continue;
+      }
+      final allocated = balance < budget ? balance : budget;
+      allocations[activity.id] = allocated;
+      balance -= allocated;
+    }
+
+    return allocations;
   }
 
   Future<void> addActivity(Activity activity) async {
@@ -523,5 +608,52 @@ class ProjectsRepository {
     final transactions = _localDataSource.getTransactions();
     transactions.removeWhere((t) => t.id == transactionId);
     await _localDataSource.saveTransactions(transactions);
+  }
+
+  Future<void> addAccountDeposit({
+    required String accountId,
+    required double amount,
+    String? description,
+    DateTime? date,
+  }) async {
+    await addTransaction(
+      Transaction(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        projectId: systemAccountProjectId,
+        activityId: null,
+        categoryId: null,
+        accountId: accountId,
+        type: TransactionType.deposit,
+        amount: amount,
+        date: date ?? DateTime.now(),
+        description: description,
+        createdAt: DateTime.now(),
+      ),
+    );
+  }
+
+  List<FinancialAccount> _withComputedBalances(
+    List<FinancialAccount> accounts,
+    List<Transaction> transactions,
+  ) {
+    final totals = <String, double>{};
+    for (final transaction in transactions) {
+      final delta = transaction.type == TransactionType.deposit
+          ? transaction.amount
+          : -transaction.amount;
+      totals.update(
+        transaction.accountId,
+        (value) => value + delta,
+        ifAbsent: () => delta,
+      );
+    }
+
+    return accounts
+        .map(
+          (account) => account.copyWith(
+            balance: totals[account.id] ?? 0.0,
+          ),
+        )
+        .toList();
   }
 }

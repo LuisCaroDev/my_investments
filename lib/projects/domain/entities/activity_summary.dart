@@ -5,6 +5,7 @@ class ActivitySummary {
   final Activity activity;
   final double spent;
   final double deposited;
+  final double fundedAmount;
   final List<Category> categories;
   final int transactionCount;
 
@@ -12,6 +13,7 @@ class ActivitySummary {
     required this.activity,
     required this.spent,
     required this.deposited,
+    required this.fundedAmount,
     required this.categories,
     required this.transactionCount,
   });
