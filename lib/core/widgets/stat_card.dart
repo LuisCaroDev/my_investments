@@ -29,9 +29,7 @@ class StatCard extends StatelessWidget {
                 Icon(icon!, size: 14, color: theme.colorScheme.mutedForeground),
                 const Gap(6),
               ],
-              Expanded(
-                child: Text(label).muted.small,
-              ),
+              Expanded(child: Text(label).muted.small),
             ],
           ),
           const Gap(8),

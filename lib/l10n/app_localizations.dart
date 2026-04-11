@@ -155,7 +155,7 @@ abstract class AppLocalizations {
   /// No description provided for @common_category.
   ///
   /// In es, this message translates to:
-  /// **'Categoría'**
+  /// **'Tarea'**
   String get common_category;
 
   /// No description provided for @common_activity.
@@ -263,7 +263,7 @@ abstract class AppLocalizations {
   /// No description provided for @projects_delete_confirmation.
   ///
   /// In es, this message translates to:
-  /// **'Escribe el nombre del proyecto para confirmar. Se eliminarán sus actividades, categorías y transacciones.'**
+  /// **'Escribe el nombre del proyecto para confirmar. Se eliminarán sus actividades, tareas y transacciones.'**
   String get projects_delete_confirmation;
 
   /// No description provided for @project_detail_summary_deposited.
@@ -299,7 +299,7 @@ abstract class AppLocalizations {
   /// No description provided for @project_detail_categories_title.
   ///
   /// In es, this message translates to:
-  /// **'Categorías'**
+  /// **'Tareas'**
   String get project_detail_categories_title;
 
   /// No description provided for @project_detail_transactions_title.
@@ -395,13 +395,13 @@ abstract class AppLocalizations {
   /// No description provided for @activity_detail_categories_title.
   ///
   /// In es, this message translates to:
-  /// **'Categorías'**
+  /// **'Tareas'**
   String get activity_detail_categories_title;
 
   /// No description provided for @activity_detail_add_category_button.
   ///
   /// In es, this message translates to:
-  /// **'Categoría'**
+  /// **'Tarea'**
   String get activity_detail_add_category_button;
 
   /// No description provided for @activity_detail_category_project_label.
@@ -443,7 +443,7 @@ abstract class AppLocalizations {
   /// No description provided for @transaction_list_filter_category.
   ///
   /// In es, this message translates to:
-  /// **'Filtrar por categoría'**
+  /// **'Filtrar por tarea'**
   String get transaction_list_filter_category;
 
   /// No description provided for @transaction_list_sort_label.
@@ -497,19 +497,19 @@ abstract class AppLocalizations {
   /// No description provided for @category_mgmt_activity_title.
   ///
   /// In es, this message translates to:
-  /// **'Categorías de la Actividad'**
+  /// **'Tareas de la Actividad'**
   String get category_mgmt_activity_title;
 
   /// No description provided for @category_mgmt_project_title.
   ///
   /// In es, this message translates to:
-  /// **'Categorías del Proyecto'**
+  /// **'Tareas del Proyecto'**
   String get category_mgmt_project_title;
 
   /// No description provided for @category_mgmt_empty.
   ///
   /// In es, this message translates to:
-  /// **'No hay categorías todavía.'**
+  /// **'No hay tareas todavía.'**
   String get category_mgmt_empty;
 
   /// No description provided for @settings_title.
@@ -839,19 +839,19 @@ abstract class AppLocalizations {
   /// No description provided for @dialog_tx_category_label.
   ///
   /// In es, this message translates to:
-  /// **'Categoría (opcional)'**
+  /// **'Tarea (opcional)'**
   String get dialog_tx_category_label;
 
   /// No description provided for @dialog_tx_category_select.
   ///
   /// In es, this message translates to:
-  /// **'Seleccionar Categoría'**
+  /// **'Seleccionar Tarea'**
   String get dialog_tx_category_select;
 
   /// No description provided for @dialog_tx_category_none.
   ///
   /// In es, this message translates to:
-  /// **'Sin categoría'**
+  /// **'Sin tarea'**
   String get dialog_tx_category_none;
 
   /// No description provided for @dialog_tx_delete_title.
@@ -869,37 +869,37 @@ abstract class AppLocalizations {
   /// No description provided for @dialog_category_edit_project_title.
   ///
   /// In es, this message translates to:
-  /// **'Editar Categoría de Proyecto'**
+  /// **'Editar Tarea de Proyecto'**
   String get dialog_category_edit_project_title;
 
   /// No description provided for @dialog_category_new_project_title.
   ///
   /// In es, this message translates to:
-  /// **'Nueva Categoría de Proyecto'**
+  /// **'Nueva Tarea de Proyecto'**
   String get dialog_category_new_project_title;
 
   /// No description provided for @dialog_category_edit_title.
   ///
   /// In es, this message translates to:
-  /// **'Editar Categoría'**
+  /// **'Editar Tarea'**
   String get dialog_category_edit_title;
 
   /// No description provided for @dialog_category_new_title.
   ///
   /// In es, this message translates to:
-  /// **'Nueva Categoría'**
+  /// **'Nueva Tarea'**
   String get dialog_category_new_title;
 
   /// No description provided for @dialog_category_name_placeholder.
   ///
   /// In es, this message translates to:
-  /// **'Ej: Compra de palma'**
+  /// **'Ej: Fumigación'**
   String get dialog_category_name_placeholder;
 
   /// No description provided for @dialog_category_project_info.
   ///
   /// In es, this message translates to:
-  /// **'Esta categoría estará disponible en todas las actividades del proyecto.'**
+  /// **'Esta tarea estará disponible en todas las actividades del proyecto.'**
   String get dialog_category_project_info;
 
   /// No description provided for @widget_budget_progress_budget.

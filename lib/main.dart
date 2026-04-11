@@ -9,21 +9,34 @@ import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
 import 'package:my_investments/core/presentation/bloc/settings_state.dart';
 import 'package:my_investments/core/theme/app_theme.dart';
 import 'package:my_investments/core/router/app_router.dart';
-import 'package:my_investments/projects/data/datasources/projects_local_ds.dart';
-import 'package:my_investments/projects/data/repositories/projects_repository_impl.dart';
-import 'package:my_investments/projects/presentation/bloc/accounts_cubit.dart';
-import 'package:my_investments/projects/presentation/bloc/goals_cubit.dart';
-import 'package:my_investments/projects/presentation/bloc/investments_cubit.dart';
+import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
+import 'package:my_investments/planning/data/repositories/planning_repository.dart';
+import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
+import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
+import 'package:my_investments/accounts/presentation/bloc/accounts_cubit.dart';
+import 'package:my_investments/planning/presentation/bloc/goals_cubit.dart';
+import 'package:my_investments/planning/presentation/bloc/investments_cubit.dart';
 import 'package:my_investments/core/i18n/shadcn_localizations_es.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
   
-  final ds = ProjectsLocalDataSource(prefs: prefs);
-  final repo = ProjectsRepository(localDataSource: ds);
+  final planningDs = PlanningLocalDataSource(prefs: prefs);
+  final accountsDs = AccountsLocalDataSource(prefs: prefs);
+  final accountsRepo = AccountsRepository(localDataSource: accountsDs);
+  final planningRepo = PlanningRepository(
+    localDataSource: planningDs,
+    transactionsReader: accountsRepo,
+  );
 
-  runApp(MyInvestmentsApp(prefs: prefs, repository: repo));
+  runApp(
+    MyInvestmentsApp(
+      prefs: prefs,
+      planningRepository: planningRepo,
+      accountsRepository: accountsRepo,
+    ),
+  );
 }
 
 class FallbackShadcnLocalizationsDelegate
@@ -50,12 +63,14 @@ class FallbackShadcnLocalizationsDelegate
 
 class MyInvestmentsApp extends StatefulWidget {
   final SharedPreferences prefs;
-  final ProjectsRepository repository;
+  final PlanningRepository planningRepository;
+  final AccountsRepository accountsRepository;
 
   const MyInvestmentsApp({
     super.key,
     required this.prefs,
-    required this.repository,
+    required this.planningRepository,
+    required this.accountsRepository,
   });
 
   @override
@@ -72,14 +87,25 @@ class _MyInvestmentsAppState extends State<MyInvestmentsApp> {
       providers: [
         BlocProvider(
           create: (_) =>
-              InvestmentsCubit(repository: widget.repository)..loadInvestments(),
+              InvestmentsCubit(
+                repository: widget.planningRepository,
+                accountsRepository: widget.accountsRepository,
+              )
+                ..loadInvestments(),
         ),
         BlocProvider(
-          create: (_) => GoalsCubit(repository: widget.repository)..loadGoals(),
+          create: (_) => GoalsCubit(
+            repository: widget.planningRepository,
+            accountsRepository: widget.accountsRepository,
+          )
+            ..loadGoals(),
         ),
         BlocProvider(
-          create: (_) =>
-              AccountsCubit(repository: widget.repository)..loadAccounts(),
+          create: (_) => AccountsCubit(
+            repository: widget.accountsRepository,
+            planningRepository: widget.planningRepository,
+          )
+            ..loadAccounts(),
         ),
         BlocProvider(create: (_) => SettingsCubit(prefs: widget.prefs)),
       ],

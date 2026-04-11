@@ -38,7 +38,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get common_category => 'Categoría';
+  String get common_category => 'Tarea';
 
   @override
   String get common_activity => 'Actividad';
@@ -96,7 +96,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get projects_delete_confirmation =>
-      'Escribe el nombre del proyecto para confirmar. Se eliminarán sus actividades, categorías y transacciones.';
+      'Escribe el nombre del proyecto para confirmar. Se eliminarán sus actividades, tareas y transacciones.';
 
   @override
   String get project_detail_summary_deposited => 'Depositado';
@@ -114,7 +114,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get project_detail_summary_budget => 'Presupuesto';
 
   @override
-  String get project_detail_categories_title => 'Categorías';
+  String get project_detail_categories_title => 'Tareas';
 
   @override
   String get project_detail_transactions_title => 'Últimas transacciones';
@@ -168,10 +168,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get activity_detail_summary_budget => 'Presupuesto';
 
   @override
-  String get activity_detail_categories_title => 'Categorías';
+  String get activity_detail_categories_title => 'Tareas';
 
   @override
-  String get activity_detail_add_category_button => 'Categoría';
+  String get activity_detail_add_category_button => 'Tarea';
 
   @override
   String get activity_detail_category_project_label => '(proyecto)';
@@ -193,7 +193,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get transaction_list_page_title => 'Transacciones';
 
   @override
-  String get transaction_list_filter_category => 'Filtrar por categoría';
+  String get transaction_list_filter_category => 'Filtrar por tarea';
 
   @override
   String get transaction_list_sort_label => 'Ordenar';
@@ -221,13 +221,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get transaction_list_sort_amount_asc => 'Monto (menor)';
 
   @override
-  String get category_mgmt_activity_title => 'Categorías de la Actividad';
+  String get category_mgmt_activity_title => 'Tareas de la Actividad';
 
   @override
-  String get category_mgmt_project_title => 'Categorías del Proyecto';
+  String get category_mgmt_project_title => 'Tareas del Proyecto';
 
   @override
-  String get category_mgmt_empty => 'No hay categorías todavía.';
+  String get category_mgmt_empty => 'No hay tareas todavía.';
 
   @override
   String get settings_title => 'Configuración';
@@ -401,13 +401,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get dialog_tx_account_select => 'Seleccionar Cuenta';
 
   @override
-  String get dialog_tx_category_label => 'Categoría (opcional)';
+  String get dialog_tx_category_label => 'Tarea (opcional)';
 
   @override
-  String get dialog_tx_category_select => 'Seleccionar Categoría';
+  String get dialog_tx_category_select => 'Seleccionar Tarea';
 
   @override
-  String get dialog_tx_category_none => 'Sin categoría';
+  String get dialog_tx_category_none => 'Sin tarea';
 
   @override
   String get dialog_tx_delete_title => 'Eliminar transacción';
@@ -417,24 +417,23 @@ class AppLocalizationsEs extends AppLocalizations {
       '¿Seguro que quieres eliminar esta transacción?';
 
   @override
-  String get dialog_category_edit_project_title =>
-      'Editar Categoría de Proyecto';
+  String get dialog_category_edit_project_title => 'Editar Tarea de Proyecto';
 
   @override
-  String get dialog_category_new_project_title => 'Nueva Categoría de Proyecto';
+  String get dialog_category_new_project_title => 'Nueva Tarea de Proyecto';
 
   @override
-  String get dialog_category_edit_title => 'Editar Categoría';
+  String get dialog_category_edit_title => 'Editar Tarea';
 
   @override
-  String get dialog_category_new_title => 'Nueva Categoría';
+  String get dialog_category_new_title => 'Nueva Tarea';
 
   @override
-  String get dialog_category_name_placeholder => 'Ej: Compra de palma';
+  String get dialog_category_name_placeholder => 'Ej: Fumigación';
 
   @override
   String get dialog_category_project_info =>
-      'Esta categoría estará disponible en todas las actividades del proyecto.';
+      'Esta tarea estará disponible en todas las actividades del proyecto.';
 
   @override
   String get widget_budget_progress_budget => 'Presupuesto:';

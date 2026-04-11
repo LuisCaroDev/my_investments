@@ -3,14 +3,14 @@ import 'dart:async';
 import 'package:flutter/material.dart' as m;
 import 'package:flutter/widgets.dart';
 import 'package:my_investments/core/presentation/pages/settings_page.dart';
-import 'package:my_investments/projects/domain/entities/financial_account.dart';
-import 'package:my_investments/projects/presentation/pages/account_transactions_page.dart';
-import 'package:my_investments/projects/presentation/pages/activity_detail_page.dart';
-import 'package:my_investments/projects/presentation/pages/category_management_page.dart';
-import 'package:my_investments/projects/presentation/pages/import_export_page.dart';
-import 'package:my_investments/projects/presentation/pages/main_navigation_shell.dart';
-import 'package:my_investments/projects/presentation/pages/project_detail_page.dart';
-import 'package:my_investments/projects/presentation/pages/transaction_list_page.dart';
+import 'package:my_investments/core/domain/entities/financial_account.dart';
+import 'package:my_investments/accounts/presentation/pages/account_transactions_page.dart';
+import 'package:my_investments/planning/presentation/pages/activity_detail_page.dart';
+import 'package:my_investments/planning/presentation/pages/operational_task_management_page.dart';
+import 'package:my_investments/planning/presentation/pages/import_export_page.dart';
+import 'package:my_investments/planning/presentation/pages/main_navigation_shell.dart';
+import 'package:my_investments/planning/presentation/pages/project_detail_page.dart';
+import 'package:my_investments/accounts/presentation/pages/transaction_list_page.dart';
 
 sealed class AppRoute {
   const AppRoute();
@@ -84,12 +84,12 @@ class TransactionListRoute extends AppRoute {
   }
 }
 
-class CategoryManagementRoute extends AppRoute {
+class OperationalTaskManagementRoute extends AppRoute {
   final String projectId;
   final String title;
   final String? activityId;
 
-  const CategoryManagementRoute({
+  const OperationalTaskManagementRoute({
     required this.projectId,
     required this.title,
     this.activityId,
@@ -192,9 +192,9 @@ class AppRouteParser extends RouteInformationParser<AppRoutePath> {
       final projectId = uri.pathSegments[1];
       return AppRoutePath([
         const HomeRoute(),
-        CategoryManagementRoute(
+        OperationalTaskManagementRoute(
           projectId: projectId,
-          title: 'Categories',
+          title: 'Tasks',
           activityId: uri.queryParameters['activity'],
         ),
       ]);
@@ -363,13 +363,13 @@ class AppRouter extends RouterDelegate<AppRoutePath>
             ),
           ),
         );
-      } else if (route is CategoryManagementRoute) {
+      } else if (route is OperationalTaskManagementRoute) {
         pages.add(
           m.MaterialPage(
             key: ValueKey(
               'categories_${route.projectId}_${route.activityId ?? 'all'}',
             ),
-            child: CategoryManagementPage(
+            child: OperationalTaskManagementPage(
               projectId: route.projectId,
               title: route.title,
               activityId: route.activityId,

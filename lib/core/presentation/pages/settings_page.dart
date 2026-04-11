@@ -19,177 +19,190 @@ class SettingsPage extends StatelessWidget {
       headers: [
         AppBar(
           title: Text(l10n.settings_title),
-          leading: [
-             ...AppBackButton.render(context),
-          ],
+          leading: [...AppBackButton.render(context)],
         ),
         Divider(height: 1),
       ],
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // ── Sincronización / Nube ──────────────────────────────
-            Text(l10n.settings_sync_title).h4,
-            const Gap(16),
-            Card(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Row(
+        child: SafeArea(
+          top: false,
+          bottom: false,
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // ── Sincronización / Nube ──────────────────────────────
+                Text(l10n.settings_sync_title).h4,
+                const Gap(16),
+                Card(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.muted,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(RadixIcons.avatar),
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.muted,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(RadixIcons.avatar),
+                          ),
+                          const Gap(16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(l10n.settings_local_mode_title).large.bold,
+                                Text(l10n.settings_local_mode_info).muted,
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                       const Gap(16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(l10n.settings_local_mode_title).large.bold,
-                            Text(l10n.settings_local_mode_info).muted,
-                          ],
-                        ),
+                      PrimaryButton(
+                        onPressed: null, // Disabled
+                        child: Text(l10n.settings_login_button),
                       ),
                     ],
                   ),
-                  const Gap(16),
-                  PrimaryButton(
-                    onPressed: null, // Disabled
-                    child: Text(l10n.settings_login_button),
-                  ),
-                ],
-              ),
-            ),
-            const Gap(32),
-
-            // ── Preferencias ──────────────────────────────
-            Text(l10n.settings_preferences_title).h4,
-            const Gap(16),
-            BlocBuilder<SettingsCubit, SettingsState>(
-              builder: (context, state) {
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Idioma
-                    CardButton(
-                      onPressed: () => _showLocaleDialog(context, state),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            const Icon(RadixIcons.globe),
-                            const Gap(16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(l10n.settings_language_label).medium,
-                                  Text(
-                                    _getLocaleName(context, state.appLocale),
-                                  ).muted,
-                                ],
-                              ),
-                            ),
-                            const Icon(RadixIcons.chevronRight),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const Gap(8),
-                    CardButton(
-                      onPressed: () => _showThemeDialog(context, state),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            const Icon(RadixIcons.moon),
-                            const Gap(16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(l10n.settings_theme_label).medium,
-                                  Text(
-                                    _getThemeModeName(context, state.themeMode),
-                                  ).muted,
-                                ],
-                              ),
-                            ),
-                            const Icon(RadixIcons.chevronRight),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const Gap(8),
-                    // Moneda
-                    CardButton(
-                      onPressed: () => _showCurrencyDialog(context, state),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          children: [
-                            const Icon(RadixIcons.component1),
-                            const Gap(16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(l10n.settings_currency_label).medium,
-                                  Text(
-                                    state.currencySymbol != null
-                                        ? '${state.currencySymbol} (${state.currencyLocale ?? l10n.settings_system_default})'
-                                        : l10n.settings_system_default,
-                                  ).muted,
-                                ],
-                              ),
-                            ),
-                            const Icon(RadixIcons.chevronRight),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-            const Gap(32),
-
-            // ── Datos ──────────────────────────────
-            Text(l10n.settings_data_title).h4,
-            const Gap(16),
-            CardButton(
-              onPressed: () {
-                context.appRouter.push(const ImportExportRoute());
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  children: [
-                    const Icon(RadixIcons.upload),
-                    const Gap(16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(l10n.settings_import_export_label).medium,
-                          Text(l10n.settings_import_export_info).muted,
-                        ],
-                      ),
-                    ),
-                    const Icon(RadixIcons.chevronRight),
-                  ],
                 ),
-              ),
+                const Gap(32),
+
+                // ── Preferencias ──────────────────────────────
+                Text(l10n.settings_preferences_title).h4,
+                const Gap(16),
+                BlocBuilder<SettingsCubit, SettingsState>(
+                  builder: (context, state) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        // Idioma
+                        CardButton(
+                          onPressed: () => _showLocaleDialog(context, state),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                const Icon(RadixIcons.globe),
+                                const Gap(16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(l10n.settings_language_label).medium,
+                                      Text(
+                                        _getLocaleName(
+                                          context,
+                                          state.appLocale,
+                                        ),
+                                      ).muted,
+                                    ],
+                                  ),
+                                ),
+                                const Icon(RadixIcons.chevronRight),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const Gap(8),
+                        CardButton(
+                          onPressed: () => _showThemeDialog(context, state),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                const Icon(RadixIcons.moon),
+                                const Gap(16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(l10n.settings_theme_label).medium,
+                                      Text(
+                                        _getThemeModeName(
+                                          context,
+                                          state.themeMode,
+                                        ),
+                                      ).muted,
+                                    ],
+                                  ),
+                                ),
+                                const Icon(RadixIcons.chevronRight),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const Gap(8),
+                        // Moneda
+                        CardButton(
+                          onPressed: () => _showCurrencyDialog(context, state),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                const Icon(RadixIcons.component1),
+                                const Gap(16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(l10n.settings_currency_label).medium,
+                                      Text(
+                                        state.currencySymbol != null
+                                            ? '${state.currencySymbol} (${state.currencyLocale ?? l10n.settings_system_default})'
+                                            : l10n.settings_system_default,
+                                      ).muted,
+                                    ],
+                                  ),
+                                ),
+                                const Icon(RadixIcons.chevronRight),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+                const Gap(32),
+
+                // ── Datos ──────────────────────────────
+                Text(l10n.settings_data_title).h4,
+                const Gap(16),
+                CardButton(
+                  onPressed: () {
+                    context.appRouter.push(const ImportExportRoute());
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      children: [
+                        const Icon(RadixIcons.upload),
+                        const Gap(16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(l10n.settings_import_export_label).medium,
+                              Text(l10n.settings_import_export_info).muted,
+                            ],
+                          ),
+                        ),
+                        const Icon(RadixIcons.chevronRight),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

@@ -1,0 +1,187 @@
+import 'package:my_investments/l10n/app_localizations.dart';
+import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:my_investments/core/widgets/app_back_button.dart';
+import 'package:my_investments/core/widgets/empty_state.dart';
+import 'package:my_investments/core/constants/ledger.dart';
+import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
+import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
+import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
+import 'package:my_investments/planning/data/repositories/planning_repository.dart';
+import 'package:my_investments/core/domain/entities/financial_account.dart';
+import 'package:my_investments/core/domain/entities/transaction.dart';
+import 'package:my_investments/planning/domain/entities/operational_task.dart'
+    as domain;
+import 'package:my_investments/accounts/presentation/widgets/add_account_deposit_dialog.dart';
+import 'package:my_investments/accounts/presentation/widgets/transaction_tile.dart';
+
+class AccountTransactionsPage extends StatefulWidget {
+  final FinancialAccount account;
+
+  const AccountTransactionsPage({super.key, required this.account});
+
+  @override
+  State<AccountTransactionsPage> createState() =>
+      _AccountTransactionsPageState();
+}
+
+class _AccountTransactionsPageState extends State<AccountTransactionsPage> {
+  late final Future<_AccountTransactionRepos> _repoFuture =
+      SharedPreferences.getInstance().then(
+        (prefs) {
+          final planningDs = PlanningLocalDataSource(prefs: prefs);
+          final accountsDs = AccountsLocalDataSource(prefs: prefs);
+          final accountsRepo = AccountsRepository(localDataSource: accountsDs);
+          final planningRepo = PlanningRepository(
+            localDataSource: planningDs,
+            transactionsReader: accountsRepo,
+          );
+          return _AccountTransactionRepos(
+            accountsRepository: accountsRepo,
+            planningRepository: planningRepo,
+          );
+        },
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<_AccountTransactionRepos>(
+      future: _repoFuture,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Scaffold(
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        final repos = snapshot.data!;
+
+        final transactions =
+            repos.accountsRepository.getTransactionsForAccount(
+              widget.account.id,
+            );
+        final operationalTasks =
+            repos.planningRepository.getAllOperationalTasks();
+
+        return _AccountTransactionsView(
+          account: widget.account,
+          transactions: transactions,
+          operationalTasks: operationalTasks,
+          accountsRepository: repos.accountsRepository,
+          onChanged: () => setState(() {}),
+        );
+      },
+    );
+  }
+}
+
+class _AccountTransactionsView extends StatelessWidget {
+  final FinancialAccount account;
+  final List<Transaction> transactions;
+  final List<domain.OperationalTask> operationalTasks;
+  final AccountsRepository accountsRepository;
+  final VoidCallback onChanged;
+
+  const _AccountTransactionsView({
+    required this.account,
+    required this.transactions,
+    required this.operationalTasks,
+    required this.accountsRepository,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final sorted = List<Transaction>.from(transactions)
+      ..sort((a, b) => b.date.compareTo(a.date));
+
+    return Scaffold(
+      headers: [
+        AppBar(
+          leading: [
+            ...AppBackButton.render(context),
+          ],
+          title: Text(account.name),
+        ),
+        Divider(height: 1),
+      ],
+      child: SafeArea(
+        top: false,
+        bottom: false,
+        child: sorted.isEmpty
+            ? Center(
+                child: EmptyState(
+                  icon: RadixIcons.calendar,
+                  title: l10n.transaction_list_empty,
+                  subtitle: l10n.transaction_list_empty_filter,
+                ),
+              )
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children:
+                      sorted
+                          .map((t) {
+                            final isAccountDeposit =
+                                t.projectId == systemAccountProjectId &&
+                                t.type == TransactionType.deposit;
+                            return TransactionTile(
+                              transaction: t,
+                              operationalTasks: operationalTasks,
+                              onEdit: isAccountDeposit
+                                  ? () => _editAccountDeposit(context, t)
+                                  : null,
+                              onDelete: isAccountDeposit
+                                  ? () => _deleteTransaction(context, t)
+                                  : null,
+                              showActionsOnTap: isAccountDeposit,
+                            );
+                          })
+                          .toList(),
+                ),
+              ),
+      ),
+    );
+  }
+
+  Future<void> _editAccountDeposit(
+    BuildContext context,
+    Transaction transaction,
+  ) async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (ctx) => AddAccountDepositDialog(
+        initialAmount: transaction.amount,
+        initialDescription: transaction.description,
+      ),
+    );
+    if (result == null) return;
+    await accountsRepository.updateTransaction(
+      transaction.copyWith(
+        amount: result['amount'] as double,
+        description: result['description'] as String?,
+      ),
+    );
+    onChanged();
+  }
+
+  Future<void> _deleteTransaction(
+    BuildContext context,
+    Transaction transaction,
+  ) async {
+    await accountsRepository.deleteTransaction(transaction.id);
+    onChanged();
+  }
+}
+
+class _AccountTransactionRepos {
+  final AccountsRepository accountsRepository;
+  final PlanningRepository planningRepository;
+
+  const _AccountTransactionRepos({
+    required this.accountsRepository,
+    required this.planningRepository,
+  });
+}
