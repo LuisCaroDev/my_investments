@@ -8,9 +8,10 @@ import 'package:my_investments/accounts/presentation/pages/account_transactions_
 import 'package:my_investments/planning/presentation/pages/activity_detail_page.dart';
 import 'package:my_investments/planning/presentation/pages/operational_task_management_page.dart';
 import 'package:my_investments/planning/presentation/pages/import_export_page.dart';
-import 'package:my_investments/planning/presentation/pages/main_navigation_shell.dart';
+import 'package:my_investments/auth/presentation/pages/home_gate.dart';
 import 'package:my_investments/planning/presentation/pages/project_detail_page.dart';
 import 'package:my_investments/accounts/presentation/pages/transaction_list_page.dart';
+import 'package:my_investments/auth/presentation/pages/login_page.dart';
 
 sealed class AppRoute {
   const AppRoute();
@@ -36,6 +37,14 @@ class ImportExportRoute extends AppRoute {
 
   @override
   String get location => '/settings/import-export';
+}
+
+class LoginRoute extends AppRoute {
+  final bool fromSettings;
+  const LoginRoute({this.fromSettings = false});
+
+  @override
+  String get location => '/login${fromSettings ? '?fromSettings=true' : ''}';
 }
 
 class ProjectDetailRoute extends AppRoute {
@@ -143,6 +152,15 @@ class AppRouteParser extends RouteInformationParser<AppRoutePath> {
         SettingsRoute(),
         ImportExportRoute(),
       ]);
+    }
+
+    if (uri.pathSegments.length == 1 && uri.pathSegments.first == 'login') {
+      final fromSettings = uri.queryParameters['fromSettings'] == 'true';
+      return AppRoutePath([
+        HomeRoute(),
+        fromSettings ? const SettingsRoute() : null, // keep Settings in stack if from settings maybe? Actually won't reconstruct properly, but let's just parse the parameter.
+        LoginRoute(fromSettings: fromSettings),
+      ].whereType<AppRoute>().toList());
     }
 
     if (uri.pathSegments.length == 2 &&
@@ -309,7 +327,7 @@ class AppRouter extends RouterDelegate<AppRoutePath>
     final pages = <m.Page>[
       const m.MaterialPage(
         key: ValueKey('home'),
-        child: MainNavigationShell(),
+        child: HomeGate(),
       ),
     ];
 
@@ -327,6 +345,13 @@ class AppRouter extends RouterDelegate<AppRoutePath>
           const m.MaterialPage(
             key: ValueKey('import_export'),
             child: ImportExportPage(),
+          ),
+        );
+      } else if (route is LoginRoute) {
+        pages.add(
+          m.MaterialPage(
+            key: const ValueKey('login'),
+            child: LoginPage(fromSettings: route.fromSettings),
           ),
         );
       } else if (route is ProjectDetailRoute) {

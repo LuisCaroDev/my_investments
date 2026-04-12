@@ -242,7 +242,78 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_local_mode_info => 'Your data is saved on this device.';
 
   @override
-  String get settings_login_button => 'Log In (Coming Soon)';
+  String get settings_login_button => 'Log In';
+
+  @override
+  String get settings_logout_button => 'Log Out';
+
+  @override
+  String get settings_guest_logout_button => 'Exit guest mode';
+
+  @override
+  String get settings_sync_logged_in => 'Signed in';
+
+  @override
+  String get settings_sync_logged_in_info =>
+      'Your data can sync with the cloud.';
+
+  @override
+  String get settings_sync_status_label => 'Sync Status';
+
+  @override
+  String get settings_sync_last_sync_label => 'Last sync';
+
+  @override
+  String get settings_sync_pending_label => 'Pending changes';
+
+  @override
+  String get settings_sync_mode_title => 'Online mode';
+
+  @override
+  String get settings_sync_mode_info =>
+      'Automatically sync and back up your data.';
+
+  @override
+  String get settings_sync_never => 'Never';
+
+  @override
+  String get settings_sync_backup_button => 'Backup now';
+
+  @override
+  String get settings_sync_restore_button => 'Restore from cloud';
+
+  @override
+  String get settings_sync_not_configured => 'Supabase is not configured.';
+
+  @override
+  String get settings_sync_not_logged_in => 'You need to log in.';
+
+  @override
+  String get settings_sync_email_title => 'Email for login';
+
+  @override
+  String get settings_sync_email_hint => 'you@example.com';
+
+  @override
+  String get settings_sync_send_link_button => 'Send magic link';
+
+  @override
+  String get settings_sync_link_sent => 'Check your email to complete login.';
+
+  @override
+  String get settings_sync_backup_success => 'Backup completed.';
+
+  @override
+  String get settings_sync_restore_success => 'Restore completed.';
+
+  @override
+  String get settings_sync_restore_not_found => 'No backup found in the cloud.';
+
+  @override
+  String get settings_sync_up_to_date => 'Already up to date.';
+
+  @override
+  String get settings_sync_error_title => 'Sync error';
 
   @override
   String get settings_preferences_title => 'Preferences';
@@ -492,4 +563,125 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dialog_account_balance_label => 'Balance';
+
+  @override
+  String get auth_login_title => 'Log In';
+
+  @override
+  String get auth_verify_title => 'Verify Code';
+
+  @override
+  String get auth_login_success =>
+      'Successfully logged in. Your data has been synced.';
+
+  @override
+  String get auth_login_error_title => 'Error';
+
+  @override
+  String get auth_login_success_title => 'Success';
+
+  @override
+  String get auth_email_view_title => 'Enter your email';
+
+  @override
+  String get auth_email_view_subtitle =>
+      'We will send you a security code to verify your account and sync your projects.';
+
+  @override
+  String get auth_email_label => 'EMAIL ADDRESS';
+
+  @override
+  String get auth_email_placeholder => 'email@example.com';
+
+  @override
+  String get auth_email_helper =>
+      'We will send you an 8-digit code to your email to securely validate your access.';
+
+  @override
+  String get auth_email_send_button => 'Send code';
+
+  @override
+  String get auth_continue_with => 'OR CONTINUE WITH';
+
+  @override
+  String get auth_continue_apple => 'Continue with Apple';
+
+  @override
+  String get auth_continue_google => 'Continue with Google';
+
+  @override
+  String get auth_otp_view_title => 'Check your email';
+
+  @override
+  String auth_otp_view_subtitle(Object email) {
+    return 'We have sent an 8-digit security code to: $email';
+  }
+
+  @override
+  String get auth_otp_label => 'ACCESS CODE';
+
+  @override
+  String get auth_otp_helper => 'Enter the 8 digits received';
+
+  @override
+  String get auth_otp_verify_button => 'Verify';
+
+  @override
+  String get auth_otp_resend_button => 'Resend code';
+
+  @override
+  String get auth_otp_spam_helper =>
+      'Didn\'t receive anything? Check your spam folder.';
+
+  @override
+  String get auth_terms_prefix => 'By continuing, you agree to our ';
+
+  @override
+  String get auth_terms_service => 'Terms of Service';
+
+  @override
+  String get auth_terms_and => ' and ';
+
+  @override
+  String get auth_terms_privacy => 'Privacy Policy';
+
+  @override
+  String get auth_terms_suffix => '.';
+
+  @override
+  String get welcome_title_prefix => 'Welcome to';
+
+  @override
+  String get welcome_title_suffix => 'My Investments';
+
+  @override
+  String get welcome_subtitle =>
+      'Take control of your goals and projects with professional-grade tools.';
+
+  @override
+  String get welcome_feature1_title => 'Project Management';
+
+  @override
+  String get welcome_feature1_desc =>
+      'Track your projects and saving goals with precision.';
+
+  @override
+  String get welcome_feature2_title => 'Total Synchronization';
+
+  @override
+  String get welcome_feature2_desc =>
+      'Access your data from any device by logging in.';
+
+  @override
+  String get welcome_feature3_title => 'Local & Private';
+
+  @override
+  String get welcome_feature3_desc =>
+      'Your data is yours. Save it locally or sync it securely.';
+
+  @override
+  String get welcome_login_button => 'Log In';
+
+  @override
+  String get welcome_guest_button => 'Continue as Guest';
 }

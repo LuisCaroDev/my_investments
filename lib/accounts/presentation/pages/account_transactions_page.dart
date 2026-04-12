@@ -1,13 +1,9 @@
 import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/core/constants/ledger.dart';
-import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
-import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
 import 'package:my_investments/planning/data/repositories/planning_repository.dart';
 import 'package:my_investments/core/domain/entities/financial_account.dart';
 import 'package:my_investments/core/domain/entities/transaction.dart';
@@ -15,6 +11,7 @@ import 'package:my_investments/planning/domain/entities/operational_task.dart'
     as domain;
 import 'package:my_investments/accounts/presentation/widgets/add_account_deposit_dialog.dart';
 import 'package:my_investments/accounts/presentation/widgets/transaction_tile.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AccountTransactionsPage extends StatefulWidget {
   final FinancialAccount account;
@@ -27,50 +24,21 @@ class AccountTransactionsPage extends StatefulWidget {
 }
 
 class _AccountTransactionsPageState extends State<AccountTransactionsPage> {
-  late final Future<_AccountTransactionRepos> _repoFuture =
-      SharedPreferences.getInstance().then(
-        (prefs) {
-          final planningDs = PlanningLocalDataSource(prefs: prefs);
-          final accountsDs = AccountsLocalDataSource(prefs: prefs);
-          final accountsRepo = AccountsRepository(localDataSource: accountsDs);
-          final planningRepo = PlanningRepository(
-            localDataSource: planningDs,
-            transactionsReader: accountsRepo,
-          );
-          return _AccountTransactionRepos(
-            accountsRepository: accountsRepo,
-            planningRepository: planningRepo,
-          );
-        },
-      );
-
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<_AccountTransactionRepos>(
-      future: _repoFuture,
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Scaffold(
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
-        final repos = snapshot.data!;
+    final accountsRepository = context.read<AccountsRepository>();
+    final planningRepository = context.read<PlanningRepository>();
+    final transactions = accountsRepository.getTransactionsForAccount(
+      widget.account.id,
+    );
+    final operationalTasks = planningRepository.getAllOperationalTasks();
 
-        final transactions =
-            repos.accountsRepository.getTransactionsForAccount(
-              widget.account.id,
-            );
-        final operationalTasks =
-            repos.planningRepository.getAllOperationalTasks();
-
-        return _AccountTransactionsView(
-          account: widget.account,
-          transactions: transactions,
-          operationalTasks: operationalTasks,
-          accountsRepository: repos.accountsRepository,
-          onChanged: () => setState(() {}),
-        );
-      },
+    return _AccountTransactionsView(
+      account: widget.account,
+      transactions: transactions,
+      operationalTasks: operationalTasks,
+      accountsRepository: accountsRepository,
+      onChanged: () => setState(() {}),
     );
   }
 }
@@ -174,14 +142,4 @@ class _AccountTransactionsView extends StatelessWidget {
     await accountsRepository.deleteTransaction(transaction.id);
     onChanged();
   }
-}
-
-class _AccountTransactionRepos {
-  final AccountsRepository accountsRepository;
-  final PlanningRepository planningRepository;
-
-  const _AccountTransactionRepos({
-    required this.accountsRepository,
-    required this.planningRepository,
-  });
 }

@@ -243,7 +243,80 @@ class AppLocalizationsEs extends AppLocalizations {
       'Tus datos se guardan en este dispositivo.';
 
   @override
-  String get settings_login_button => 'Iniciar Sesión (Próximamente)';
+  String get settings_login_button => 'Iniciar sesión';
+
+  @override
+  String get settings_logout_button => 'Cerrar sesión';
+
+  @override
+  String get settings_guest_logout_button => 'Salir de invitado';
+
+  @override
+  String get settings_sync_logged_in => 'Sesión iniciada';
+
+  @override
+  String get settings_sync_logged_in_info =>
+      'Tus datos pueden sincronizarse con la nube.';
+
+  @override
+  String get settings_sync_status_label => 'Estado de sincronización';
+
+  @override
+  String get settings_sync_last_sync_label => 'Última sincronización';
+
+  @override
+  String get settings_sync_pending_label => 'Cambios pendientes';
+
+  @override
+  String get settings_sync_mode_title => 'Modo online';
+
+  @override
+  String get settings_sync_mode_info =>
+      'Sincroniza y respalda tus datos automáticamente.';
+
+  @override
+  String get settings_sync_never => 'Nunca';
+
+  @override
+  String get settings_sync_backup_button => 'Hacer backup';
+
+  @override
+  String get settings_sync_restore_button => 'Restaurar desde la nube';
+
+  @override
+  String get settings_sync_not_configured => 'Supabase no está configurado.';
+
+  @override
+  String get settings_sync_not_logged_in => 'Necesitas iniciar sesión.';
+
+  @override
+  String get settings_sync_email_title => 'Email para iniciar sesión';
+
+  @override
+  String get settings_sync_email_hint => 'tu@correo.com';
+
+  @override
+  String get settings_sync_send_link_button => 'Enviar magic link';
+
+  @override
+  String get settings_sync_link_sent =>
+      'Revisa tu correo para completar el inicio de sesión.';
+
+  @override
+  String get settings_sync_backup_success => 'Backup completado.';
+
+  @override
+  String get settings_sync_restore_success => 'Restauración completada.';
+
+  @override
+  String get settings_sync_restore_not_found =>
+      'No se encontró backup en la nube.';
+
+  @override
+  String get settings_sync_up_to_date => 'Ya está actualizado.';
+
+  @override
+  String get settings_sync_error_title => 'Error de sincronización';
 
   @override
   String get settings_preferences_title => 'Preferencias';
@@ -495,4 +568,125 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get dialog_account_balance_label => 'Saldo';
+
+  @override
+  String get auth_login_title => 'Iniciar sesión';
+
+  @override
+  String get auth_verify_title => 'Verificar Código';
+
+  @override
+  String get auth_login_success =>
+      'Sesión iniciada correctamente. Sus datos se han sincronizado.';
+
+  @override
+  String get auth_login_error_title => 'Error';
+
+  @override
+  String get auth_login_success_title => 'Éxito';
+
+  @override
+  String get auth_email_view_title => 'Ingresa tu correo';
+
+  @override
+  String get auth_email_view_subtitle =>
+      'Te enviaremos un código de seguridad para verificar tu cuenta y sincronizar tus proyectos.';
+
+  @override
+  String get auth_email_label => 'DIRECCIÓN DE CORREO ELECTRÓNICO';
+
+  @override
+  String get auth_email_placeholder => 'correo@ejemplo.com';
+
+  @override
+  String get auth_email_helper =>
+      'Te enviaremos un código de 8 dígitos al correo para validar tu acceso de forma segura.';
+
+  @override
+  String get auth_email_send_button => 'Enviar código';
+
+  @override
+  String get auth_continue_with => 'O CONTINUAR CON';
+
+  @override
+  String get auth_continue_apple => 'Continuar con Apple';
+
+  @override
+  String get auth_continue_google => 'Continuar con Google';
+
+  @override
+  String get auth_otp_view_title => 'Revisa tu correo';
+
+  @override
+  String auth_otp_view_subtitle(Object email) {
+    return 'Hemos enviado un código de seguridad de 8 dígitos a: $email';
+  }
+
+  @override
+  String get auth_otp_label => 'CÓDIGO DE ACCESO';
+
+  @override
+  String get auth_otp_helper => 'Ingresa los 8 dígitos recibidos';
+
+  @override
+  String get auth_otp_verify_button => 'Verificar';
+
+  @override
+  String get auth_otp_resend_button => 'Reenviar código';
+
+  @override
+  String get auth_otp_spam_helper =>
+      '¿No recibiste nada? Revisa tu carpeta de spam.';
+
+  @override
+  String get auth_terms_prefix => 'Al continuar, aceptas nuestros ';
+
+  @override
+  String get auth_terms_service => 'Términos de Servicio';
+
+  @override
+  String get auth_terms_and => ' y ';
+
+  @override
+  String get auth_terms_privacy => 'Política de Privacidad';
+
+  @override
+  String get auth_terms_suffix => '.';
+
+  @override
+  String get welcome_title_prefix => 'Bienvenido a';
+
+  @override
+  String get welcome_title_suffix => 'Mis Inversiones';
+
+  @override
+  String get welcome_subtitle =>
+      'Toma el control de tus metas y proyectos con herramientas de nivel profesional.';
+
+  @override
+  String get welcome_feature1_title => 'Gestión de Proyectos';
+
+  @override
+  String get welcome_feature1_desc =>
+      'Sigue tus proyectos y metas de ahorro con datos precisos.';
+
+  @override
+  String get welcome_feature2_title => 'Sincronización Total';
+
+  @override
+  String get welcome_feature2_desc =>
+      'Accede a tus datos desde cualquier dispositivo iniciando sesión.';
+
+  @override
+  String get welcome_feature3_title => 'Local y Privado';
+
+  @override
+  String get welcome_feature3_desc =>
+      'Tus datos son tuyos. Guárdalos localmente o sincronízalos de forma segura.';
+
+  @override
+  String get welcome_login_button => 'Iniciar sesión';
+
+  @override
+  String get welcome_guest_button => 'Continuar como invitado';
 }

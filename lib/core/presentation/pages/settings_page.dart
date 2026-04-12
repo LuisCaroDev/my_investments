@@ -1,19 +1,43 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
 import 'package:my_investments/core/presentation/bloc/settings_state.dart';
 import 'package:my_investments/core/router/app_router.dart';
 import 'package:my_investments/core/widgets/app_back_button.dart';
+import 'package:my_investments/core/constants/supabase_config.dart';
+import 'package:my_investments/accounts/presentation/bloc/accounts_cubit.dart';
+import 'package:my_investments/planning/presentation/bloc/goals_cubit.dart';
+import 'package:my_investments/planning/presentation/bloc/investments_cubit.dart';
+import 'package:my_investments/sync/data/repositories/sync_repository.dart';
+import 'package:my_investments/sync/domain/usecases/sync_service.dart';
+import 'package:my_investments/core/storage/profile_ids.dart';
+import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
+import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
 
-class SettingsPage extends StatelessWidget {
+class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
+
+  @override
+  State<SettingsPage> createState() => _SettingsPageState();
+}
+
+class _SettingsPageState extends State<SettingsPage> {
+  bool _syncWorking = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final settingsState = context.watch<SettingsCubit>().state;
+    final syncRepo = context.watch<SyncRepository>();
 
     return Scaffold(
       headers: [
@@ -35,40 +59,12 @@ class SettingsPage extends StatelessWidget {
                 // ── Sincronización / Nube ──────────────────────────────
                 Text(l10n.settings_sync_title).h4,
                 const Gap(16),
-                Card(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.muted,
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(RadixIcons.avatar),
-                          ),
-                          const Gap(16),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(l10n.settings_local_mode_title).large.bold,
-                                Text(l10n.settings_local_mode_info).muted,
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                      const Gap(16),
-                      PrimaryButton(
-                        onPressed: null, // Disabled
-                        child: Text(l10n.settings_login_button),
-                      ),
-                    ],
-                  ),
+                _buildSyncCard(
+                  context,
+                  theme: theme,
+                  l10n: l10n,
+                  settingsState: settingsState,
+                  syncRepo: syncRepo,
                 ),
                 const Gap(32),
 
@@ -204,6 +200,122 @@ class SettingsPage extends StatelessWidget {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildSyncCard(
+    BuildContext context, {
+    required ThemeData theme,
+    required AppLocalizations l10n,
+    required SettingsState settingsState,
+    required SyncRepository syncRepo,
+  }) {
+    final pendingCount = syncRepo.getPendingChanges().length;
+    final lastSync = syncRepo.getLastSync();
+
+    final isConfigured = SupabaseConfig.isConfigured;
+    final user =
+        isConfigured ? Supabase.instance.client.auth.currentUser : null;
+    final isLoggedIn = user != null;
+
+    return Card(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.muted,
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(RadixIcons.avatar),
+              ),
+              const Gap(16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isLoggedIn
+                          ? (user.email ?? l10n.settings_sync_logged_in)
+                          : l10n.settings_local_mode_title,
+                    ).medium.bold,
+                    Text(
+                      isLoggedIn
+                          ? l10n.settings_sync_logged_in_info
+                          : l10n.settings_local_mode_info,
+                    ).xSmall.muted,
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const Gap(16),
+          Text(l10n.settings_sync_status_label).small.bold,
+          const Gap(6),
+          Text(
+            '${l10n.settings_sync_last_sync_label}: '
+            '${lastSync?.toLocal().toIso8601String() ?? l10n.settings_sync_never}',
+          ).xSmall.muted,
+          Text(
+            '${l10n.settings_sync_pending_label}: $pendingCount',
+          ).xSmall.muted,
+          const Gap(16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(l10n.settings_sync_mode_title).medium,
+                  Text(l10n.settings_sync_mode_info).xSmall.muted,
+                ],
+              ),
+              Switch(
+                value: settingsState.syncEnabled,
+                onChanged: isLoggedIn
+                    ? (value) => context
+                        .read<SettingsCubit>()
+                        .setSyncEnabled(value)
+                    : null,
+              ),
+            ],
+          ),
+          if (!isLoggedIn) ...[
+            const Gap(16),
+            PrimaryButton(
+              onPressed: _syncWorking ? null : () => _login(context),
+              child: Text(l10n.settings_login_button),
+            ),
+            if (settingsState.isGuestMode) ...[
+              const Gap(8),
+              OutlineButton(
+                onPressed: _syncWorking ? null : _logoutGuest,
+                child: Text(l10n.settings_guest_logout_button),
+              ),
+            ],
+          ] else ...[
+            const Gap(16),
+            PrimaryButton(
+              onPressed: _syncWorking ? null : () => _backupNow(context),
+              child: Text(l10n.settings_sync_backup_button),
+            ),
+            const Gap(8),
+            OutlineButton(
+              onPressed: _syncWorking ? null : () => _restoreNow(context),
+              child: Text(l10n.settings_sync_restore_button),
+            ),
+            const Gap(8),
+            OutlineButton(
+              onPressed: _syncWorking ? null : _logout,
+              child: Text(l10n.settings_logout_button),
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -393,6 +505,226 @@ class SettingsPage extends StatelessWidget {
           OutlineButton(
             onPressed: () => Navigator.of(ctx).pop(),
             child: Text(l10n.common_cancel),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _login(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    if (!SupabaseConfig.isConfigured) {
+      await _showInfoDialog(
+        context,
+        title: l10n.settings_sync_error_title,
+        message: l10n.settings_sync_not_configured,
+      );
+      return;
+    }
+
+    await context.appRouter.pushForResult(const LoginRoute(fromSettings: true));
+
+    // Check if we logged in
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user != null && mounted) {
+      setState(() {});
+    }
+  }
+
+  Future<void> _logout() async {
+    if (!SupabaseConfig.isConfigured) return;
+    await Supabase.instance.client.auth.signOut();
+    if (mounted) {
+      await context.read<SettingsCubit>().setSyncEnabled(false);
+      await context.read<SettingsCubit>().setActiveProfileId(guestProfileId);
+      await context.read<SettingsCubit>().setGuestMode(false);
+      setState(() {});
+      context.appRouter.popToHome();
+    }
+  }
+
+  Future<void> _logoutGuest() async {
+    if (!mounted) return;
+    await context.read<SettingsCubit>().setSyncEnabled(false);
+    await context.read<SettingsCubit>().setActiveProfileId(guestProfileId);
+    await context.read<SettingsCubit>().setGuestMode(false);
+    setState(() {});
+    context.appRouter.popToHome();
+  }
+
+  Future<void> _backupNow(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    if (!SupabaseConfig.isConfigured) {
+      await _showInfoDialog(
+        context,
+        title: l10n.settings_sync_error_title,
+        message: l10n.settings_sync_not_configured,
+      );
+      return;
+    }
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      await _showInfoDialog(
+        context,
+        title: l10n.settings_sync_error_title,
+        message: l10n.settings_sync_not_logged_in,
+      );
+      return;
+    }
+
+    setState(() => _syncWorking = true);
+    try {
+      final service = context.read<SyncService>();
+      final planningDs = context.read<PlanningLocalDataSource>();
+      final accountsDs = context.read<AccountsLocalDataSource>();
+      await service.pushSnapshot(
+        userId: user.id,
+        providers: [
+          planningDs,
+          accountsDs,
+        ],
+      );
+      if (context.mounted) {
+        await _showInfoDialog(
+          context,
+          title: l10n.settings_sync_status_label,
+          message: l10n.settings_sync_backup_success,
+        );
+        setState(() {});
+      }
+    } catch (e) {
+      if (context.mounted) {
+        await _showInfoDialog(
+          context,
+          title: l10n.settings_sync_error_title,
+          // message: 'adsd'
+          message: l10n.common_error_msg(e.toString()),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _syncWorking = false);
+      }
+    }
+  }
+
+  Future<void> _restoreNow(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    if (!SupabaseConfig.isConfigured) {
+      await _showInfoDialog(
+        context,
+        title: l10n.settings_sync_error_title,
+        message: l10n.settings_sync_not_configured,
+      );
+      return;
+    }
+    final user = Supabase.instance.client.auth.currentUser;
+    if (user == null) {
+      await _showInfoDialog(
+        context,
+        title: l10n.settings_sync_error_title,
+        message: l10n.settings_sync_not_logged_in,
+      );
+      return;
+    }
+
+    setState(() => _syncWorking = true);
+    try {
+      final service = context.read<SyncService>();
+      final planningDs = context.read<PlanningLocalDataSource>();
+      final accountsDs = context.read<AccountsLocalDataSource>();
+      final outcome = await service.pullIfRemoteNewer(
+        userId: user.id,
+        providers: [
+          planningDs,
+          accountsDs,
+        ],
+      );
+      if (context.mounted) {
+        switch (outcome) {
+          case SyncPullOutcome.noRemote:
+            await _showInfoDialog(
+              context,
+              title: l10n.settings_sync_status_label,
+              message: l10n.settings_sync_restore_not_found,
+            );
+            break;
+          case SyncPullOutcome.upToDate:
+            await _showInfoDialog(
+              context,
+              title: l10n.settings_sync_status_label,
+              message: l10n.settings_sync_up_to_date,
+            );
+            break;
+          case SyncPullOutcome.pulled:
+            context.read<InvestmentsCubit>().loadInvestments();
+            context.read<GoalsCubit>().loadGoals();
+            context.read<AccountsCubit>().loadAccounts();
+            await _showInfoDialog(
+              context,
+              title: l10n.settings_sync_status_label,
+              message: l10n.settings_sync_restore_success,
+            );
+            break;
+        }
+        setState(() {});
+      }
+    } catch (e) {
+      if (context.mounted) {
+        await _showInfoDialog(
+          context,
+          title: l10n.settings_sync_error_title,
+          message: l10n.common_error_msg(e.toString()),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _syncWorking = false);
+      }
+    }
+  }
+
+  Future<String?> _promptEmail(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.settings_sync_email_title),
+        content: TextField(
+          controller: controller,
+          placeholder: Text(l10n.settings_sync_email_hint),
+          keyboardType: TextInputType.emailAddress,
+        ),
+        actions: [
+          OutlineButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.common_cancel),
+          ),
+          PrimaryButton(
+            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
+            child: Text(l10n.settings_sync_send_link_button),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showInfoDialog(
+    BuildContext context, {
+    required String title,
+    required String message,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
+    return showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          PrimaryButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text(l10n.common_close),
           ),
         ],
       ),

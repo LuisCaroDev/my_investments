@@ -2,7 +2,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
@@ -46,112 +45,99 @@ class _ImportExportPageState extends State<ImportExportPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<SharedPreferences>(
-      future: SharedPreferences.getInstance(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Scaffold(
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
-        final planningDs = PlanningLocalDataSource(prefs: snapshot.data!);
-        final accountsDs =
-            AccountsLocalDataSource(prefs: snapshot.data!);
+    final planningDs = context.read<PlanningLocalDataSource>();
+    final accountsDs = context.read<AccountsLocalDataSource>();
 
-        final projects = planningDs.getProjects();
-        final activities = planningDs.getActivities();
-        final operationalTasks = planningDs.getCategories();
-        final transactions = accountsDs.getTransactions();
-        final accounts = accountsDs.getFinancialAccounts();
+    final projects = planningDs.getProjects();
+    final activities = planningDs.getActivities();
+    final operationalTasks = planningDs.getCategories();
+    final transactions = accountsDs.getTransactions();
+    final accounts = accountsDs.getFinancialAccounts();
 
-        final exportText = _buildExportText(
-          projects: projects,
-          activities: activities,
-          categories: operationalTasks,
-          transactions: transactions,
-          accounts: accounts,
-        );
+    final exportText = _buildExportText(
+      projects: projects,
+      activities: activities,
+      categories: operationalTasks,
+      transactions: transactions,
+      accounts: accounts,
+    );
 
-        return Scaffold(
-          headers: [
-            AppBar(
-              leading: [...AppBackButton.render(context)],
-              title: Text(
-                AppLocalizations.of(context)!.settings_import_export_label,
+    return Scaffold(
+      headers: [
+        AppBar(
+          leading: [...AppBackButton.render(context)],
+          title: Text(
+            AppLocalizations.of(context)!.settings_import_export_label,
+          ),
+        ),
+      ],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.import_export_export_tab,
+            ).large.bold,
+            const Gap(8),
+            Text(
+              AppLocalizations.of(context)!.import_export_export_info,
+            ).small,
+            const Gap(12),
+            TextArea(
+              initialValue: exportText,
+              readOnly: true,
+              minHeight: 320,
+            ),
+            const Gap(12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: PrimaryButton(
+                onPressed: () async {
+                  await Clipboard.setData(ClipboardData(text: exportText));
+                },
+                child: Text(
+                  AppLocalizations.of(context)!.import_export_copy_button,
+                ),
+              ),
+            ),
+            const Gap(28),
+            const Divider(),
+            const Gap(20),
+            Text(
+              AppLocalizations.of(context)!.import_export_import_tab,
+            ).large.bold,
+            const Gap(8),
+            Text(
+              AppLocalizations.of(context)!.import_export_import_info,
+            ).small,
+            const Gap(12),
+            TextArea(
+              controller: _importController,
+              placeholder: Text(
+                AppLocalizations.of(context)!.import_export_import_placeholder,
+              ),
+              minHeight: 240,
+            ),
+            const Gap(12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: PrimaryButton(
+                onPressed: _importing
+                    ? null
+                    : () => _importData(
+                      context,
+                      planningDs,
+                      accountsDs,
+                    ),
+                child: Text(
+                  AppLocalizations.of(context)!.import_export_import_tab,
+                ),
               ),
             ),
           ],
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(
-                  AppLocalizations.of(context)!.import_export_export_tab,
-                ).large.bold,
-                const Gap(8),
-                Text(
-                  AppLocalizations.of(context)!.import_export_export_info,
-                ).small,
-                const Gap(12),
-                TextArea(
-                  initialValue: exportText,
-                  readOnly: true,
-                  minHeight: 320,
-                ),
-                const Gap(12),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: PrimaryButton(
-                    onPressed: () async {
-                      await Clipboard.setData(ClipboardData(text: exportText));
-                    },
-                    child: Text(
-                      AppLocalizations.of(context)!.import_export_copy_button,
-                    ),
-                  ),
-                ),
-                const Gap(28),
-                const Divider(),
-                const Gap(20),
-                Text(
-                  AppLocalizations.of(context)!.import_export_import_tab,
-                ).large.bold,
-                const Gap(8),
-                Text(
-                  AppLocalizations.of(context)!.import_export_import_info,
-                ).small,
-                const Gap(12),
-                TextArea(
-                  controller: _importController,
-                  placeholder: Text(
-                    AppLocalizations.of(
-                      context,
-                    )!.import_export_import_placeholder,
-                  ),
-                  minHeight: 240,
-                ),
-                const Gap(12),
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: PrimaryButton(
-                    onPressed: _importing
-                        ? null
-                        : () => _importData(
-                          context,
-                          planningDs,
-                          accountsDs,
-                        ),
-                    child: Text(
-                      AppLocalizations.of(context)!.import_export_import_tab,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
+        ),
+      ),
     );
   }
 

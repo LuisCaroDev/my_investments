@@ -1,16 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:my_investments/core/extensions/currency_ext.dart';
 import 'package:my_investments/core/router/app_router.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/core/widgets/stat_card.dart';
-import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
 import 'package:my_investments/planning/data/repositories/planning_repository.dart';
-import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
 import 'package:my_investments/planning/domain/entities/activity.dart';
 import 'package:my_investments/core/domain/entities/transaction.dart';
@@ -45,32 +42,17 @@ class ProjectDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<SharedPreferences>(
-      future: SharedPreferences.getInstance(),
-      builder: (context, snapshot) {
-        if (!snapshot.hasData) {
-          return const Scaffold(
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
-        final planningDs = PlanningLocalDataSource(prefs: snapshot.data!);
-        final accountsDs = AccountsLocalDataSource(prefs: snapshot.data!);
-        final accountsRepo = AccountsRepository(localDataSource: accountsDs);
-        final planningRepo = PlanningRepository(
-          localDataSource: planningDs,
-          transactionsReader: accountsRepo,
-        );
-        return BlocProvider(
-          create: (_) =>
-              ProjectDetailCubit(
-                planningRepository: planningRepo,
-                accountsRepository: accountsRepo,
-                projectId: projectId,
-              )
-                ..load(),
-          child: _ProjectDetailView(projectName: projectName),
-        );
-      },
+    final planningRepo = context.read<PlanningRepository>();
+    final accountsRepo = context.read<AccountsRepository>();
+    return BlocProvider(
+      create: (_) =>
+          ProjectDetailCubit(
+            planningRepository: planningRepo,
+            accountsRepository: accountsRepo,
+            projectId: projectId,
+          )
+            ..load(),
+      child: _ProjectDetailView(projectName: projectName),
     );
   }
 }

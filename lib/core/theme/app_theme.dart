@@ -5,10 +5,15 @@ class AppTheme {
     return ThemeData(
       colorScheme: ColorSchemes.lightSlate.emerald,
       radius: 0.75,
+      scaling: 1,
     );
   }
 
   static ThemeData dark() {
-    return ThemeData(colorScheme: ColorSchemes.darkSlate.emerald, radius: 0.75);
+    return ThemeData(
+      colorScheme: ColorSchemes.darkSlate.emerald,
+      radius: 0.75,
+      scaling: 1,
+    );
   }
 }

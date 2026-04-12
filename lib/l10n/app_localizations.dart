@@ -539,8 +539,146 @@ abstract class AppLocalizations {
   /// No description provided for @settings_login_button.
   ///
   /// In es, this message translates to:
-  /// **'Iniciar Sesión (Próximamente)'**
+  /// **'Iniciar sesión'**
   String get settings_login_button;
+
+  /// No description provided for @settings_logout_button.
+  ///
+  /// In es, this message translates to:
+  /// **'Cerrar sesión'**
+  String get settings_logout_button;
+
+  /// No description provided for @settings_guest_logout_button.
+  ///
+  /// In es, this message translates to:
+  /// **'Salir de invitado'**
+  String get settings_guest_logout_button;
+
+  /// No description provided for @settings_sync_logged_in.
+  ///
+  /// In es, this message translates to:
+  /// **'Sesión iniciada'**
+  String get settings_sync_logged_in;
+
+  /// No description provided for @settings_sync_logged_in_info.
+  ///
+  /// In es, this message translates to:
+  /// **'Tus datos pueden sincronizarse con la nube.'**
+  String get settings_sync_logged_in_info;
+
+  /// No description provided for @settings_sync_status_label.
+  ///
+  /// In es, this message translates to:
+  /// **'Estado de sincronización'**
+  String get settings_sync_status_label;
+
+  /// No description provided for @settings_sync_last_sync_label.
+  ///
+  /// In es, this message translates to:
+  /// **'Última sincronización'**
+  String get settings_sync_last_sync_label;
+
+  /// No description provided for @settings_sync_pending_label.
+  ///
+  /// In es, this message translates to:
+  /// **'Cambios pendientes'**
+  String get settings_sync_pending_label;
+
+  /// No description provided for @settings_sync_mode_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Modo online'**
+  String get settings_sync_mode_title;
+
+  /// No description provided for @settings_sync_mode_info.
+  ///
+  /// In es, this message translates to:
+  /// **'Sincroniza y respalda tus datos automáticamente.'**
+  String get settings_sync_mode_info;
+
+  /// No description provided for @settings_sync_never.
+  ///
+  /// In es, this message translates to:
+  /// **'Nunca'**
+  String get settings_sync_never;
+
+  /// No description provided for @settings_sync_backup_button.
+  ///
+  /// In es, this message translates to:
+  /// **'Hacer backup'**
+  String get settings_sync_backup_button;
+
+  /// No description provided for @settings_sync_restore_button.
+  ///
+  /// In es, this message translates to:
+  /// **'Restaurar desde la nube'**
+  String get settings_sync_restore_button;
+
+  /// No description provided for @settings_sync_not_configured.
+  ///
+  /// In es, this message translates to:
+  /// **'Supabase no está configurado.'**
+  String get settings_sync_not_configured;
+
+  /// No description provided for @settings_sync_not_logged_in.
+  ///
+  /// In es, this message translates to:
+  /// **'Necesitas iniciar sesión.'**
+  String get settings_sync_not_logged_in;
+
+  /// No description provided for @settings_sync_email_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Email para iniciar sesión'**
+  String get settings_sync_email_title;
+
+  /// No description provided for @settings_sync_email_hint.
+  ///
+  /// In es, this message translates to:
+  /// **'tu@correo.com'**
+  String get settings_sync_email_hint;
+
+  /// No description provided for @settings_sync_send_link_button.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar magic link'**
+  String get settings_sync_send_link_button;
+
+  /// No description provided for @settings_sync_link_sent.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisa tu correo para completar el inicio de sesión.'**
+  String get settings_sync_link_sent;
+
+  /// No description provided for @settings_sync_backup_success.
+  ///
+  /// In es, this message translates to:
+  /// **'Backup completado.'**
+  String get settings_sync_backup_success;
+
+  /// No description provided for @settings_sync_restore_success.
+  ///
+  /// In es, this message translates to:
+  /// **'Restauración completada.'**
+  String get settings_sync_restore_success;
+
+  /// No description provided for @settings_sync_restore_not_found.
+  ///
+  /// In es, this message translates to:
+  /// **'No se encontró backup en la nube.'**
+  String get settings_sync_restore_not_found;
+
+  /// No description provided for @settings_sync_up_to_date.
+  ///
+  /// In es, this message translates to:
+  /// **'Ya está actualizado.'**
+  String get settings_sync_up_to_date;
+
+  /// No description provided for @settings_sync_error_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Error de sincronización'**
+  String get settings_sync_error_title;
 
   /// No description provided for @settings_preferences_title.
   ///
@@ -1021,6 +1159,228 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Saldo'**
   String get dialog_account_balance_label;
+
+  /// No description provided for @auth_login_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar sesión'**
+  String get auth_login_title;
+
+  /// No description provided for @auth_verify_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Verificar Código'**
+  String get auth_verify_title;
+
+  /// No description provided for @auth_login_success.
+  ///
+  /// In es, this message translates to:
+  /// **'Sesión iniciada correctamente. Sus datos se han sincronizado.'**
+  String get auth_login_success;
+
+  /// No description provided for @auth_login_error_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Error'**
+  String get auth_login_error_title;
+
+  /// No description provided for @auth_login_success_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Éxito'**
+  String get auth_login_success_title;
+
+  /// No description provided for @auth_email_view_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Ingresa tu correo'**
+  String get auth_email_view_title;
+
+  /// No description provided for @auth_email_view_subtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Te enviaremos un código de seguridad para verificar tu cuenta y sincronizar tus proyectos.'**
+  String get auth_email_view_subtitle;
+
+  /// No description provided for @auth_email_label.
+  ///
+  /// In es, this message translates to:
+  /// **'DIRECCIÓN DE CORREO ELECTRÓNICO'**
+  String get auth_email_label;
+
+  /// No description provided for @auth_email_placeholder.
+  ///
+  /// In es, this message translates to:
+  /// **'correo@ejemplo.com'**
+  String get auth_email_placeholder;
+
+  /// No description provided for @auth_email_helper.
+  ///
+  /// In es, this message translates to:
+  /// **'Te enviaremos un código de 8 dígitos al correo para validar tu acceso de forma segura.'**
+  String get auth_email_helper;
+
+  /// No description provided for @auth_email_send_button.
+  ///
+  /// In es, this message translates to:
+  /// **'Enviar código'**
+  String get auth_email_send_button;
+
+  /// No description provided for @auth_continue_with.
+  ///
+  /// In es, this message translates to:
+  /// **'O CONTINUAR CON'**
+  String get auth_continue_with;
+
+  /// No description provided for @auth_continue_apple.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar con Apple'**
+  String get auth_continue_apple;
+
+  /// No description provided for @auth_continue_google.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar con Google'**
+  String get auth_continue_google;
+
+  /// No description provided for @auth_otp_view_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Revisa tu correo'**
+  String get auth_otp_view_title;
+
+  /// No description provided for @auth_otp_view_subtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Hemos enviado un código de seguridad de 8 dígitos a: {email}'**
+  String auth_otp_view_subtitle(Object email);
+
+  /// No description provided for @auth_otp_label.
+  ///
+  /// In es, this message translates to:
+  /// **'CÓDIGO DE ACCESO'**
+  String get auth_otp_label;
+
+  /// No description provided for @auth_otp_helper.
+  ///
+  /// In es, this message translates to:
+  /// **'Ingresa los 8 dígitos recibidos'**
+  String get auth_otp_helper;
+
+  /// No description provided for @auth_otp_verify_button.
+  ///
+  /// In es, this message translates to:
+  /// **'Verificar'**
+  String get auth_otp_verify_button;
+
+  /// No description provided for @auth_otp_resend_button.
+  ///
+  /// In es, this message translates to:
+  /// **'Reenviar código'**
+  String get auth_otp_resend_button;
+
+  /// No description provided for @auth_otp_spam_helper.
+  ///
+  /// In es, this message translates to:
+  /// **'¿No recibiste nada? Revisa tu carpeta de spam.'**
+  String get auth_otp_spam_helper;
+
+  /// No description provided for @auth_terms_prefix.
+  ///
+  /// In es, this message translates to:
+  /// **'Al continuar, aceptas nuestros '**
+  String get auth_terms_prefix;
+
+  /// No description provided for @auth_terms_service.
+  ///
+  /// In es, this message translates to:
+  /// **'Términos de Servicio'**
+  String get auth_terms_service;
+
+  /// No description provided for @auth_terms_and.
+  ///
+  /// In es, this message translates to:
+  /// **' y '**
+  String get auth_terms_and;
+
+  /// No description provided for @auth_terms_privacy.
+  ///
+  /// In es, this message translates to:
+  /// **'Política de Privacidad'**
+  String get auth_terms_privacy;
+
+  /// No description provided for @auth_terms_suffix.
+  ///
+  /// In es, this message translates to:
+  /// **'.'**
+  String get auth_terms_suffix;
+
+  /// No description provided for @welcome_title_prefix.
+  ///
+  /// In es, this message translates to:
+  /// **'Bienvenido a'**
+  String get welcome_title_prefix;
+
+  /// No description provided for @welcome_title_suffix.
+  ///
+  /// In es, this message translates to:
+  /// **'Mis Inversiones'**
+  String get welcome_title_suffix;
+
+  /// No description provided for @welcome_subtitle.
+  ///
+  /// In es, this message translates to:
+  /// **'Toma el control de tus metas y proyectos con herramientas de nivel profesional.'**
+  String get welcome_subtitle;
+
+  /// No description provided for @welcome_feature1_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Gestión de Proyectos'**
+  String get welcome_feature1_title;
+
+  /// No description provided for @welcome_feature1_desc.
+  ///
+  /// In es, this message translates to:
+  /// **'Sigue tus proyectos y metas de ahorro con datos precisos.'**
+  String get welcome_feature1_desc;
+
+  /// No description provided for @welcome_feature2_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Sincronización Total'**
+  String get welcome_feature2_title;
+
+  /// No description provided for @welcome_feature2_desc.
+  ///
+  /// In es, this message translates to:
+  /// **'Accede a tus datos desde cualquier dispositivo iniciando sesión.'**
+  String get welcome_feature2_desc;
+
+  /// No description provided for @welcome_feature3_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Local y Privado'**
+  String get welcome_feature3_title;
+
+  /// No description provided for @welcome_feature3_desc.
+  ///
+  /// In es, this message translates to:
+  /// **'Tus datos son tuyos. Guárdalos localmente o sincronízalos de forma segura.'**
+  String get welcome_feature3_desc;
+
+  /// No description provided for @welcome_login_button.
+  ///
+  /// In es, this message translates to:
+  /// **'Iniciar sesión'**
+  String get welcome_login_button;
+
+  /// No description provided for @welcome_guest_button.
+  ///
+  /// In es, this message translates to:
+  /// **'Continuar como invitado'**
+  String get welcome_guest_button;
 }
 
 class _AppLocalizationsDelegate

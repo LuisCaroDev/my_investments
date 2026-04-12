@@ -1,0 +1,30 @@
+# Plan de Implementacion: Sync JSON Snapshot + Supabase
+
+- [x] Definir modelo de `manifest.json` (version, updatedAt, deviceId, checksum opcional) y rutas en Storage `backups/{userId}/`
+- [x] Agregar dependencia `supabase_flutter` y configuracion de cliente en `lib/main.dart`
+- [x] Agregar `uuid` para `deviceId`
+- [x] Crear modulo `sync/` con:
+- [x] `lib/sync/domain/entities/pending_change.dart` (ops: add/update/delete por entidad)
+- [x] `lib/sync/data/datasources/sync_remote_ds.dart` (upload/download JSON snapshot + manifest)
+- [x] `lib/sync/data/datasources/sync_local_ds.dart` (cola local + lastSync en prefs/archivo)
+- [x] `lib/sync/data/repositories/sync_repository.dart` (orquesta check -> pull -> apply -> push)
+- [x] Agregar `SyncSnapshotProvider` e implementarlo en Planning/Accounts
+- [x] Implementar `applyPendingChanges()` que:
+- [x] parsea JSON snapshot -> mapas
+- [x] aplica deletes/updates/adds por ID
+- [x] regenera JSON snapshot
+- [x] Agregar codec JSON snapshot (encode/decode)
+- [x] Agregar `SyncService` para pull/push de snapshots
+- [x] Registrar cambios locales (cola) en repos:
+- [x] `lib/planning/data/repositories/planning_repository.dart`
+- [x] `lib/accounts/data/repositories/accounts_repository.dart`
+- [ ] Antes de mutar: pull remoto si hay snapshot mas reciente
+- [x] Crear comandos UI en `lib/core/presentation/pages/settings_page.dart`:
+- [x] Login/Logout
+- [x] Backup manual (push)
+- [x] Restaurar (pull)
+- [x] Estado de sync (lastSync, pending count)
+- [x] Agregar strings i18n para sync en `lib/l10n/app_es.arb` y `lib/l10n/app_en.arb`
+- [ ] Probar flujo:
+- [ ] login -> backup -> restore
+- [ ] delete transaction local -> pull remoto -> re-aplicar cola -> push

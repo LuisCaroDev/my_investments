@@ -5,12 +5,17 @@ import 'package:my_investments/accounts/data/models/financial_account_model.dart
 import 'package:my_investments/accounts/data/models/transaction_model.dart';
 import 'package:my_investments/accounts/domain/entities/financial_account.dart';
 import 'package:my_investments/accounts/domain/entities/transaction.dart';
+import 'package:my_investments/core/storage/sync_change_recorder.dart';
 
 class AccountsRepository implements TransactionsReader {
   final AccountsLocalDataSource _localDataSource;
+  final SyncChangeRecorder? _changeRecorder;
 
-  const AccountsRepository({required AccountsLocalDataSource localDataSource})
-      : _localDataSource = localDataSource;
+  const AccountsRepository({
+    required AccountsLocalDataSource localDataSource,
+    SyncChangeRecorder? changeRecorder,
+  })  : _localDataSource = localDataSource,
+        _changeRecorder = changeRecorder;
 
   // ── Financial Accounts ────────────────────────────────────
 
@@ -27,6 +32,14 @@ class AccountsRepository implements TransactionsReader {
       FinancialAccountModel.fromEntity(account.copyWith(balance: 0)),
     );
     await _localDataSource.saveFinancialAccounts(accounts);
+    await _changeRecorder?.recordChange(
+      entity: 'accounts',
+      op: SyncChangeOp.add,
+      id: account.id,
+      payload: FinancialAccountModel.fromEntity(
+        account.copyWith(balance: 0),
+      ).toJson(),
+    );
     if (initialDeposit > 0) {
       await addTransaction(
         Transaction(
@@ -54,6 +67,12 @@ class AccountsRepository implements TransactionsReader {
         account.copyWith(balance: current.balance),
       );
       await _localDataSource.saveFinancialAccounts(accounts);
+      await _changeRecorder?.recordChange(
+        entity: 'accounts',
+        op: SyncChangeOp.update,
+        id: account.id,
+        payload: accounts[index].toJson(),
+      );
     }
   }
 
@@ -61,6 +80,11 @@ class AccountsRepository implements TransactionsReader {
     final accounts = _localDataSource.getFinancialAccounts();
     accounts.removeWhere((a) => a.id == accountId);
     await _localDataSource.saveFinancialAccounts(accounts);
+    await _changeRecorder?.recordChange(
+      entity: 'accounts',
+      op: SyncChangeOp.delete,
+      id: accountId,
+    );
   }
 
   // ── Transactions ──────────────────────────────────────────
@@ -102,6 +126,12 @@ class AccountsRepository implements TransactionsReader {
     final transactions = _localDataSource.getTransactions();
     transactions.add(TransactionModel.fromEntity(transaction));
     await _localDataSource.saveTransactions(transactions);
+    await _changeRecorder?.recordChange(
+      entity: 'transactions',
+      op: SyncChangeOp.add,
+      id: transaction.id,
+      payload: TransactionModel.fromEntity(transaction).toJson(),
+    );
   }
 
   Future<void> updateTransaction(Transaction transaction) async {
@@ -110,6 +140,12 @@ class AccountsRepository implements TransactionsReader {
     if (index != -1) {
       transactions[index] = TransactionModel.fromEntity(transaction);
       await _localDataSource.saveTransactions(transactions);
+      await _changeRecorder?.recordChange(
+        entity: 'transactions',
+        op: SyncChangeOp.update,
+        id: transaction.id,
+        payload: transactions[index].toJson(),
+      );
     }
   }
 
@@ -117,18 +153,43 @@ class AccountsRepository implements TransactionsReader {
     final transactions = _localDataSource.getTransactions();
     transactions.removeWhere((t) => t.id == transactionId);
     await _localDataSource.saveTransactions(transactions);
+    await _changeRecorder?.recordChange(
+      entity: 'transactions',
+      op: SyncChangeOp.delete,
+      id: transactionId,
+    );
   }
 
   Future<void> deleteTransactionsForProject(String projectId) async {
     final transactions = _localDataSource.getTransactions();
+    final removed = transactions
+        .where((t) => t.projectId == projectId)
+        .toList();
     transactions.removeWhere((t) => t.projectId == projectId);
     await _localDataSource.saveTransactions(transactions);
+    for (final tx in removed) {
+      await _changeRecorder?.recordChange(
+        entity: 'transactions',
+        op: SyncChangeOp.delete,
+        id: tx.id,
+      );
+    }
   }
 
   Future<void> deleteTransactionsForActivity(String activityId) async {
     final transactions = _localDataSource.getTransactions();
+    final removed = transactions
+        .where((t) => t.activityId == activityId)
+        .toList();
     transactions.removeWhere((t) => t.activityId == activityId);
     await _localDataSource.saveTransactions(transactions);
+    for (final tx in removed) {
+      await _changeRecorder?.recordChange(
+        entity: 'transactions',
+        op: SyncChangeOp.delete,
+        id: tx.id,
+      );
+    }
   }
 
   Future<void> addAccountDeposit({

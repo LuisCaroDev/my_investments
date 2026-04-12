@@ -12,16 +12,20 @@ import 'package:my_investments/planning/domain/entities/activity_summary.dart';
 import 'package:my_investments/planning/domain/entities/project_summary.dart';
 import 'package:my_investments/planning/domain/entities/project_detail.dart';
 import 'package:my_investments/planning/domain/entities/activity_detail.dart';
+import 'package:my_investments/core/storage/sync_change_recorder.dart';
 
 class PlanningRepository {
   final PlanningLocalDataSource _localDataSource;
   final TransactionsReader _transactionsReader;
+  final SyncChangeRecorder? _changeRecorder;
 
   const PlanningRepository({
     required PlanningLocalDataSource localDataSource,
     required TransactionsReader transactionsReader,
-  }) : _localDataSource = localDataSource,
-       _transactionsReader = transactionsReader;
+    SyncChangeRecorder? changeRecorder,
+  })  : _localDataSource = localDataSource,
+        _transactionsReader = transactionsReader,
+        _changeRecorder = changeRecorder;
 
   // ── Funding Distribution Algorithm ──────────────────────────
 
@@ -95,8 +99,16 @@ class PlanningRepository {
     final maxPriority = projects.where((p) => p.type == ProjectType.investment)
       .fold(0, (max, p) => p.priority > max ? p.priority : max);
     
-    projects.add(ProjectModel.fromEntity(investment.copyWith(priority: maxPriority + 1)));
+    final model =
+        ProjectModel.fromEntity(investment.copyWith(priority: maxPriority + 1));
+    projects.add(model);
     await _localDataSource.saveProjects(projects);
+    await _changeRecorder?.recordChange(
+      entity: 'projects',
+      op: SyncChangeOp.add,
+      id: model.id,
+      payload: model.toJson(),
+    );
   }
 
   Future<void> updateInvestment(Project project) async {
@@ -105,6 +117,12 @@ class PlanningRepository {
     if (index != -1) {
       projects[index] = ProjectModel.fromEntity(project);
       await _localDataSource.saveProjects(projects);
+      await _changeRecorder?.recordChange(
+        entity: 'projects',
+        op: SyncChangeOp.update,
+        id: project.id,
+        payload: projects[index].toJson(),
+      );
     }
   }
 
@@ -117,6 +135,12 @@ class PlanningRepository {
         final index = projects.indexWhere((p) => p.id == id);
         if (index != -1) {
             projects[index] = ProjectModel.fromEntity(projects[index].copyWith(priority: i));
+            await _changeRecorder?.recordChange(
+              entity: 'projects',
+              op: SyncChangeOp.update,
+              id: projects[index].id,
+              payload: projects[index].toJson(),
+            );
         }
     }
     await _localDataSource.saveProjects(projects);
@@ -140,8 +164,16 @@ class PlanningRepository {
         }
     }
 
-    projects.add(ProjectModel.fromEntity(goal.copyWith(priority: maxPriority + 1)));
+    final model =
+        ProjectModel.fromEntity(goal.copyWith(priority: maxPriority + 1));
+    projects.add(model);
     await _localDataSource.saveProjects(projects);
+    await _changeRecorder?.recordChange(
+      entity: 'projects',
+      op: SyncChangeOp.add,
+      id: model.id,
+      payload: model.toJson(),
+    );
   }
 
   Future<void> updateGoal(Project project) async {
@@ -150,6 +182,12 @@ class PlanningRepository {
     if (index != -1) {
       projects[index] = ProjectModel.fromEntity(project);
       await _localDataSource.saveProjects(projects);
+      await _changeRecorder?.recordChange(
+        entity: 'projects',
+        op: SyncChangeOp.update,
+        id: project.id,
+        payload: projects[index].toJson(),
+      );
     }
   }
 
@@ -162,6 +200,12 @@ class PlanningRepository {
         final index = projects.indexWhere((p) => p.id == id);
         if (index != -1) {
             projects[index] = ProjectModel.fromEntity(projects[index].copyWith(priority: i));
+            await _changeRecorder?.recordChange(
+              entity: 'projects',
+              op: SyncChangeOp.update,
+              id: projects[index].id,
+              payload: projects[index].toJson(),
+            );
         }
     }
     await _localDataSource.saveProjects(projects);
@@ -176,6 +220,12 @@ class PlanningRepository {
       final index = projects.indexWhere((p) => p.id == id);
       if (index != -1) {
         projects[index] = ProjectModel.fromEntity(projects[index].copyWith(priority: i));
+        await _changeRecorder?.recordChange(
+          entity: 'projects',
+          op: SyncChangeOp.update,
+          id: projects[index].id,
+          payload: projects[index].toJson(),
+        );
       }
     }
     await _localDataSource.saveProjects(projects);
@@ -273,14 +323,37 @@ class PlanningRepository {
     final projects = _localDataSource.getProjects();
     projects.removeWhere((p) => p.id == projectId);
     await _localDataSource.saveProjects(projects);
+    await _changeRecorder?.recordChange(
+      entity: 'projects',
+      op: SyncChangeOp.delete,
+      id: projectId,
+    );
 
     final activities = _localDataSource.getActivities();
+    final removedActivities =
+        activities.where((a) => a.projectId == projectId).toList();
     activities.removeWhere((a) => a.projectId == projectId);
     await _localDataSource.saveActivities(activities);
+    for (final activity in removedActivities) {
+      await _changeRecorder?.recordChange(
+        entity: 'activities',
+        op: SyncChangeOp.delete,
+        id: activity.id,
+      );
+    }
 
     final categories = _localDataSource.getCategories();
+    final removedCategories =
+        categories.where((c) => c.projectId == projectId).toList();
     categories.removeWhere((c) => c.projectId == projectId);
     await _localDataSource.saveCategories(categories);
+    for (final category in removedCategories) {
+      await _changeRecorder?.recordChange(
+        entity: 'categories',
+        op: SyncChangeOp.delete,
+        id: category.id,
+      );
+    }
 
   }
 
@@ -427,8 +500,15 @@ class PlanningRepository {
 
   Future<void> addActivity(Activity activity) async {
     final activities = _localDataSource.getActivities();
-    activities.add(ActivityModel.fromEntity(activity));
+    final model = ActivityModel.fromEntity(activity);
+    activities.add(model);
     await _localDataSource.saveActivities(activities);
+    await _changeRecorder?.recordChange(
+      entity: 'activities',
+      op: SyncChangeOp.add,
+      id: model.id,
+      payload: model.toJson(),
+    );
   }
 
   Future<void> updateActivity(Activity activity) async {
@@ -437,6 +517,12 @@ class PlanningRepository {
     if (index != -1) {
       activities[index] = ActivityModel.fromEntity(activity);
       await _localDataSource.saveActivities(activities);
+      await _changeRecorder?.recordChange(
+        entity: 'activities',
+        op: SyncChangeOp.update,
+        id: activity.id,
+        payload: activities[index].toJson(),
+      );
     }
   }
 
@@ -444,10 +530,24 @@ class PlanningRepository {
     final activities = _localDataSource.getActivities();
     activities.removeWhere((a) => a.id == activityId);
     await _localDataSource.saveActivities(activities);
+    await _changeRecorder?.recordChange(
+      entity: 'activities',
+      op: SyncChangeOp.delete,
+      id: activityId,
+    );
 
     final categories = _localDataSource.getCategories();
+    final removedCategories =
+        categories.where((c) => c.activityId == activityId).toList();
     categories.removeWhere((c) => c.activityId == activityId);
     await _localDataSource.saveCategories(categories);
+    for (final category in removedCategories) {
+      await _changeRecorder?.recordChange(
+        entity: 'categories',
+        op: SyncChangeOp.delete,
+        id: category.id,
+      );
+    }
 
   }
 
@@ -485,8 +585,15 @@ class PlanningRepository {
 
   Future<void> addOperationalTask(OperationalTask task) async {
     final categories = _localDataSource.getCategories();
-    categories.add(OperationalTaskModel.fromEntity(task));
+    final model = OperationalTaskModel.fromEntity(task);
+    categories.add(model);
     await _localDataSource.saveCategories(categories);
+    await _changeRecorder?.recordChange(
+      entity: 'categories',
+      op: SyncChangeOp.add,
+      id: model.id,
+      payload: model.toJson(),
+    );
   }
 
   Future<void> updateOperationalTask(OperationalTask task) async {
@@ -495,6 +602,12 @@ class PlanningRepository {
     if (index != -1) {
       categories[index] = OperationalTaskModel.fromEntity(task);
       await _localDataSource.saveCategories(categories);
+      await _changeRecorder?.recordChange(
+        entity: 'categories',
+        op: SyncChangeOp.update,
+        id: task.id,
+        payload: categories[index].toJson(),
+      );
     }
   }
 
@@ -502,6 +615,11 @@ class PlanningRepository {
     final categories = _localDataSource.getCategories();
     categories.removeWhere((c) => c.id == taskId);
     await _localDataSource.saveCategories(categories);
+    await _changeRecorder?.recordChange(
+      entity: 'categories',
+      op: SyncChangeOp.delete,
+      id: taskId,
+    );
   }
 
 }
