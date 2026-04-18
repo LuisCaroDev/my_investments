@@ -1,3 +1,4 @@
+import 'package:my_investments/accounts/presentation/bloc/accounts_cubit.dart';
 import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:my_investments/core/widgets/app_back_button.dart';
@@ -13,10 +14,16 @@ import 'package:my_investments/accounts/presentation/widgets/add_account_deposit
 import 'package:my_investments/accounts/presentation/widgets/transaction_tile.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class AccountTransactionsPage extends StatefulWidget {
-  final FinancialAccount account;
+import 'package:my_investments/accounts/presentation/bloc/accounts_state.dart';
 
-  const AccountTransactionsPage({super.key, required this.account});
+class AccountTransactionsPage extends StatefulWidget {
+  static const routePattern = '/accounts/:accountId';
+
+  static String routeOf(String accountId) => '/accounts/$accountId';
+
+  final String accountId;
+
+  const AccountTransactionsPage({super.key, required this.accountId});
 
   @override
   State<AccountTransactionsPage> createState() =>
@@ -26,15 +33,24 @@ class AccountTransactionsPage extends StatefulWidget {
 class _AccountTransactionsPageState extends State<AccountTransactionsPage> {
   @override
   Widget build(BuildContext context) {
+    final accountsState = context.read<AccountsCubit>().state;
+    final FinancialAccount? account = accountsState is AccountsLoaded
+        ? accountsState.accounts.firstWhere((a) => a.id == widget.accountId)
+        : null;
+
+    if (account == null) {
+      return const Scaffold(child: Center(child: CircularProgressIndicator()));
+    }
+
     final accountsRepository = context.read<AccountsRepository>();
     final planningRepository = context.read<PlanningRepository>();
     final transactions = accountsRepository.getTransactionsForAccount(
-      widget.account.id,
+      account.id,
     );
     final operationalTasks = planningRepository.getAllOperationalTasks();
 
     return _AccountTransactionsView(
-      account: widget.account,
+      account: account,
       transactions: transactions,
       operationalTasks: operationalTasks,
       accountsRepository: accountsRepository,
@@ -67,9 +83,7 @@ class _AccountTransactionsView extends StatelessWidget {
     return Scaffold(
       headers: [
         AppBar(
-          leading: [
-            ...AppBackButton.render(context),
-          ],
+          leading: [...AppBackButton.render(context)],
           title: Text(account.name),
         ),
         Divider(height: 1),
@@ -89,25 +103,22 @@ class _AccountTransactionsView extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children:
-                      sorted
-                          .map((t) {
-                            final isAccountDeposit =
-                                t.projectId == systemAccountProjectId &&
-                                t.type == TransactionType.deposit;
-                            return TransactionTile(
-                              transaction: t,
-                              operationalTasks: operationalTasks,
-                              onEdit: isAccountDeposit
-                                  ? () => _editAccountDeposit(context, t)
-                                  : null,
-                              onDelete: isAccountDeposit
-                                  ? () => _deleteTransaction(context, t)
-                                  : null,
-                              showActionsOnTap: isAccountDeposit,
-                            );
-                          })
-                          .toList(),
+                  children: sorted.map((t) {
+                    final isAccountDeposit =
+                        t.projectId == systemAccountProjectId &&
+                        t.type == TransactionType.deposit;
+                    return TransactionTile(
+                      transaction: t,
+                      operationalTasks: operationalTasks,
+                      onEdit: isAccountDeposit
+                          ? () => _editAccountDeposit(context, t)
+                          : null,
+                      onDelete: isAccountDeposit
+                          ? () => _deleteTransaction(context, t)
+                          : null,
+                      showActionsOnTap: isAccountDeposit,
+                    );
+                  }).toList(),
                 ),
               ),
       ),

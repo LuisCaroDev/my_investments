@@ -3,7 +3,8 @@ import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'package:my_investments/core/extensions/currency_ext.dart';
-import 'package:my_investments/core/router/app_router.dart';
+import 'package:go_router/go_router.dart';
+import 'package:my_investments/planning/presentation/pages/project_detail_page.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/core/widgets/stat_card.dart';
 import 'package:my_investments/planning/domain/entities/project.dart';
@@ -14,6 +15,8 @@ import 'package:my_investments/planning/presentation/widgets/add_project_dialog.
 import 'package:my_investments/planning/presentation/widgets/budget_progress.dart';
 
 class InvestmentsPage extends StatelessWidget {
+  static const route = '/investments';
+
   const InvestmentsPage({super.key});
 
   @override
@@ -231,8 +234,8 @@ class _ProjectCard extends StatelessWidget {
 
     return CardButton(
       onPressed: () {
-        context.appRouter.push(
-          ProjectDetailRoute(
+        context.push(
+          ProjectDetailPage.routeOf(
             projectId: summary.project.id,
             projectName: summary.project.name,
           ),

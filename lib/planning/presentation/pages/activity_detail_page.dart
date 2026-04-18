@@ -5,7 +5,9 @@ import 'package:my_investments/planning/presentation/bloc/activity_detail_state.
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'package:my_investments/core/extensions/currency_ext.dart';
-import 'package:my_investments/core/router/app_router.dart';
+import 'package:go_router/go_router.dart';
+import 'package:my_investments/planning/presentation/pages/operational_task_management_page.dart';
+import 'package:my_investments/accounts/presentation/pages/transaction_list_page.dart';
 import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/planning/data/repositories/planning_repository.dart';
@@ -30,6 +32,18 @@ List<FinancialAccount> _getAccountsFromContext(BuildContext context) {
 /// A dedicated page for viewing an Activity's details, its operational tasks,
 /// and transactions. Uses its own Cubit scoped to the activity.
 class ActivityDetailPage extends StatelessWidget {
+  static const routePattern = 'activities/:activityId';
+
+  /// Sub-route pattern for use as a child of ProjectDetailPage in GoRouter.
+  static const subRoutePattern = 'activities/:activityId';
+
+  static String routeOf({
+    required String projectId,
+    required String activityId,
+    required String activityName,
+  }) =>
+      '/projects/$projectId/activities/$activityId?name=${Uri.encodeComponent(activityName)}';
+
   final String projectId;
   final String activityId;
   final String activityName;
@@ -356,8 +370,8 @@ class _ActivityContent extends StatelessWidget {
   void _openCategoryManagement(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     final cubit = context.read<ActivityDetailCubit>();
-    await context.appRouter.pushForResult(
-      OperationalTaskManagementRoute(
+    await context.push(
+      OperationalTaskManagementPage.routeOf(
         projectId: cubit.projectId,
         activityId: cubit.activityId,
         title: l10n.category_mgmt_activity_title,
@@ -371,8 +385,8 @@ class _ActivityContent extends StatelessWidget {
   void _openTransactionList(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     final cubit = context.read<ActivityDetailCubit>();
-    await context.appRouter.pushForResult(
-      TransactionListRoute(
+    await context.push(
+      TransactionListPage.routeOf(
         projectId: cubit.projectId,
         activityId: cubit.activityId,
         title: l10n.transaction_list_page_title,

@@ -5,7 +5,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
 import 'package:my_investments/core/presentation/bloc/settings_state.dart';
-import 'package:my_investments/core/router/app_router.dart';
+import 'package:go_router/go_router.dart';
+import 'package:my_investments/auth/presentation/pages/login_page.dart';
+import 'package:my_investments/planning/presentation/pages/import_export_page.dart';
 import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/core/constants/supabase_config.dart';
 import 'package:my_investments/accounts/presentation/bloc/accounts_cubit.dart';
@@ -18,6 +20,8 @@ import 'package:my_investments/planning/data/datasources/planning_local_ds.dart'
 import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
 
 class SettingsPage extends StatefulWidget {
+  static const route = '/settings';
+
   const SettingsPage({super.key});
 
   @override
@@ -174,7 +178,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 const Gap(16),
                 CardButton(
                   onPressed: () {
-                    context.appRouter.push(const ImportExportRoute());
+                    context.push(ImportExportPage.route);
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -215,8 +219,9 @@ class _SettingsPageState extends State<SettingsPage> {
     final lastSync = syncRepo.getLastSync();
 
     final isConfigured = SupabaseConfig.isConfigured;
-    final user =
-        isConfigured ? Supabase.instance.client.auth.currentUser : null;
+    final user = isConfigured
+        ? Supabase.instance.client.auth.currentUser
+        : null;
     final isLoggedIn = user != null;
 
     return Card(
@@ -278,9 +283,8 @@ class _SettingsPageState extends State<SettingsPage> {
               Switch(
                 value: settingsState.syncEnabled,
                 onChanged: isLoggedIn
-                    ? (value) => context
-                        .read<SettingsCubit>()
-                        .setSyncEnabled(value)
+                    ? (value) =>
+                          context.read<SettingsCubit>().setSyncEnabled(value)
                     : null,
               ),
             ],
@@ -522,7 +526,7 @@ class _SettingsPageState extends State<SettingsPage> {
       return;
     }
 
-    await context.appRouter.pushForResult(const LoginRoute(fromSettings: true));
+    await context.push('${LoginPage.route}?fromSettings=true');
 
     // Check if we logged in
     final user = Supabase.instance.client.auth.currentUser;
@@ -539,7 +543,7 @@ class _SettingsPageState extends State<SettingsPage> {
       await context.read<SettingsCubit>().setActiveProfileId(guestProfileId);
       await context.read<SettingsCubit>().setGuestMode(false);
       setState(() {});
-      context.appRouter.popToHome();
+      context.go('/');
     }
   }
 
@@ -549,7 +553,7 @@ class _SettingsPageState extends State<SettingsPage> {
     await context.read<SettingsCubit>().setActiveProfileId(guestProfileId);
     await context.read<SettingsCubit>().setGuestMode(false);
     setState(() {});
-    context.appRouter.popToHome();
+    context.go('/');
   }
 
   Future<void> _backupNow(BuildContext context) async {
@@ -579,10 +583,7 @@ class _SettingsPageState extends State<SettingsPage> {
       final accountsDs = context.read<AccountsLocalDataSource>();
       await service.pushSnapshot(
         userId: user.id,
-        providers: [
-          planningDs,
-          accountsDs,
-        ],
+        providers: [planningDs, accountsDs],
       );
       if (context.mounted) {
         await _showInfoDialog(
@@ -635,10 +636,7 @@ class _SettingsPageState extends State<SettingsPage> {
       final accountsDs = context.read<AccountsLocalDataSource>();
       final outcome = await service.pullIfRemoteNewer(
         userId: user.id,
-        providers: [
-          planningDs,
-          accountsDs,
-        ],
+        providers: [planningDs, accountsDs],
       );
       if (context.mounted) {
         switch (outcome) {
@@ -682,32 +680,6 @@ class _SettingsPageState extends State<SettingsPage> {
         setState(() => _syncWorking = false);
       }
     }
-  }
-
-  Future<String?> _promptEmail(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    final controller = TextEditingController();
-    return showDialog<String>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(l10n.settings_sync_email_title),
-        content: TextField(
-          controller: controller,
-          placeholder: Text(l10n.settings_sync_email_hint),
-          keyboardType: TextInputType.emailAddress,
-        ),
-        actions: [
-          OutlineButton(
-            onPressed: () => Navigator.of(ctx).pop(),
-            child: Text(l10n.common_cancel),
-          ),
-          PrimaryButton(
-            onPressed: () => Navigator.of(ctx).pop(controller.text.trim()),
-            child: Text(l10n.settings_sync_send_link_button),
-          ),
-        ],
-      ),
-    );
   }
 
   Future<void> _showInfoDialog(

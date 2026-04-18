@@ -20,6 +20,7 @@ with Shadcn Flutter components and keep imports clean to avoid class name collis
 
 2. Map components
 - Use `references/components-map.md` to map Material widgets to Shadcn Flutter equivalents.
+- Consult the **LLMs Support** reference ([llms-full.txt](https://sunarya-thito.github.io/shadcn_flutter/llms-full.txt)) for detailed widget descriptions, props, and usage examples.
 - For widgets not listed, look up the export list in `~/.pub-cache/hosted/pub.dev/shadcn_flutter-0.0.52/lib/shadcn_flutter.dart`.
 
 3. Replace with Shadcn widgets
@@ -39,4 +40,7 @@ with Shadcn Flutter components and keep imports clean to avoid class name collis
 
 ## Resources
 
+- **Primary Reference (Machine Friendly)**: [`llms-full.txt`](https://sunarya-thito.github.io/shadcn_flutter/llms-full.txt) - Use this as the main source of truth for component APIs and examples.
 - `references/components-map.md`: Catalog and Material-to-Shadcn mapping table (based on shadcn_flutter 0.0.52).
+- **Widget Catalog**: [Official Documentation](https://sunarya-thito.github.io/shadcn_flutter/)
+

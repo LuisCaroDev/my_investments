@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_investments/core/router/app_router.dart';
+import 'package:go_router/go_router.dart';
 import 'package:my_investments/core/widgets/responsive_container.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:my_investments/auth/presentation/bloc/auth_cubit.dart';
@@ -10,10 +10,14 @@ import 'package:my_investments/auth/presentation/widgets/data_conflict_handler.d
 import 'package:my_investments/auth/presentation/widgets/login_email_view.dart';
 import 'package:my_investments/auth/presentation/widgets/login_otp_view.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:my_investments/auth/presentation/pages/home_gate.dart';
+import 'package:my_investments/core/router/app_router.dart';
 import 'package:my_investments/core/storage/profile_ids.dart';
 import 'package:my_investments/l10n/app_localizations.dart';
 
 class LoginPage extends StatefulWidget {
+  static const route = '/login';
+
   final bool fromSettings;
 
   const LoginPage({super.key, this.fromSettings = false});
@@ -62,7 +66,7 @@ class _LoginPageState extends State<LoginPage> {
     await context.read<SettingsCubit>().setGuestMode(false);
 
     if (widget.fromSettings) {
-      context.appRouter.pop();
+      context.pop();
       final l10n = AppLocalizations.of(context)!;
       showToast(
         context: context,
@@ -76,7 +80,7 @@ class _LoginPageState extends State<LoginPage> {
         },
       );
     } else {
-      context.appRouter.popToHome();
+      context.popToHome();
     }
   }
 

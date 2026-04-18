@@ -106,9 +106,6 @@ class MyInvestmentsApp extends StatefulWidget {
 }
 
 class _MyInvestmentsAppState extends State<MyInvestmentsApp> {
-  late final AppRouter _router = AppRouter();
-  late final AppRouteParser _routeParser = AppRouteParser();
-
   @override
   Widget build(BuildContext context) {
     return MultiBlocProvider(
@@ -207,8 +204,7 @@ class _MyInvestmentsAppState extends State<MyInvestmentsApp> {
                     theme: AppTheme.light(),
                     darkTheme: AppTheme.dark(),
                     themeMode: settingsState.themeMode,
-                    routerDelegate: _router,
-                    routeInformationParser: _routeParser,
+                    routerConfig: appRouter,
                     localizationsDelegates: [
                       const FallbackShadcnLocalizationsDelegate(),
                       AppLocalizations.delegate,

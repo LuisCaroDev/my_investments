@@ -3,7 +3,10 @@ import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'package:my_investments/core/extensions/currency_ext.dart';
-import 'package:my_investments/core/router/app_router.dart';
+import 'package:go_router/go_router.dart';
+import 'package:my_investments/planning/presentation/pages/operational_task_management_page.dart';
+import 'package:my_investments/accounts/presentation/pages/transaction_list_page.dart';
+import 'package:my_investments/planning/presentation/pages/activity_detail_page.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/core/widgets/stat_card.dart';
@@ -31,6 +34,14 @@ List<FinancialAccount> _getAccountsFromContext(BuildContext context) {
 }
 
 class ProjectDetailPage extends StatelessWidget {
+  static const routePattern = '/projects/:projectId';
+
+  static String routeOf({
+    required String projectId,
+    required String projectName,
+  }) =>
+      '/projects/$projectId?name=${Uri.encodeComponent(projectName)}';
+
   final String projectId;
   final String projectName;
 
@@ -366,8 +377,8 @@ class _ProjectDetailContent extends StatelessWidget {
   void _openCategoryManagement(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     final cubit = context.read<ProjectDetailCubit>();
-    await context.appRouter.pushForResult(
-      OperationalTaskManagementRoute(
+    await context.push(
+      OperationalTaskManagementPage.routeOf(
         projectId: cubit.projectId,
         title: l10n.category_mgmt_project_title,
       ),
@@ -380,8 +391,8 @@ class _ProjectDetailContent extends StatelessWidget {
   void _openTransactionList(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
     final cubit = context.read<ProjectDetailCubit>();
-    await context.appRouter.pushForResult(
-      TransactionListRoute(
+    await context.push(
+      TransactionListPage.routeOf(
         projectId: cubit.projectId,
         title: l10n.transaction_list_page_title,
       ),
@@ -525,8 +536,8 @@ class _ActivityCard extends StatelessWidget {
 
     return CardButton(
       onPressed: () async {
-        await context.appRouter.pushForResult(
-          ActivityDetailRoute(
+        await context.push(
+          ActivityDetailPage.routeOf(
             projectId: cubit.projectId,
             activityId: summary.activity.id,
             activityName: summary.activity.name,

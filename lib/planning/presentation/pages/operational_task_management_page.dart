@@ -12,6 +12,21 @@ import 'package:my_investments/planning/presentation/widgets/add_operational_tas
 import 'package:my_investments/planning/presentation/widgets/operational_task_tile.dart';
 
 class OperationalTaskManagementPage extends StatelessWidget {
+  static const routePattern = '/projects/:projectId/categories';
+
+  /// Sub-route pattern for use as a child of ProjectDetailPage in GoRouter.
+  static const subRoutePattern = 'categories';
+
+  static String routeOf({
+    required String projectId,
+    required String title,
+    String? activityId,
+  }) {
+    final query = StringBuffer('?title=${Uri.encodeComponent(title)}');
+    if (activityId != null) query.write('&activity=$activityId');
+    return '/projects/$projectId/categories$query';
+  }
+
   final String projectId;
   final String title;
   final String? activityId;

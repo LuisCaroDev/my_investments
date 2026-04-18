@@ -3,7 +3,8 @@ import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'package:my_investments/core/extensions/currency_ext.dart';
-import 'package:my_investments/core/router/app_router.dart';
+import 'package:go_router/go_router.dart';
+import 'package:my_investments/accounts/presentation/pages/account_transactions_page.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/core/widgets/stat_card.dart';
 import 'package:my_investments/core/domain/entities/financial_account.dart';
@@ -21,6 +22,8 @@ import 'package:flutter/material.dart'
     show ReorderableDragStartListener, ReorderableListView, WidgetsBinding;
 
 class AccountsPage extends StatelessWidget {
+  static const route = '/accounts';
+
   const AccountsPage({super.key});
 
   @override
@@ -394,7 +397,7 @@ class _AccountCard extends StatelessWidget {
   }
 
   void _openTransactions(BuildContext context) {
-    context.appRouter.push(AccountTransactionsRoute(account: account));
+    context.push(AccountTransactionsPage.routeOf(account.id));
   }
 
   void _showActionsMenu(BuildContext context) {

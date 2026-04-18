@@ -2,10 +2,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_investments/core/widgets/responsive_container.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
+import 'package:go_router/go_router.dart';
+import 'package:my_investments/auth/presentation/pages/login_page.dart';
+import 'package:my_investments/auth/presentation/pages/home_gate.dart';
 import 'package:my_investments/core/router/app_router.dart';
 import 'package:my_investments/l10n/app_localizations.dart';
 
 class WelcomePage extends StatelessWidget {
+  static const route = '/welcome';
+
   const WelcomePage({super.key});
 
   @override
@@ -91,8 +96,8 @@ class WelcomePage extends StatelessWidget {
                     // Buttons
                     PrimaryButton(
                       onPressed: () {
-                        context.appRouter.push(
-                          const LoginRoute(fromSettings: false),
+                        context.push(
+                          '${LoginPage.route}?fromSettings=false',
                         );
                       },
                       child: Row(
@@ -106,8 +111,11 @@ class WelcomePage extends StatelessWidget {
                     ),
                     const Gap(16),
                     OutlineButton(
-                      onPressed: () {
-                        context.read<SettingsCubit>().setGuestMode(true);
+                      onPressed: () async {
+                        await context.read<SettingsCubit>().setGuestMode(true);
+                        if (context.mounted) {
+                          context.popToHome();
+                        }
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,

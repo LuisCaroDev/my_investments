@@ -21,6 +21,8 @@ import 'package:my_investments/planning/presentation/bloc/goals_cubit.dart';
 import 'package:my_investments/planning/presentation/bloc/investments_cubit.dart';
 
 class ImportExportPage extends StatefulWidget {
+  static const route = '/settings/import-export';
+
   const ImportExportPage({super.key});
 
   @override
