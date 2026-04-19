@@ -518,6 +518,12 @@ abstract class AppLocalizations {
   /// **'Configuración'**
   String get settings_title;
 
+  /// No description provided for @settings_account_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Cuenta'**
+  String get settings_account_title;
+
   /// No description provided for @settings_sync_title.
   ///
   /// In es, this message translates to:
@@ -739,6 +745,12 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Datos'**
   String get settings_data_title;
+
+  /// No description provided for @settings_data_sync_title.
+  ///
+  /// In es, this message translates to:
+  /// **'Datos y Sincronización'**
+  String get settings_data_sync_title;
 
   /// No description provided for @settings_import_export_label.
   ///

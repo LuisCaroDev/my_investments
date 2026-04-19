@@ -102,6 +102,7 @@ class _AccountTransactionsView extends StatelessWidget {
             : SingleChildScrollView(
                 padding: const EdgeInsets.all(16),
                 child: Column(
+                  spacing: 8,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: sorted.map((t) {
                     final isAccountDeposit =

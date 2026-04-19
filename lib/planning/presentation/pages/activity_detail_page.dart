@@ -111,9 +111,7 @@ class _ActivityDetailView extends StatelessWidget {
         return Scaffold(
           headers: [
             AppBar(
-              leading: [
-                ...AppBackButton.render(context),
-              ],
+              leading: [...AppBackButton.render(context)],
               title: Text(activityName),
             ),
             Divider(height: 1),
@@ -352,15 +350,22 @@ class _ActivityContent extends StatelessWidget {
               subtitle: l10n.activity_detail_transactions_empty_info,
             )
           else
-            ..._latestTransactions(state.detail!.transactions).map(
-              (t) => TransactionTile(
-                transaction: t,
-                operationalTasks: state.detail!.categories,
-                onEdit: () => _editTransaction(context, t),
-                onDelete: () {
-                  context.read<ActivityDetailCubit>().deleteTransaction(t.id);
-                },
-              ),
+            Column(
+              spacing: 8,
+              children: [
+                ..._latestTransactions(state.detail!.transactions).map(
+                  (t) => TransactionTile(
+                    transaction: t,
+                    operationalTasks: state.detail!.categories,
+                    onEdit: () => _editTransaction(context, t),
+                    onDelete: () {
+                      context.read<ActivityDetailCubit>().deleteTransaction(
+                        t.id,
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
         ],
       ),
@@ -424,6 +429,6 @@ class _ActivityContent extends StatelessWidget {
   List<Transaction> _latestTransactions(List<Transaction> items) {
     final sorted = List<Transaction>.from(items)
       ..sort((a, b) => b.date.compareTo(a.date));
-    return sorted.take(4).toList();
+    return sorted.take(3).toList();
   }
 }

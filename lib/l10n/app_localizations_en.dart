@@ -233,6 +233,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settings_title => 'Settings';
 
   @override
+  String get settings_account_title => 'Account';
+
+  @override
   String get settings_sync_title => 'Sync and Account';
 
   @override
@@ -344,6 +347,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get settings_data_title => 'Data';
+
+  @override
+  String get settings_data_sync_title => 'Data & Sync';
 
   @override
   String get settings_import_export_label => 'Import / Export JSON';

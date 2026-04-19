@@ -39,8 +39,7 @@ class ProjectDetailPage extends StatelessWidget {
   static String routeOf({
     required String projectId,
     required String projectName,
-  }) =>
-      '/projects/$projectId?name=${Uri.encodeComponent(projectName)}';
+  }) => '/projects/$projectId?name=${Uri.encodeComponent(projectName)}';
 
   final String projectId;
   final String projectName;
@@ -56,13 +55,11 @@ class ProjectDetailPage extends StatelessWidget {
     final planningRepo = context.read<PlanningRepository>();
     final accountsRepo = context.read<AccountsRepository>();
     return BlocProvider(
-      create: (_) =>
-          ProjectDetailCubit(
-            planningRepository: planningRepo,
-            accountsRepository: accountsRepo,
-            projectId: projectId,
-          )
-            ..load(),
+      create: (_) => ProjectDetailCubit(
+        planningRepository: planningRepo,
+        accountsRepository: accountsRepo,
+        projectId: projectId,
+      )..load(),
       child: _ProjectDetailView(projectName: projectName),
     );
   }
@@ -106,9 +103,7 @@ class _ProjectDetailView extends StatelessWidget {
         return Scaffold(
           headers: [
             AppBar(
-              leading: [
-                ...AppBackButton.render(context),
-              ],
+              leading: [...AppBackButton.render(context)],
               title: Text(projectName),
             ),
             Divider(height: 1),
@@ -207,7 +202,9 @@ class _ProjectDetailContent extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.project_detail_summary_deposited,
-                      value: state.detail.totalDeposited.toCompactCurrency(context),
+                      value: state.detail.totalDeposited.toCompactCurrency(
+                        context,
+                      ),
                       icon: RadixIcons.arrowUp,
                       valueColor: theme.colorScheme.primary,
                     ),
@@ -225,7 +222,9 @@ class _ProjectDetailContent extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.project_detail_summary_operating,
-                      value: state.detail.operatingBalance.toCompactCurrency(context),
+                      value: state.detail.operatingBalance.toCompactCurrency(
+                        context,
+                      ),
                       icon: RadixIcons.dimensions,
                     ),
                   ),
@@ -255,7 +254,9 @@ class _ProjectDetailContent extends StatelessWidget {
                       width: cardWidth,
                       child: StatCard(
                         label: l10n.project_detail_summary_budget,
-                        value: state.detail.totalBudget.toCompactCurrency(context),
+                        value: state.detail.totalBudget.toCompactCurrency(
+                          context,
+                        ),
                         icon: RadixIcons.target,
                       ),
                     ),
@@ -313,15 +314,24 @@ class _ProjectDetailContent extends StatelessWidget {
               subtitle: l10n.project_detail_transactions_empty_info,
             )
           else
-            ..._latestTransactions(state.detail.projectLevelTransactions).map(
-              (t) => TransactionTile(
-                transaction: t,
-                operationalTasks: state.detail.projectCategories,
-                onEdit: () => _editTransaction(context, t),
-                onDelete: () {
-                  context.read<ProjectDetailCubit>().deleteTransaction(t.id);
-                },
-              ),
+            Column(
+              spacing: 8,
+              children: [
+                ..._latestTransactions(
+                  state.detail.projectLevelTransactions,
+                ).map(
+                  (t) => TransactionTile(
+                    transaction: t,
+                    operationalTasks: state.detail.projectCategories,
+                    onEdit: () => _editTransaction(context, t),
+                    onDelete: () {
+                      context.read<ProjectDetailCubit>().deleteTransaction(
+                        t.id,
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
 
           // ── Activities ───────────────────────
@@ -547,83 +557,80 @@ class _ActivityCard extends StatelessWidget {
           cubit.load();
         }
       },
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 32,
-                  height: 32,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.secondary.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Icon(
-                    RadixIcons.layers,
-                    size: 16,
-                    color: theme.colorScheme.secondaryForeground,
-                  ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.secondary.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(6),
                 ),
-                const Gap(10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(summary.activity.name).medium,
-                      if (summary.activity.year != null)
-                        Text(
-                          l10n.project_detail_activity_year(
-                            summary.activity.year!,
-                          ),
-                        ).muted.small,
-                    ],
-                  ),
+                child: Icon(
+                  RadixIcons.layers,
+                  size: 16,
+                  color: theme.colorScheme.secondaryForeground,
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
+              ),
+              const Gap(10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SecondaryBadge(
-                      child: Text(
-                        l10n.project_detail_activity_transaction_count(
-                          summary.transactionCount,
+                    Text(summary.activity.name).medium,
+                    if (summary.activity.year != null)
+                      Text(
+                        l10n.project_detail_activity_year(
+                          summary.activity.year!,
                         ),
-                      ),
-                    ),
-                    const Gap(4),
-                    IconButton.ghost(
-                      onPressed: () => _showActionsMenu(context),
-                      icon: const Icon(RadixIcons.dotsVertical, size: 16),
-                    ),
+                      ).muted.small,
                   ],
                 ),
-              ],
-            ),
-            const Gap(12),
-            if (summary.budget > 0)
-              BudgetProgress(
-                budget: summary.budget,
-                fundedAmount: summary.fundedAmount,
-                spent: summary.spent,
-                formatCurrency: (v) => v.toCompactCurrency(context),
-              )
-            else
+              ),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(
-                    '${l10n.project_detail_summary_deposited}: ${summary.deposited.toCompactCurrency(context)}',
-                  ).small(color: theme.colorScheme.primary),
-                  Text(
-                    '${l10n.project_detail_summary_spent}: ${summary.spent.toCompactCurrency(context)}',
-                  ).small(color: theme.colorScheme.destructive),
+                  SecondaryBadge(
+                    child: Text(
+                      l10n.project_detail_activity_transaction_count(
+                        summary.transactionCount,
+                      ),
+                    ),
+                  ),
+                  const Gap(4),
+                  IconButton.ghost(
+                    onPressed: () => _showActionsMenu(context),
+                    icon: const Icon(RadixIcons.dotsVertical, size: 16),
+                  ),
                 ],
               ),
-          ],
-        ),
+            ],
+          ),
+          const Gap(12),
+          if (summary.budget > 0)
+            BudgetProgress(
+              budget: summary.budget,
+              fundedAmount: summary.fundedAmount,
+              spent: summary.spent,
+              formatCurrency: (v) => v.toCompactCurrency(context),
+            )
+          else
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${l10n.project_detail_summary_deposited}: ${summary.deposited.toCompactCurrency(context)}',
+                ).small(color: theme.colorScheme.primary),
+                Text(
+                  '${l10n.project_detail_summary_spent}: ${summary.spent.toCompactCurrency(context)}',
+                ).small(color: theme.colorScheme.destructive),
+              ],
+            ),
+        ],
       ),
     );
   }

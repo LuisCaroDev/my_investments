@@ -43,6 +43,12 @@ class _SettingsPageState extends State<SettingsPage> {
     final settingsState = context.watch<SettingsCubit>().state;
     final syncRepo = context.watch<SyncRepository>();
 
+    final isConfigured = SupabaseConfig.isConfigured;
+    final user = isConfigured
+        ? Supabase.instance.client.auth.currentUser
+        : null;
+    final isLoggedIn = user != null;
+
     return Scaffold(
       headers: [
         AppBar(
@@ -60,15 +66,16 @@ class _SettingsPageState extends State<SettingsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // ── Sincronización / Nube ──────────────────────────────
-                Text(l10n.settings_sync_title).h4,
+                // ── Cuenta ──────────────────────────────
+                Text(l10n.settings_account_title).h4,
                 const Gap(16),
-                _buildSyncCard(
+                _buildAccountCard(
                   context,
                   theme: theme,
                   l10n: l10n,
                   settingsState: settingsState,
-                  syncRepo: syncRepo,
+                  isLoggedIn: isLoggedIn,
+                  user: user,
                 ),
                 const Gap(32),
 
@@ -83,88 +90,73 @@ class _SettingsPageState extends State<SettingsPage> {
                         // Idioma
                         CardButton(
                           onPressed: () => _showLocaleDialog(context, state),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                const Icon(RadixIcons.globe),
-                                const Gap(16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(l10n.settings_language_label).medium,
-                                      Text(
-                                        _getLocaleName(
-                                          context,
-                                          state.appLocale,
-                                        ),
-                                      ).muted,
-                                    ],
-                                  ),
+                          child: Row(
+                            children: [
+                              const Icon(RadixIcons.globe),
+                              const Gap(16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(l10n.settings_language_label).medium,
+                                    Text(
+                                      _getLocaleName(context, state.appLocale),
+                                    ).muted,
+                                  ],
                                 ),
-                                const Icon(RadixIcons.chevronRight),
-                              ],
-                            ),
+                              ),
+                              const Icon(RadixIcons.chevronRight),
+                            ],
                           ),
                         ),
                         const Gap(8),
                         CardButton(
                           onPressed: () => _showThemeDialog(context, state),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                const Icon(RadixIcons.moon),
-                                const Gap(16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(l10n.settings_theme_label).medium,
-                                      Text(
-                                        _getThemeModeName(
-                                          context,
-                                          state.themeMode,
-                                        ),
-                                      ).muted,
-                                    ],
-                                  ),
+                          child: Row(
+                            children: [
+                              const Icon(RadixIcons.moon),
+                              const Gap(16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(l10n.settings_theme_label).medium,
+                                    Text(
+                                      _getThemeModeName(
+                                        context,
+                                        state.themeMode,
+                                      ),
+                                    ).muted,
+                                  ],
                                 ),
-                                const Icon(RadixIcons.chevronRight),
-                              ],
-                            ),
+                              ),
+                              const Icon(RadixIcons.chevronRight),
+                            ],
                           ),
                         ),
                         const Gap(8),
                         // Moneda
                         CardButton(
                           onPressed: () => _showCurrencyDialog(context, state),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                              children: [
-                                const Icon(RadixIcons.component1),
-                                const Gap(16),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(l10n.settings_currency_label).medium,
-                                      Text(
-                                        state.currencySymbol != null
-                                            ? '${state.currencySymbol} (${state.currencyLocale ?? l10n.settings_system_default})'
-                                            : l10n.settings_system_default,
-                                      ).muted,
-                                    ],
-                                  ),
+                          child: Row(
+                            children: [
+                              const Icon(RadixIcons.component1),
+                              const Gap(16),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(l10n.settings_currency_label).medium,
+                                    Text(
+                                      state.currencySymbol != null
+                                          ? '${state.currencySymbol} (${state.currencyLocale ?? l10n.settings_system_default})'
+                                          : l10n.settings_system_default,
+                                    ).muted,
+                                  ],
                                 ),
-                                const Icon(RadixIcons.chevronRight),
-                              ],
-                            ),
+                              ),
+                              const Icon(RadixIcons.chevronRight),
+                            ],
                           ),
                         ),
                       ],
@@ -173,31 +165,37 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
                 const Gap(32),
 
-                // ── Datos ──────────────────────────────
-                Text(l10n.settings_data_title).h4,
+                // ── Datos y Sincronización ──────────────────────────────
+                Text(l10n.settings_data_sync_title).h4,
                 const Gap(16),
+                _buildSyncCard(
+                  context,
+                  theme: theme,
+                  l10n: l10n,
+                  settingsState: settingsState,
+                  syncRepo: syncRepo,
+                  isLoggedIn: isLoggedIn,
+                ),
+                const Gap(8),
                 CardButton(
                   onPressed: () {
                     context.push(ImportExportPage.route);
                   },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Row(
-                      children: [
-                        const Icon(RadixIcons.upload),
-                        const Gap(16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(l10n.settings_import_export_label).medium,
-                              Text(l10n.settings_import_export_info).muted,
-                            ],
-                          ),
+                  child: Row(
+                    children: [
+                      const Icon(RadixIcons.upload),
+                      const Gap(16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(l10n.settings_import_export_label).medium,
+                            Text(l10n.settings_import_export_info).muted,
+                          ],
                         ),
-                        const Icon(RadixIcons.chevronRight),
-                      ],
-                    ),
+                      ),
+                      const Icon(RadixIcons.chevronRight),
+                    ],
                   ),
                 ),
               ],
@@ -208,24 +206,15 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildSyncCard(
+  Widget _buildAccountCard(
     BuildContext context, {
     required ThemeData theme,
     required AppLocalizations l10n,
     required SettingsState settingsState,
-    required SyncRepository syncRepo,
+    required bool isLoggedIn,
+    User? user,
   }) {
-    final pendingCount = syncRepo.getPendingChanges().length;
-    final lastSync = syncRepo.getLastSync();
-
-    final isConfigured = SupabaseConfig.isConfigured;
-    final user = isConfigured
-        ? Supabase.instance.client.auth.currentUser
-        : null;
-    final isLoggedIn = user != null;
-
     return Card(
-      padding: const EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -246,7 +235,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   children: [
                     Text(
                       isLoggedIn
-                          ? (user.email ?? l10n.settings_sync_logged_in)
+                          ? (user?.email ?? l10n.settings_sync_logged_in)
                           : l10n.settings_local_mode_title,
                     ).medium.bold,
                     Text(
@@ -256,36 +245,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     ).xSmall.muted,
                   ],
                 ),
-              ),
-            ],
-          ),
-          const Gap(16),
-          Text(l10n.settings_sync_status_label).small.bold,
-          const Gap(6),
-          Text(
-            '${l10n.settings_sync_last_sync_label}: '
-            '${lastSync?.toLocal().toIso8601String() ?? l10n.settings_sync_never}',
-          ).xSmall.muted,
-          Text(
-            '${l10n.settings_sync_pending_label}: $pendingCount',
-          ).xSmall.muted,
-          const Gap(16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(l10n.settings_sync_mode_title).medium,
-                  Text(l10n.settings_sync_mode_info).xSmall.muted,
-                ],
-              ),
-              Switch(
-                value: settingsState.syncEnabled,
-                onChanged: isLoggedIn
-                    ? (value) =>
-                          context.read<SettingsCubit>().setSyncEnabled(value)
-                    : null,
               ),
             ],
           ),
@@ -304,21 +263,76 @@ class _SettingsPageState extends State<SettingsPage> {
             ],
           ] else ...[
             const Gap(16),
-            PrimaryButton(
-              onPressed: _syncWorking ? null : () => _backupNow(context),
-              child: Text(l10n.settings_sync_backup_button),
-            ),
-            const Gap(8),
-            OutlineButton(
-              onPressed: _syncWorking ? null : () => _restoreNow(context),
-              child: Text(l10n.settings_sync_restore_button),
-            ),
-            const Gap(8),
             OutlineButton(
               onPressed: _syncWorking ? null : _logout,
               child: Text(l10n.settings_logout_button),
             ),
           ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSyncCard(
+    BuildContext context, {
+    required ThemeData theme,
+    required AppLocalizations l10n,
+    required SettingsState settingsState,
+    required SyncRepository syncRepo,
+    required bool isLoggedIn,
+  }) {
+    final pendingCount = syncRepo.getPendingChanges().length;
+    final lastSync = syncRepo.getLastSync();
+
+    return Card(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l10n.settings_sync_status_label).small.bold,
+          const Gap(6),
+          Text(
+            '${l10n.settings_sync_last_sync_label}: '
+            '${lastSync?.toLocal().toIso8601String() ?? l10n.settings_sync_never}',
+          ).xSmall.muted,
+          Text(
+            '${l10n.settings_sync_pending_label}: $pendingCount',
+          ).xSmall.muted,
+          const Gap(16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.settings_sync_mode_title).medium,
+                    Text(l10n.settings_sync_mode_info).xSmall.muted,
+                  ],
+                ),
+              ),
+              Switch(
+                value: settingsState.syncEnabled,
+                onChanged: isLoggedIn
+                    ? (value) =>
+                          context.read<SettingsCubit>().setSyncEnabled(value)
+                    : null,
+              ),
+            ],
+          ),
+          const Gap(16),
+          PrimaryButton(
+            onPressed: isLoggedIn && !_syncWorking
+                ? () => _backupNow(context)
+                : null,
+            child: Text(l10n.settings_sync_backup_button),
+          ),
+          const Gap(8),
+          OutlineButton(
+            onPressed: isLoggedIn && !_syncWorking
+                ? () => _restoreNow(context)
+                : null,
+            child: Text(l10n.settings_sync_restore_button),
+          ),
         ],
       ),
     );

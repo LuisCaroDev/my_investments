@@ -102,9 +102,7 @@ class _TransactionListView extends StatelessWidget {
         return Scaffold(
           headers: [
             AppBar(
-              leading: [
-                ...AppBackButton.render(context),
-              ],
+              leading: [...AppBackButton.render(context)],
               title: Text(title),
             ),
             Divider(height: 1),
@@ -162,7 +160,6 @@ class _TransactionListView extends StatelessWidget {
       cubit.addTransaction(transaction);
     }
   }
-
 }
 
 class _TransactionListContent extends StatelessWidget {
@@ -204,7 +201,10 @@ class _TransactionListContent extends StatelessWidget {
                   children: [
                     const Icon(RadixIcons.mixerHorizontal, size: 14),
                     const Gap(6),
-                    Text(sortLabels[state.sort] ?? l10n.transaction_list_sort_label),
+                    Text(
+                      sortLabels[state.sort] ??
+                          l10n.transaction_list_sort_label,
+                    ),
                   ],
                 ),
               ),
@@ -221,8 +221,9 @@ class _TransactionListContent extends StatelessWidget {
               if (value == null) {
                 return Text(l10n.transaction_list_category_all);
               }
-              final task =
-                  state.operationalTasks.firstWhere((c) => c.id == value);
+              final task = state.operationalTasks.firstWhere(
+                (c) => c.id == value,
+              );
               return Text(task.name);
             },
             popup: (context) {
@@ -256,7 +257,9 @@ class _TransactionListContent extends StatelessWidget {
                       ),
                     if (projectTasks.isNotEmpty)
                       SelectGroup(
-                        headers: [SelectLabel(child: Text(l10n.common_project))],
+                        headers: [
+                          SelectLabel(child: Text(l10n.common_project)),
+                        ],
                         children: projectTasks
                             .map(
                               (cat) => SelectItemButton(
@@ -279,15 +282,22 @@ class _TransactionListContent extends StatelessWidget {
               subtitle: l10n.transaction_list_empty_filter,
             )
           else
-            ...state.filteredTransactions.map(
-              (t) => TransactionTile(
-                transaction: t,
-                operationalTasks: state.operationalTasks,
-                onEdit: () => _editTransaction(context, t),
-                onDelete: () {
-                  context.read<TransactionListCubit>().deleteTransaction(t.id);
-                },
-              ),
+            Column(
+              spacing: 8,
+              children: [
+                ...state.filteredTransactions.map(
+                  (t) => TransactionTile(
+                    transaction: t,
+                    operationalTasks: state.operationalTasks,
+                    onEdit: () => _editTransaction(context, t),
+                    onDelete: () {
+                      context.read<TransactionListCubit>().deleteTransaction(
+                        t.id,
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
         ],
       ),

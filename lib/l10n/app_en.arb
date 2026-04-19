@@ -77,6 +77,7 @@
   "category_mgmt_empty": "No tasks yet.",
 
   "settings_title": "Settings",
+  "settings_account_title": "Account",
   "settings_sync_title": "Sync and Account",
   "settings_local_mode_title": "Independent Local Mode",
   "settings_local_mode_info": "Your data is saved on this device.",
@@ -114,6 +115,7 @@
   "settings_language_dialog_title": "Select Language",
   "settings_theme_dialog_title": "Select Theme",
   "settings_data_title": "Data",
+  "settings_data_sync_title": "Data & Sync",
   "settings_import_export_label": "Import / Export JSON",
   "settings_import_export_info": "Back up your data manually",
 

@@ -32,8 +32,8 @@ class TransactionTile extends StatelessWidget {
     final isExpense = transaction.type == TransactionType.expense;
     final task = transaction.operationalTaskId != null
         ? operationalTasks
-            .where((c) => c.id == transaction.operationalTaskId)
-            .firstOrNull
+              .where((c) => c.id == transaction.operationalTaskId)
+              .firstOrNull
         : null;
     final icon = isExpense ? RadixIcons.arrowDown : RadixIcons.arrowUp;
     final valueColor = isExpense

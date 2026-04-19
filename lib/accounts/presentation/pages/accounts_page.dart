@@ -365,33 +365,30 @@ class _AccountCard extends StatelessWidget {
 
     return CardButton(
       onPressed: () => _openTransactions(context),
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [Text(account.name).medium],
-                  ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [Text(account.name).medium],
                 ),
-                IconButton.ghost(
-                  onPressed: () => _showActionsMenu(context),
-                  icon: const Icon(RadixIcons.dotsVertical, size: 16),
-                ),
-              ],
-            ),
-            const Gap(16),
-            Text('Balance').muted.small,
-            Text(
-              account.balance.toCompactCurrency(context),
-            ).semiBold(color: theme.colorScheme.primary),
-          ],
-        ),
+              ),
+              IconButton.ghost(
+                onPressed: () => _showActionsMenu(context),
+                icon: const Icon(RadixIcons.dotsVertical, size: 16),
+              ),
+            ],
+          ),
+          const Gap(16),
+          Text('Balance').muted.small,
+          Text(
+            account.balance.toCompactCurrency(context),
+          ).semiBold(color: theme.colorScheme.primary),
+        ],
       ),
     );
   }

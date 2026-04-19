@@ -77,6 +77,7 @@
   "category_mgmt_empty": "No hay tareas todavía.",
 
   "settings_title": "Configuración",
+  "settings_account_title": "Cuenta",
   "settings_sync_title": "Sincronización y Cuenta",
   "settings_local_mode_title": "Modo Local Independiente",
   "settings_local_mode_info": "Tus datos se guardan en este dispositivo.",
@@ -114,6 +115,7 @@
   "settings_language_dialog_title": "Seleccionar Idioma",
   "settings_theme_dialog_title": "Seleccionar Tema",
   "settings_data_title": "Datos",
+  "settings_data_sync_title": "Datos y Sincronización",
   "settings_import_export_label": "Importar / Exportar JSON",
   "settings_import_export_info": "Respalda tus datos manualmente",
 

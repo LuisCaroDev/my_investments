@@ -10,7 +10,6 @@ import 'package:my_investments/auth/presentation/widgets/data_conflict_handler.d
 import 'package:my_investments/auth/presentation/widgets/login_email_view.dart';
 import 'package:my_investments/auth/presentation/widgets/login_otp_view.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:my_investments/auth/presentation/pages/home_gate.dart';
 import 'package:my_investments/core/router/app_router.dart';
 import 'package:my_investments/core/storage/profile_ids.dart';
 import 'package:my_investments/l10n/app_localizations.dart';

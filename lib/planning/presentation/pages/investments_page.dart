@@ -24,9 +24,7 @@ class InvestmentsPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       headers: [
-        AppBar(
-          title: Text(l10n.nav_investments),
-        ),
+        AppBar(title: Text(l10n.nav_investments)),
         Divider(height: 1),
       ],
       floatingFooter: true,
@@ -92,7 +90,6 @@ class InvestmentsPage extends StatelessWidget {
       context.read<InvestmentsCubit>().addInvestment(project);
     }
   }
-
 }
 
 class _ProjectsList extends StatelessWidget {
@@ -206,15 +203,11 @@ class _ProjectsList extends StatelessWidget {
           Wrap(
             spacing: 16,
             runSpacing: 16,
-            children:
-                summaries
-                    .map(
-                      (s) => SizedBox(
-                        width: 340,
-                        child: _ProjectCard(summary: s),
-                      ),
-                    )
-                    .toList(),
+            children: summaries
+                .map(
+                  (s) => SizedBox(width: 340, child: _ProjectCard(summary: s)),
+                )
+                .toList(),
           ),
         ],
       ),
@@ -241,94 +234,89 @@ class _ProjectCard extends StatelessWidget {
           ),
         );
       },
-      child: Padding(
-        padding: const EdgeInsets.all(8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              children: [
-                Container(
-                  width: 36,
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Icon(
-                    RadixIcons.cube,
-                    size: 18,
-                    color: theme.colorScheme.primary,
-                  ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 36,
+                height: 36,
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                const Gap(12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(summary.project.name).medium,
-                      if (summary.project.description != null)
-                        OverflowMarquee(
-                          child: Text(summary.project.description!).muted.small,
-                        ),
-                    ],
-                  ),
+                child: Icon(
+                  RadixIcons.cube,
+                  size: 18,
+                  color: theme.colorScheme.primary,
                 ),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
+              ),
+              const Gap(12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SecondaryBadge(
-                      child: Text(
-                        l10n.projects_item_activity_count(
-                          summary.activityCount,
-                        ),
+                    Text(summary.project.name).medium,
+                    if (summary.project.description != null)
+                      OverflowMarquee(
+                        child: Text(summary.project.description!).muted.small,
                       ),
-                    ),
-                    const Gap(4),
-                    IconButton.ghost(
-                      onPressed: () => _showActionsMenu(context),
-                      icon: const Icon(RadixIcons.dotsVertical, size: 16),
-                    ),
                   ],
                 ),
-              ],
-            ),
-            const Gap(16),
-            if (summary.totalBudget > 0)
-              BudgetProgress(
-                budget: summary.totalBudget,
-                fundedAmount: summary.fundedAmount,
-                spent: summary.totalSpent,
-                formatCurrency: (v) => v.toCompactCurrency(context),
               ),
-            if (summary.totalBudget == 0) ...[
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(l10n.projects_summary_deposited).muted.small,
-                      Text(
-                        summary.totalDeposited.toCompactCurrency(context),
-                      ).semiBold(color: theme.colorScheme.primary),
-                    ],
+                  SecondaryBadge(
+                    child: Text(
+                      l10n.projects_item_activity_count(summary.activityCount),
+                    ),
                   ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      Text(l10n.projects_summary_spent).muted.small,
-                      Text(
-                        summary.totalSpent.toCompactCurrency(context),
-                      ).semiBold(color: theme.colorScheme.muted),
-                    ],
+                  const Gap(4),
+                  IconButton.ghost(
+                    onPressed: () => _showActionsMenu(context),
+                    icon: const Icon(RadixIcons.dotsVertical, size: 16),
                   ),
                 ],
               ),
             ],
+          ),
+          const Gap(16),
+          if (summary.totalBudget > 0)
+            BudgetProgress(
+              budget: summary.totalBudget,
+              fundedAmount: summary.fundedAmount,
+              spent: summary.totalSpent,
+              formatCurrency: (v) => v.toCompactCurrency(context),
+            ),
+          if (summary.totalBudget == 0) ...[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.projects_summary_deposited).muted.small,
+                    Text(
+                      summary.totalDeposited.toCompactCurrency(context),
+                    ).semiBold(color: theme.colorScheme.primary),
+                  ],
+                ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(l10n.projects_summary_spent).muted.small,
+                    Text(
+                      summary.totalSpent.toCompactCurrency(context),
+                    ).semiBold(color: theme.colorScheme.muted),
+                  ],
+                ),
+              ],
+            ),
           ],
-        ),
+        ],
       ),
     );
   }
