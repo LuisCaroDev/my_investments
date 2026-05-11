@@ -20,6 +20,8 @@ import 'package:my_investments/planning/presentation/bloc/project_detail_cubit.d
 import 'package:my_investments/planning/presentation/bloc/project_detail_state.dart';
 import 'package:my_investments/accounts/presentation/bloc/accounts_cubit.dart';
 import 'package:my_investments/accounts/presentation/bloc/accounts_state.dart';
+import 'package:my_investments/planning/presentation/bloc/goals_cubit.dart';
+import 'package:my_investments/planning/presentation/bloc/investments_cubit.dart';
 import 'package:my_investments/planning/presentation/widgets/add_activity_dialog.dart';
 import 'package:my_investments/accounts/presentation/widgets/add_transaction_dialog.dart';
 import 'package:my_investments/planning/presentation/widgets/budget_progress.dart';
@@ -31,6 +33,12 @@ List<FinancialAccount> _getAccountsFromContext(BuildContext context) {
   final state = context.read<AccountsCubit>().state;
   if (state is AccountsLoaded) return state.accounts;
   return const [];
+}
+
+void _refreshPlanningSummaries(BuildContext context) {
+  context.read<AccountsCubit>().loadAccounts();
+  context.read<InvestmentsCubit>().loadInvestments();
+  context.read<GoalsCubit>().loadGoals();
 }
 
 class ProjectDetailPage extends StatelessWidget {
@@ -141,7 +149,10 @@ class _ProjectDetailView extends StatelessWidget {
         operationalTaskId: result['operationalTaskId'] as String?,
         createdAt: DateTime.now(),
       );
-      cubit.addTransaction(transaction);
+      await cubit.addTransaction(transaction);
+      if (context.mounted) {
+        _refreshPlanningSummaries(context);
+      }
     }
   }
 
@@ -216,26 +227,6 @@ class _ProjectDetailContent extends StatelessWidget {
                       value: state.detail.totalSpent.toCompactCurrency(context),
                       icon: RadixIcons.arrowDown,
                       valueColor: theme.colorScheme.destructive,
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: StatCard(
-                      label: l10n.project_detail_summary_operating,
-                      value: state.detail.operatingBalance.toCompactCurrency(
-                        context,
-                      ),
-                      icon: RadixIcons.dimensions,
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: StatCard(
-                      label: l10n.projects_summary_funded,
-                      value: state.detail.fundedAmount.toCompactCurrency(
-                        context,
-                      ),
-                      icon: RadixIcons.drawingPinSolid,
                     ),
                   ),
                   SizedBox(
@@ -324,10 +315,13 @@ class _ProjectDetailContent extends StatelessWidget {
                     transaction: t,
                     operationalTasks: state.detail.projectCategories,
                     onEdit: () => _editTransaction(context, t),
-                    onDelete: () {
-                      context.read<ProjectDetailCubit>().deleteTransaction(
-                        t.id,
-                      );
+                    onDelete: () async {
+                      await context
+                          .read<ProjectDetailCubit>()
+                          .deleteTransaction(t.id);
+                      if (context.mounted) {
+                        _refreshPlanningSummaries(context);
+                      }
                     },
                   ),
                 ),
@@ -434,7 +428,10 @@ class _ProjectDetailContent extends StatelessWidget {
         description: result['description'] as String?,
         operationalTaskId: result['operationalTaskId'] as String?,
       );
-      cubit.updateTransaction(updated);
+      await cubit.updateTransaction(updated);
+      if (context.mounted) {
+        _refreshPlanningSummaries(context);
+      }
     }
   }
 

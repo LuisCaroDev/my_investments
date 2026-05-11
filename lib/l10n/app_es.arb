@@ -175,7 +175,7 @@
   "widget_budget_progress_budget": "Presupuesto:",
   "widget_budget_progress_deposited": "Depositado:",
   "widget_budget_progress_spent": "Gastado:",
-  "widget_budget_progress_funded": "Financiado:",
+  "widget_budget_progress_funded": "Destinado:",
   "widget_budget_progress_remaining": "Por Financiar:",
   "widget_tx_tile_project_label": "(proyecto)",
 

@@ -17,6 +17,8 @@ import 'package:my_investments/core/domain/entities/financial_account.dart';
 import 'package:my_investments/core/domain/entities/transaction.dart';
 import 'package:my_investments/accounts/presentation/bloc/accounts_cubit.dart';
 import 'package:my_investments/accounts/presentation/bloc/accounts_state.dart';
+import 'package:my_investments/planning/presentation/bloc/goals_cubit.dart';
+import 'package:my_investments/planning/presentation/bloc/investments_cubit.dart';
 import 'package:my_investments/accounts/presentation/widgets/add_transaction_dialog.dart';
 import 'package:my_investments/planning/presentation/widgets/budget_progress.dart';
 import 'package:my_investments/planning/presentation/widgets/section_header.dart';
@@ -27,6 +29,12 @@ List<FinancialAccount> _getAccountsFromContext(BuildContext context) {
   final state = context.read<AccountsCubit>().state;
   if (state is AccountsLoaded) return state.accounts;
   return const [];
+}
+
+void _refreshPlanningSummaries(BuildContext context) {
+  context.read<AccountsCubit>().loadAccounts();
+  context.read<InvestmentsCubit>().loadInvestments();
+  context.read<GoalsCubit>().loadGoals();
 }
 
 /// A dedicated page for viewing an Activity's details, its operational tasks,
@@ -153,7 +161,10 @@ class _ActivityDetailView extends StatelessWidget {
         operationalTaskId: result['operationalTaskId'] as String?,
         createdAt: DateTime.now(),
       );
-      cubit.addTransaction(transaction);
+      await cubit.addTransaction(transaction);
+      if (context.mounted) {
+        _refreshPlanningSummaries(context);
+      }
     }
   }
 
@@ -358,10 +369,13 @@ class _ActivityContent extends StatelessWidget {
                     transaction: t,
                     operationalTasks: state.detail!.categories,
                     onEdit: () => _editTransaction(context, t),
-                    onDelete: () {
-                      context.read<ActivityDetailCubit>().deleteTransaction(
-                        t.id,
-                      );
+                    onDelete: () async {
+                      await context
+                          .read<ActivityDetailCubit>()
+                          .deleteTransaction(t.id);
+                      if (context.mounted) {
+                        _refreshPlanningSummaries(context);
+                      }
                     },
                   ),
                 ),
@@ -422,7 +436,10 @@ class _ActivityContent extends StatelessWidget {
         description: result['description'] as String?,
         operationalTaskId: result['operationalTaskId'] as String?,
       );
-      cubit.updateTransaction(updated);
+      await cubit.updateTransaction(updated);
+      if (context.mounted) {
+        _refreshPlanningSummaries(context);
+      }
     }
   }
 

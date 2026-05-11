@@ -524,7 +524,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get widget_budget_progress_spent => 'Gastado:';
 
   @override
-  String get widget_budget_progress_funded => 'Financiado:';
+  String get widget_budget_progress_funded => 'Destinado:';
 
   @override
   String get widget_budget_progress_remaining => 'Por Financiar:';

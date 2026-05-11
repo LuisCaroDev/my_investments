@@ -175,7 +175,7 @@
   "widget_budget_progress_budget": "Budget:",
   "widget_budget_progress_deposited": "Deposited:",
   "widget_budget_progress_spent": "Spent:",
-  "widget_budget_progress_funded": "Funded:",
+  "widget_budget_progress_funded": "Allocated:",
   "widget_budget_progress_remaining": "Remaining to Fund:",
   "widget_tx_tile_project_label": "(project)",
 

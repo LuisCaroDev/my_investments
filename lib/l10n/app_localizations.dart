@@ -1073,7 +1073,7 @@ abstract class AppLocalizations {
   /// No description provided for @widget_budget_progress_funded.
   ///
   /// In es, this message translates to:
-  /// **'Financiado:'**
+  /// **'Destinado:'**
   String get widget_budget_progress_funded;
 
   /// No description provided for @widget_budget_progress_remaining.

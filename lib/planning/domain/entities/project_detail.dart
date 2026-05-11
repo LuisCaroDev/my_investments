@@ -27,7 +27,7 @@ class ProjectDetail {
   });
 
   double get operatingBalance => totalDeposited - totalSpent;
-  double get netBalance => operatingBalance + fundedAmount;
+  double get netBalance => operatingBalance;
   double get remainingBudget => totalBudget - totalDeposited;
   double get budgetProgress =>
       totalBudget > 0 ? (totalSpent / totalBudget).clamp(0.0, 1.0) : 0.0;

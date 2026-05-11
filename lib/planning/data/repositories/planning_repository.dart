@@ -1,4 +1,3 @@
-import 'package:my_investments/core/constants/ledger.dart';
 import 'package:my_investments/core/domain/entities/transaction.dart';
 import 'package:my_investments/core/domain/repositories/transactions_reader.dart';
 import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
@@ -23,9 +22,9 @@ class PlanningRepository {
     required PlanningLocalDataSource localDataSource,
     required TransactionsReader transactionsReader,
     SyncChangeRecorder? changeRecorder,
-  })  : _localDataSource = localDataSource,
-        _transactionsReader = transactionsReader,
-        _changeRecorder = changeRecorder;
+  }) : _localDataSource = localDataSource,
+       _transactionsReader = transactionsReader,
+       _changeRecorder = changeRecorder;
 
   // ── Funding Distribution Algorithm ──────────────────────────
 
@@ -34,9 +33,10 @@ class PlanningRepository {
     final allActivities = _localDataSource.getActivities();
     final allTransactions = _transactionsReader.getAllTransactions();
 
-    // 1. Calculate Total Funding from account deposits
-    double totalLiquidity =
-        _calculateTotalFundingFromAccountDeposits(allTransactions);
+    // 1. Calculate available liquidity from real account balances.
+    double totalLiquidity = _calculateAvailableLiquidityFromAccounts(
+      allTransactions,
+    );
 
     // 2. Sort all projects by priority ASC
     allProjects.sort((a, b) => a.priority.compareTo(b.priority));
@@ -45,10 +45,12 @@ class PlanningRepository {
 
     // 3. Iterate and drain liquidity
     for (var project in allProjects) {
-      final projectActivities =
-          allActivities.where((a) => a.projectId == project.id).toList();
-      final projectTransactions =
-          allTransactions.where((t) => t.projectId == project.id).toList();
+      final projectActivities = allActivities
+          .where((a) => a.projectId == project.id)
+          .toList();
+      final projectTransactions = allTransactions
+          .where((t) => t.projectId == project.id)
+          .toList();
 
       final totalSpent = projectTransactions
           .where((t) => t.type == TransactionType.expense)
@@ -57,28 +59,40 @@ class PlanningRepository {
           .where((t) => t.type == TransactionType.deposit)
           .fold(0.0, (sum, t) => sum + t.amount);
 
-      final totalBudget = project.globalBudget ??
-          projectActivities.fold<double>(0.0, (sum, a) => sum + (a.budget ?? 0));
+      final totalBudget = _calculateProjectBudget(
+        project: project,
+        projectActivities: projectActivities,
+      );
+      final remainingNeed = _calculateRemainingProjectNeed(
+        totalBudget: totalBudget,
+        totalSpent: totalSpent,
+      );
 
-      // Calculate Funding
+      // Allocate only the money still needed by this project.
       double fundedAmount = 0.0;
-      if (totalBudget > 0) {
-        fundedAmount = totalBudget < totalLiquidity ? totalBudget : totalLiquidity;
+      if (remainingNeed > 0) {
+        fundedAmount = remainingNeed < totalLiquidity
+            ? remainingNeed
+            : totalLiquidity;
         if (fundedAmount < 0) fundedAmount = 0; // Negative liquidity guard
         totalLiquidity -= fundedAmount;
       }
 
-      final remainingToFund = totalBudget > 0 ? (totalBudget - fundedAmount) : 0.0;
+      final remainingToFund = remainingNeed > 0
+          ? (remainingNeed - fundedAmount)
+          : 0.0;
 
-      allSummaries.add(ProjectSummary(
-        project: project,
-        totalBudget: totalBudget,
-        totalSpent: totalSpent,
-        totalDeposited: totalDeposited,
-        fundedAmount: fundedAmount,
-        remainingToFund: remainingToFund,
-        activityCount: projectActivities.length,
-      ));
+      allSummaries.add(
+        ProjectSummary(
+          project: project,
+          totalBudget: totalBudget,
+          totalSpent: totalSpent,
+          totalDeposited: totalDeposited,
+          fundedAmount: fundedAmount,
+          remainingToFund: remainingToFund,
+          activityCount: projectActivities.length,
+        ),
+      );
     }
 
     // 4. Return only the requested type
@@ -91,16 +105,19 @@ class PlanningRepository {
     return _buildProjectSummaries(ProjectType.investment);
   }
 
-  ProjectDetail getInvestmentDetail(String projectId) => getProjectDetail(projectId);
+  ProjectDetail getInvestmentDetail(String projectId) =>
+      getProjectDetail(projectId);
 
   Future<void> addInvestment(Project project) async {
     final investment = project.copyWith(type: ProjectType.investment);
     final projects = _localDataSource.getProjects();
-    final maxPriority = projects.where((p) => p.type == ProjectType.investment)
-      .fold(0, (max, p) => p.priority > max ? p.priority : max);
-    
-    final model =
-        ProjectModel.fromEntity(investment.copyWith(priority: maxPriority + 1));
+    final maxPriority = projects
+        .where((p) => p.type == ProjectType.investment)
+        .fold(0, (max, p) => p.priority > max ? p.priority : max);
+
+    final model = ProjectModel.fromEntity(
+      investment.copyWith(priority: maxPriority + 1),
+    );
     projects.add(model);
     await _localDataSource.saveProjects(projects);
     await _changeRecorder?.recordChange(
@@ -126,22 +143,25 @@ class PlanningRepository {
     }
   }
 
-  Future<void> deleteInvestment(String projectId) => _deleteProjectDataAndCascade(projectId);
+  Future<void> deleteInvestment(String projectId) =>
+      _deleteProjectDataAndCascade(projectId);
 
   Future<void> reorderInvestments(List<String> orderedIds) async {
     final projects = _localDataSource.getProjects();
     for (int i = 0; i < orderedIds.length; i++) {
-        final id = orderedIds[i];
-        final index = projects.indexWhere((p) => p.id == id);
-        if (index != -1) {
-            projects[index] = ProjectModel.fromEntity(projects[index].copyWith(priority: i));
-            await _changeRecorder?.recordChange(
-              entity: 'projects',
-              op: SyncChangeOp.update,
-              id: projects[index].id,
-              payload: projects[index].toJson(),
-            );
-        }
+      final id = orderedIds[i];
+      final index = projects.indexWhere((p) => p.id == id);
+      if (index != -1) {
+        projects[index] = ProjectModel.fromEntity(
+          projects[index].copyWith(priority: i),
+        );
+        await _changeRecorder?.recordChange(
+          entity: 'projects',
+          op: SyncChangeOp.update,
+          id: projects[index].id,
+          payload: projects[index].toJson(),
+        );
+      }
     }
     await _localDataSource.saveProjects(projects);
   }
@@ -158,14 +178,15 @@ class PlanningRepository {
     final goal = project.copyWith(type: ProjectType.savingsGoal);
     final projects = _localDataSource.getProjects();
     int maxPriority = -1;
-    for(var p in projects) {
-        if(p.type == ProjectType.savingsGoal && p.priority > maxPriority) {
-            maxPriority = p.priority;
-        }
+    for (var p in projects) {
+      if (p.type == ProjectType.savingsGoal && p.priority > maxPriority) {
+        maxPriority = p.priority;
+      }
     }
 
-    final model =
-        ProjectModel.fromEntity(goal.copyWith(priority: maxPriority + 1));
+    final model = ProjectModel.fromEntity(
+      goal.copyWith(priority: maxPriority + 1),
+    );
     projects.add(model);
     await _localDataSource.saveProjects(projects);
     await _changeRecorder?.recordChange(
@@ -191,22 +212,25 @@ class PlanningRepository {
     }
   }
 
-  Future<void> deleteGoal(String projectId) => _deleteProjectDataAndCascade(projectId);
+  Future<void> deleteGoal(String projectId) =>
+      _deleteProjectDataAndCascade(projectId);
 
   Future<void> reorderGoals(List<String> orderedIds) async {
     final projects = _localDataSource.getProjects();
     for (int i = 0; i < orderedIds.length; i++) {
-        final id = orderedIds[i];
-        final index = projects.indexWhere((p) => p.id == id);
-        if (index != -1) {
-            projects[index] = ProjectModel.fromEntity(projects[index].copyWith(priority: i));
-            await _changeRecorder?.recordChange(
-              entity: 'projects',
-              op: SyncChangeOp.update,
-              id: projects[index].id,
-              payload: projects[index].toJson(),
-            );
-        }
+      final id = orderedIds[i];
+      final index = projects.indexWhere((p) => p.id == id);
+      if (index != -1) {
+        projects[index] = ProjectModel.fromEntity(
+          projects[index].copyWith(priority: i),
+        );
+        await _changeRecorder?.recordChange(
+          entity: 'projects',
+          op: SyncChangeOp.update,
+          id: projects[index].id,
+          payload: projects[index].toJson(),
+        );
+      }
     }
     await _localDataSource.saveProjects(projects);
   }
@@ -219,7 +243,9 @@ class PlanningRepository {
       final id = orderedIds[i];
       final index = projects.indexWhere((p) => p.id == id);
       if (index != -1) {
-        projects[index] = ProjectModel.fromEntity(projects[index].copyWith(priority: i));
+        projects[index] = ProjectModel.fromEntity(
+          projects[index].copyWith(priority: i),
+        );
         await _changeRecorder?.recordChange(
           entity: 'projects',
           op: SyncChangeOp.update,
@@ -237,21 +263,20 @@ class PlanningRepository {
     final projects = _localDataSource.getProjects();
     final project = projects.firstWhere((p) => p.id == projectId);
     final allActivities = _localDataSource.getActivities();
-    final projectActivities =
-        allActivities.where((a) => a.projectId == projectId).toList();
+    final projectActivities = allActivities
+        .where((a) => a.projectId == projectId)
+        .toList();
     final allTransactions = _transactionsReader.getAllTransactions();
-    final projectTransactions =
-        allTransactions.where((t) => t.projectId == projectId).toList();
+    final projectTransactions = allTransactions
+        .where((t) => t.projectId == projectId)
+        .toList();
     final allCategories = _localDataSource.getCategories();
-    // Funding is based on account deposits only.
+    // Funding is based on currently available account liquidity only.
 
     // Project-level details
     final projectLevelTransactions = projectTransactions
         .where((t) => t.activityId == null)
         .toList();
-    final projectLevelSpent = projectLevelTransactions
-        .where((t) => t.type == TransactionType.expense)
-        .fold(0.0, (sum, t) => sum + t.amount);
     final projectCategories = allCategories
         .where((c) => c.projectId == projectId && c.activityId == null)
         .toList();
@@ -262,9 +287,10 @@ class PlanningRepository {
     final totalDeposited = projectTransactions
         .where((t) => t.type == TransactionType.deposit)
         .fold(0.0, (sum, t) => sum + t.amount);
-    final totalBudget =
-        project.globalBudget ??
-        projectActivities.fold<double>(0.0, (sum, a) => sum + (a.budget ?? 0));
+    final totalBudget = _calculateProjectBudget(
+      project: project,
+      projectActivities: projectActivities,
+    );
 
     final myFundedAmount = _calculateFundedAmountForProject(
       project: project,
@@ -273,17 +299,17 @@ class PlanningRepository {
       allTransactions: allTransactions,
     );
 
-    final availableFundingForActivities =
-        (myFundedAmount - projectLevelSpent).clamp(0.0, myFundedAmount);
     final activityFunding = _allocateFundingSequentially(
       activities: projectActivities,
-      fundedAmount: availableFundingForActivities,
+      fundedAmount: myFundedAmount,
+      transactions: projectTransactions,
     );
 
     // Map activity summaries
     final activitySummaries = projectActivities.map((activity) {
-      final activityTransactions =
-          projectTransactions.where((t) => t.activityId == activity.id).toList();
+      final activityTransactions = projectTransactions
+          .where((t) => t.activityId == activity.id)
+          .toList();
       final spent = activityTransactions
           .where((t) => t.type == TransactionType.expense)
           .fold(0.0, (sum, t) => sum + t.amount);
@@ -303,8 +329,17 @@ class PlanningRepository {
         transactionCount: activityTransactions.length,
       );
     }).toList();
-    
-    final remainingToFund = totalBudget > 0 ? (totalBudget - myFundedAmount) : 0.0;
+
+    final remainingProjectNeed = _calculateRemainingProjectNeed(
+      totalBudget: totalBudget,
+      totalSpent: totalSpent,
+    );
+    final remainingToFund = remainingProjectNeed > 0
+        ? (remainingProjectNeed - myFundedAmount).clamp(
+            0.0,
+            remainingProjectNeed,
+          )
+        : 0.0;
 
     return ProjectDetail(
       project: project,
@@ -330,8 +365,9 @@ class PlanningRepository {
     );
 
     final activities = _localDataSource.getActivities();
-    final removedActivities =
-        activities.where((a) => a.projectId == projectId).toList();
+    final removedActivities = activities
+        .where((a) => a.projectId == projectId)
+        .toList();
     activities.removeWhere((a) => a.projectId == projectId);
     await _localDataSource.saveActivities(activities);
     for (final activity in removedActivities) {
@@ -343,8 +379,9 @@ class PlanningRepository {
     }
 
     final categories = _localDataSource.getCategories();
-    final removedCategories =
-        categories.where((c) => c.projectId == projectId).toList();
+    final removedCategories = categories
+        .where((c) => c.projectId == projectId)
+        .toList();
     categories.removeWhere((c) => c.projectId == projectId);
     await _localDataSource.saveCategories(categories);
     for (final category in removedCategories) {
@@ -354,7 +391,6 @@ class PlanningRepository {
         id: category.id,
       );
     }
-
   }
 
   // ── Activities ────────────────────────────────────────────
@@ -376,8 +412,9 @@ class PlanningRepository {
     final projects = _localDataSource.getProjects();
     final project = projects.firstWhere((p) => p.id == projectId);
     final allTransactions = _transactionsReader.getAllTransactions();
-    final transactions =
-        allTransactions.where((t) => t.activityId == activityId).toList();
+    final transactions = allTransactions
+        .where((t) => t.activityId == activityId)
+        .toList();
     final categories = getAvailableOperationalTasks(projectId, activityId);
 
     final spent = transactions
@@ -387,25 +424,22 @@ class PlanningRepository {
         .where((t) => t.type == TransactionType.deposit)
         .fold(0.0, (sum, t) => sum + t.amount);
 
-    // Funding is based on account deposits only.
-    final projectActivities =
-        activities.where((a) => a.projectId == projectId).toList();
-    final projectLevelSpent = allTransactions
-        .where((t) => t.projectId == projectId && t.activityId == null)
-        .where((t) => t.type == TransactionType.expense)
-        .fold(0.0, (sum, t) => sum + t.amount);
+    // Funding is based on currently available account liquidity only.
+    final projectActivities = activities
+        .where((a) => a.projectId == projectId)
+        .toList();
     final projectFundedAmount = _calculateFundedAmountForProject(
       project: project,
       projects: projects,
       allActivities: activities,
       allTransactions: allTransactions,
     );
-    final availableFundingForActivities =
-        (projectFundedAmount - projectLevelSpent)
-            .clamp(0.0, projectFundedAmount);
     final activityFunding = _allocateFundingSequentially(
       activities: projectActivities,
-      fundedAmount: availableFundingForActivities,
+      fundedAmount: projectFundedAmount,
+      transactions: allTransactions
+          .where((t) => t.projectId == projectId)
+          .toList(),
     );
 
     final activitySummary = ActivitySummary(
@@ -433,21 +467,37 @@ class PlanningRepository {
     required List<Activity> allActivities,
     required List<Transaction> allTransactions,
   }) {
-    double totalLiquidity =
-        _calculateTotalFundingFromAccountDeposits(allTransactions);
-    final sortedProjects =
-        List.of(projects)..sort((a, b) => a.priority.compareTo(b.priority));
+    double totalLiquidity = _calculateAvailableLiquidityFromAccounts(
+      allTransactions,
+    );
+    final sortedProjects = List.of(projects)
+      ..sort((a, b) => a.priority.compareTo(b.priority));
 
     double fundedAmount = 0.0;
     for (final p in sortedProjects) {
-      final pActivities =
-          allActivities.where((a) => a.projectId == p.id).toList();
-      final pBudget = p.globalBudget ??
-          pActivities.fold<double>(0.0, (sum, a) => sum + (a.budget ?? 0));
+      final pActivities = allActivities
+          .where((a) => a.projectId == p.id)
+          .toList();
+      final pTransactions = allTransactions
+          .where((t) => t.projectId == p.id)
+          .toList();
+      final pBudget = _calculateProjectBudget(
+        project: p,
+        projectActivities: pActivities,
+      );
+      final pSpent = pTransactions
+          .where((t) => t.type == TransactionType.expense)
+          .fold(0.0, (sum, t) => sum + t.amount);
+      final pRemainingNeed = _calculateRemainingProjectNeed(
+        totalBudget: pBudget,
+        totalSpent: pSpent,
+      );
 
       double pFundedAmount = 0.0;
-      if (pBudget > 0) {
-        pFundedAmount = pBudget < totalLiquidity ? pBudget : totalLiquidity;
+      if (pRemainingNeed > 0) {
+        pFundedAmount = pRemainingNeed < totalLiquidity
+            ? pRemainingNeed
+            : totalLiquidity;
         if (pFundedAmount < 0) pFundedAmount = 0;
         totalLiquidity -= pFundedAmount;
       }
@@ -461,21 +511,20 @@ class PlanningRepository {
     return fundedAmount;
   }
 
-  double _calculateTotalFundingFromAccountDeposits(
+  double _calculateAvailableLiquidityFromAccounts(
     List<Transaction> transactions,
   ) {
-    return transactions
-        .where(
-          (t) =>
-              t.projectId == systemAccountProjectId &&
-              t.type == TransactionType.deposit,
-        )
-        .fold(0.0, (sum, t) => sum + t.amount);
+    return transactions.fold(
+      0.0,
+      (sum, t) =>
+          sum + (t.type == TransactionType.deposit ? t.amount : -t.amount),
+    );
   }
 
   Map<String, double> _allocateFundingSequentially({
     required List<Activity> activities,
     required double fundedAmount,
+    required List<Transaction> transactions,
   }) {
     final remaining = fundedAmount < 0 ? 0.0 : fundedAmount;
     final allocations = <String, double>{};
@@ -486,16 +535,40 @@ class PlanningRepository {
 
     for (final activity in sorted) {
       final budget = activity.budget ?? 0.0;
-      if (budget <= 0 || balance <= 0) {
+      final spent = transactions
+          .where((t) => t.activityId == activity.id)
+          .where((t) => t.type == TransactionType.expense)
+          .fold(0.0, (sum, t) => sum + t.amount);
+      final remainingNeed = _calculateRemainingProjectNeed(
+        totalBudget: budget,
+        totalSpent: spent,
+      );
+      if (remainingNeed <= 0 || balance <= 0) {
         allocations[activity.id] = 0.0;
         continue;
       }
-      final allocated = balance < budget ? balance : budget;
+      final allocated = balance < remainingNeed ? balance : remainingNeed;
       allocations[activity.id] = allocated;
       balance -= allocated;
     }
 
     return allocations;
+  }
+
+  double _calculateProjectBudget({
+    required Project project,
+    required List<Activity> projectActivities,
+  }) {
+    return project.globalBudget ??
+        projectActivities.fold<double>(0.0, (sum, a) => sum + (a.budget ?? 0));
+  }
+
+  double _calculateRemainingProjectNeed({
+    required double totalBudget,
+    required double totalSpent,
+  }) {
+    if (totalBudget <= 0) return 0.0;
+    return (totalBudget - totalSpent).clamp(0.0, totalBudget);
   }
 
   Future<void> addActivity(Activity activity) async {
@@ -537,8 +610,9 @@ class PlanningRepository {
     );
 
     final categories = _localDataSource.getCategories();
-    final removedCategories =
-        categories.where((c) => c.activityId == activityId).toList();
+    final removedCategories = categories
+        .where((c) => c.activityId == activityId)
+        .toList();
     categories.removeWhere((c) => c.activityId == activityId);
     await _localDataSource.saveCategories(categories);
     for (final category in removedCategories) {
@@ -548,7 +622,6 @@ class PlanningRepository {
         id: category.id,
       );
     }
-
   }
 
   // ── Categories ────────────────────────────────────────────
@@ -577,9 +650,11 @@ class PlanningRepository {
   ) {
     return _localDataSource
         .getCategories()
-        .where((c) =>
-            c.activityId == activityId ||
-            (c.projectId == projectId && c.activityId == null))
+        .where(
+          (c) =>
+              c.activityId == activityId ||
+              (c.projectId == projectId && c.activityId == null),
+        )
         .toList();
   }
 
@@ -621,5 +696,4 @@ class PlanningRepository {
       id: taskId,
     );
   }
-
 }

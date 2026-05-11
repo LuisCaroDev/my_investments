@@ -4,7 +4,6 @@ import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
 import 'package:go_router/go_router.dart';
 import 'package:my_investments/auth/presentation/pages/login_page.dart';
-import 'package:my_investments/auth/presentation/pages/home_gate.dart';
 import 'package:my_investments/core/router/app_router.dart';
 import 'package:my_investments/l10n/app_localizations.dart';
 
@@ -96,9 +95,7 @@ class WelcomePage extends StatelessWidget {
                     // Buttons
                     PrimaryButton(
                       onPressed: () {
-                        context.push(
-                          '${LoginPage.route}?fromSettings=false',
-                        );
+                        context.push('${LoginPage.route}?fromSettings=false');
                       },
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -161,9 +158,7 @@ class WelcomePage extends StatelessWidget {
               const Gap(4),
               Text(
                 description,
-                style: TextStyle(
-                  color: theme.colorScheme.mutedForeground,
-                ),
+                style: TextStyle(color: theme.colorScheme.mutedForeground),
               ).small,
             ],
           ),

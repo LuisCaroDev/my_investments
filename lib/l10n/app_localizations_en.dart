@@ -520,7 +520,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get widget_budget_progress_spent => 'Spent:';
 
   @override
-  String get widget_budget_progress_funded => 'Funded:';
+  String get widget_budget_progress_funded => 'Allocated:';
 
   @override
   String get widget_budget_progress_remaining => 'Remaining to Fund:';
