@@ -5,7 +5,7 @@ import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
-import 'package:my_investments/planning/data/repositories/planning_repository.dart';
+import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
 import 'package:my_investments/core/domain/entities/financial_account.dart';
 import 'package:my_investments/core/domain/entities/transaction.dart';
 import 'package:my_investments/accounts/presentation/bloc/accounts_cubit.dart';
@@ -51,11 +51,11 @@ class TransactionListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accountsRepo = context.read<AccountsRepository>();
-    final planningRepo = context.read<PlanningRepository>();
+    final operationalTaskRepository = context.read<OperationalTaskRepository>();
     return BlocProvider(
       create: (_) => TransactionListCubit(
         accountsRepository: accountsRepo,
-        planningRepository: planningRepo,
+        operationalTaskRepository: operationalTaskRepository,
         projectId: projectId,
         activityId: activityId,
       )..load(),

@@ -10,8 +10,10 @@ import 'package:my_investments/planning/presentation/pages/activity_detail_page.
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/core/widgets/stat_card.dart';
-import 'package:my_investments/planning/data/repositories/planning_repository.dart';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
+import 'package:my_investments/planning/data/repositories/activity_repository.dart';
+import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
+import 'package:my_investments/planning/data/services/planning_detail_query_service.dart';
 import 'package:my_investments/planning/domain/entities/activity.dart';
 import 'package:my_investments/core/domain/entities/transaction.dart';
 import 'package:my_investments/planning/domain/entities/activity_summary.dart';
@@ -60,11 +62,15 @@ class ProjectDetailPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final planningRepo = context.read<PlanningRepository>();
     final accountsRepo = context.read<AccountsRepository>();
+    final detailQueryService = context.read<PlanningDetailQueryService>();
+    final activityRepository = context.read<ActivityRepository>();
+    final operationalTaskRepository = context.read<OperationalTaskRepository>();
     return BlocProvider(
       create: (_) => ProjectDetailCubit(
-        planningRepository: planningRepo,
+        detailQueryService: detailQueryService,
+        activityRepository: activityRepository,
+        operationalTaskRepository: operationalTaskRepository,
         accountsRepository: accountsRepo,
         projectId: projectId,
       )..load(),

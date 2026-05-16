@@ -3,7 +3,7 @@ import 'package:my_investments/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'package:my_investments/core/widgets/app_back_button.dart';
-import 'package:my_investments/planning/data/repositories/planning_repository.dart';
+import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
 import 'package:my_investments/planning/domain/entities/operational_task.dart'
     as domain;
 import 'package:my_investments/planning/presentation/bloc/operational_task_management_cubit.dart';
@@ -40,10 +40,10 @@ class OperationalTaskManagementPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final planningRepo = context.read<PlanningRepository>();
+    final operationalTaskRepository = context.read<OperationalTaskRepository>();
     return BlocProvider(
       create: (_) => OperationalTaskManagementCubit(
-        repository: planningRepo,
+        repository: operationalTaskRepository,
         projectId: projectId,
         activityId: activityId,
       )..load(),
@@ -59,15 +59,15 @@ class _OperationalTaskManagementView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<OperationalTaskManagementCubit,
-        OperationalTaskManagementState>(
+    return BlocBuilder<
+      OperationalTaskManagementCubit,
+      OperationalTaskManagementState
+    >(
       builder: (context, state) {
         return Scaffold(
           headers: [
             AppBar(
-              leading: [
-                ...AppBackButton.render(context),
-              ],
+              leading: [...AppBackButton.render(context)],
               title: Text(title),
             ),
             Divider(height: 1),
@@ -115,8 +115,9 @@ class _OperationalTaskManagementView extends StatelessWidget {
         OperationalTaskManagementError(message: final msg) => Center(
           child: Text(l10n.common_error_msg(msg)),
         ),
-        OperationalTaskManagementLoaded() =>
-          _OperationalTaskManagementContent(state: state),
+        OperationalTaskManagementLoaded() => _OperationalTaskManagementContent(
+          state: state,
+        ),
       },
     );
   }
@@ -212,6 +213,8 @@ class _OperationalTaskManagementContent extends StatelessWidget {
   }
 
   void _deleteCategory(BuildContext context, domain.OperationalTask task) {
-    context.read<OperationalTaskManagementCubit>().deleteOperationalTask(task.id);
+    context.read<OperationalTaskManagementCubit>().deleteOperationalTask(
+      task.id,
+    );
   }
 }

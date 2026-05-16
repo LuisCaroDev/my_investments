@@ -2,21 +2,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
 import 'package:my_investments/core/domain/entities/transaction.dart';
 import 'package:my_investments/accounts/presentation/bloc/transaction_list_state.dart';
-import 'package:my_investments/planning/data/repositories/planning_repository.dart';
+import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
 
 class TransactionListCubit extends Cubit<TransactionListState> {
   final AccountsRepository _accountsRepository;
-  final PlanningRepository _planningRepository;
+  final OperationalTaskRepository _operationalTaskRepository;
   final String projectId;
   final String? activityId;
 
   TransactionListCubit({
     required AccountsRepository accountsRepository,
-    required PlanningRepository planningRepository,
+    required OperationalTaskRepository operationalTaskRepository,
     required this.projectId,
     this.activityId,
   }) : _accountsRepository = accountsRepository,
-       _planningRepository = planningRepository,
+       _operationalTaskRepository = operationalTaskRepository,
        super(const TransactionListLoading());
 
   void load() {
@@ -25,11 +25,11 @@ class TransactionListCubit extends Cubit<TransactionListState> {
           ? _accountsRepository.getTransactionsForActivity(activityId!)
           : _accountsRepository.getProjectLevelTransactions(projectId);
       final operationalTasks = activityId != null
-          ? _planningRepository.getAvailableOperationalTasks(
+          ? _operationalTaskRepository.getAvailableOperationalTasks(
               projectId,
               activityId!,
             )
-          : _planningRepository.getProjectOperationalTasks(projectId);
+          : _operationalTaskRepository.getProjectOperationalTasks(projectId);
 
       emit(
         TransactionListLoaded(

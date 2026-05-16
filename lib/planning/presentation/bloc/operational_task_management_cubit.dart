@@ -1,16 +1,16 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_investments/planning/data/repositories/planning_repository.dart';
+import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
 import 'package:my_investments/planning/domain/entities/operational_task.dart';
 import 'package:my_investments/planning/presentation/bloc/operational_task_management_state.dart';
 
 class OperationalTaskManagementCubit
     extends Cubit<OperationalTaskManagementState> {
-  final PlanningRepository _repository;
+  final OperationalTaskRepository _repository;
   final String projectId;
   final String? activityId;
 
   OperationalTaskManagementCubit({
-    required PlanningRepository repository,
+    required OperationalTaskRepository repository,
     required this.projectId,
     this.activityId,
   }) : _repository = repository,
@@ -18,8 +18,9 @@ class OperationalTaskManagementCubit
 
   void load() {
     try {
-      final projectOperationalTasks =
-          _repository.getProjectOperationalTasks(projectId);
+      final projectOperationalTasks = _repository.getProjectOperationalTasks(
+        projectId,
+      );
       final activityOperationalTasks = activityId != null
           ? _repository.getActivityOperationalTasks(activityId!)
           : <OperationalTask>[];

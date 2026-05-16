@@ -5,7 +5,7 @@ import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/core/constants/ledger.dart';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
-import 'package:my_investments/planning/data/repositories/planning_repository.dart';
+import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
 import 'package:my_investments/core/domain/entities/financial_account.dart';
 import 'package:my_investments/core/domain/entities/transaction.dart';
 import 'package:my_investments/planning/domain/entities/operational_task.dart'
@@ -43,11 +43,11 @@ class _AccountTransactionsPageState extends State<AccountTransactionsPage> {
     }
 
     final accountsRepository = context.read<AccountsRepository>();
-    final planningRepository = context.read<PlanningRepository>();
+    final operationalTaskRepository = context.read<OperationalTaskRepository>();
     final transactions = accountsRepository.getTransactionsForAccount(
       account.id,
     );
-    final operationalTasks = planningRepository.getAllOperationalTasks();
+    final operationalTasks = operationalTaskRepository.getAllOperationalTasks();
 
     return _AccountTransactionsView(
       account: account,

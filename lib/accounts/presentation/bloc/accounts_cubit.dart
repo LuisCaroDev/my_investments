@@ -2,17 +2,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
 import 'package:my_investments/core/domain/entities/financial_account.dart';
 import 'package:my_investments/accounts/presentation/bloc/accounts_state.dart';
-import 'package:my_investments/planning/data/repositories/planning_repository.dart';
+import 'package:my_investments/planning/data/repositories/project_repository.dart';
 
 class AccountsCubit extends Cubit<AccountsState> {
   final AccountsRepository _repository;
-  final PlanningRepository _planningRepository;
+  final ProjectRepository _projectRepository;
 
   AccountsCubit({
     required AccountsRepository repository,
-    required PlanningRepository planningRepository,
+    required ProjectRepository projectRepository,
   }) : _repository = repository,
-       _planningRepository = planningRepository,
+       _projectRepository = projectRepository,
        super(const AccountsInitial());
 
   void loadAccounts() {
@@ -54,6 +54,6 @@ class AccountsCubit extends Cubit<AccountsState> {
   }
 
   Future<void> reorderProjectPriorities(List<String> orderedIds) async {
-    await _planningRepository.reorderProjects(orderedIds);
+    await _projectRepository.reorderProjects(orderedIds);
   }
 }
