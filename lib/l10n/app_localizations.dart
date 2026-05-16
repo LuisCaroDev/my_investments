@@ -242,6 +242,30 @@ abstract class AppLocalizations {
   /// **'Balance Neto'**
   String get projects_summary_net_balance;
 
+  /// No description provided for @goals_summary_saved.
+  ///
+  /// In es, this message translates to:
+  /// **'Ahorrado'**
+  String get goals_summary_saved;
+
+  /// No description provided for @goals_summary_spent.
+  ///
+  /// In es, this message translates to:
+  /// **'Gastado'**
+  String get goals_summary_spent;
+
+  /// No description provided for @goals_summary_target.
+  ///
+  /// In es, this message translates to:
+  /// **'Objetivo'**
+  String get goals_summary_target;
+
+  /// No description provided for @goals_summary_missing.
+  ///
+  /// In es, this message translates to:
+  /// **'Falta'**
+  String get goals_summary_missing;
+
   /// No description provided for @projects_list_title.
   ///
   /// In es, this message translates to:
@@ -295,6 +319,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Presupuesto'**
   String get project_detail_summary_budget;
+
+  /// No description provided for @goal_detail_summary_saved.
+  ///
+  /// In es, this message translates to:
+  /// **'Ahorrado'**
+  String get goal_detail_summary_saved;
+
+  /// No description provided for @goal_detail_summary_spent.
+  ///
+  /// In es, this message translates to:
+  /// **'Gastado'**
+  String get goal_detail_summary_spent;
+
+  /// No description provided for @goal_detail_summary_target.
+  ///
+  /// In es, this message translates to:
+  /// **'Objetivo'**
+  String get goal_detail_summary_target;
+
+  /// No description provided for @goal_detail_summary_missing.
+  ///
+  /// In es, this message translates to:
+  /// **'Falta'**
+  String get goal_detail_summary_missing;
 
   /// No description provided for @project_detail_categories_title.
   ///
@@ -1081,6 +1129,30 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Por Financiar:'**
   String get widget_budget_progress_remaining;
+
+  /// No description provided for @widget_goal_progress_target.
+  ///
+  /// In es, this message translates to:
+  /// **'Objetivo:'**
+  String get widget_goal_progress_target;
+
+  /// No description provided for @widget_goal_progress_saved.
+  ///
+  /// In es, this message translates to:
+  /// **'Ahorrado:'**
+  String get widget_goal_progress_saved;
+
+  /// No description provided for @widget_goal_progress_spent.
+  ///
+  /// In es, this message translates to:
+  /// **'Gastado:'**
+  String get widget_goal_progress_spent;
+
+  /// No description provided for @widget_goal_progress_missing.
+  ///
+  /// In es, this message translates to:
+  /// **'Falta:'**
+  String get widget_goal_progress_missing;
 
   /// No description provided for @widget_tx_tile_project_label.
   ///

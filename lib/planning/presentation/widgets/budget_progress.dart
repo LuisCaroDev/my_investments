@@ -6,6 +6,11 @@ class BudgetProgress extends StatelessWidget {
   final double fundedAmount;
   final double spent;
   final String Function(num) formatCurrency;
+  final String? budgetLabel;
+  final String? fundedLabel;
+  final String? spentLabel;
+  final String? remainingLabel;
+  final bool alwaysShowRemaining;
 
   const BudgetProgress({
     super.key,
@@ -13,6 +18,11 @@ class BudgetProgress extends StatelessWidget {
     required this.fundedAmount,
     required this.spent,
     required this.formatCurrency,
+    this.budgetLabel,
+    this.fundedLabel,
+    this.spentLabel,
+    this.remainingLabel,
+    this.alwaysShowRemaining = false,
   });
 
   @override
@@ -43,15 +53,20 @@ class BudgetProgress extends StatelessWidget {
     final allocatedProgress = budget > 0
         ? (displayedAllocatedAmount / budget).clamp(0.0, 1.0)
         : 0.0;
+    final resolvedBudgetLabel =
+        budgetLabel ?? l10n.widget_budget_progress_budget;
+    final resolvedSpentLabel = spentLabel ?? l10n.widget_budget_progress_spent;
+    final resolvedFundedLabel =
+        fundedLabel ?? l10n.widget_budget_progress_funded;
+    final resolvedRemainingLabel =
+        remainingLabel ?? l10n.widget_budget_progress_remaining;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              '${l10n.widget_budget_progress_budget} ${formatCurrency(budget)}',
-            ).muted.small,
+            Text('$resolvedBudgetLabel ${formatCurrency(budget)}').muted.small,
             Text('${(coveredProgress * 100).toStringAsFixed(0)}%').muted.small,
           ],
         ),
@@ -64,9 +79,7 @@ class BudgetProgress extends StatelessWidget {
               children: [
                 // Background
                 Container(
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.muted,
-                  ),
+                  decoration: BoxDecoration(color: theme.colorScheme.muted),
                 ),
                 FractionallySizedBox(
                   widthFactor: coveredProgress,
@@ -81,9 +94,7 @@ class BudgetProgress extends StatelessWidget {
                 FractionallySizedBox(
                   widthFactor: spentProgress,
                   child: Container(
-                    decoration: BoxDecoration(
-                      color: theme.colorScheme.primary,
-                    ),
+                    decoration: BoxDecoration(color: theme.colorScheme.primary),
                   ),
                 ),
                 if (allocatedProgress > 0)
@@ -113,14 +124,14 @@ class BudgetProgress extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '${l10n.widget_budget_progress_spent} ${formatCurrency(spentAmount)}',
+              '$resolvedSpentLabel ${formatCurrency(spentAmount)}',
             ).small(color: theme.colorScheme.destructive),
             Text(
-              '${l10n.widget_budget_progress_funded} ${formatCurrency(allocatedAmount)}',
+              '$resolvedFundedLabel ${formatCurrency(allocatedAmount)}',
             ).small(color: theme.colorScheme.cardForeground),
-            if (budget > 0)
+            if (budget > 0 || alwaysShowRemaining)
               Text(
-                '${l10n.widget_budget_progress_remaining} ${formatCurrency(remainingAmount)}',
+                '$resolvedRemainingLabel ${formatCurrency(remainingAmount)}',
               ).muted.small,
           ],
         ),

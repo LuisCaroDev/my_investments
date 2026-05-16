@@ -9,12 +9,12 @@ import 'package:my_investments/accounts/presentation/pages/transaction_list_page
 import 'package:my_investments/planning/presentation/pages/activity_detail_page.dart';
 import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/core/widgets/app_back_button.dart';
-import 'package:my_investments/core/widgets/stat_card.dart';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
 import 'package:my_investments/planning/data/repositories/activity_repository.dart';
 import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
 import 'package:my_investments/planning/data/services/planning_detail_query_service.dart';
 import 'package:my_investments/planning/domain/entities/activity.dart';
+import 'package:my_investments/planning/domain/entities/project.dart';
 import 'package:my_investments/core/domain/entities/transaction.dart';
 import 'package:my_investments/planning/domain/entities/activity_summary.dart';
 import 'package:my_investments/core/domain/entities/financial_account.dart';
@@ -27,6 +27,8 @@ import 'package:my_investments/planning/presentation/bloc/investments_cubit.dart
 import 'package:my_investments/planning/presentation/widgets/add_activity_dialog.dart';
 import 'package:my_investments/accounts/presentation/widgets/add_transaction_dialog.dart';
 import 'package:my_investments/planning/presentation/widgets/budget_progress.dart';
+import 'package:my_investments/planning/presentation/widgets/project_metrics_section.dart';
+import 'package:my_investments/planning/presentation/widgets/preview_section.dart';
 import 'package:my_investments/planning/presentation/widgets/section_header.dart';
 import 'package:my_investments/accounts/presentation/widgets/transaction_tile.dart';
 import 'package:my_investments/planning/presentation/widgets/operational_task_tile.dart';
@@ -201,138 +203,53 @@ class _ProjectDetailContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const Gap(8),
-          // ── Budget Summary ───────────────────
-          LayoutBuilder(
-            builder: (context, constraints) {
-              const spacing = 12.0;
-              const minCardWidth = 200.0;
-              int columns = (constraints.maxWidth / minCardWidth).floor();
-              if (columns < 2) columns = 2;
-              final cardWidth =
-                  (constraints.maxWidth - (spacing * (columns - 1))) / columns;
-
-              return Wrap(
-                spacing: spacing,
-                runSpacing: spacing,
-                children: [
-                  SizedBox(
-                    width: cardWidth,
-                    child: StatCard(
-                      label: l10n.project_detail_summary_deposited,
-                      value: state.detail.totalDeposited.toCompactCurrency(
-                        context,
-                      ),
-                      icon: RadixIcons.arrowUp,
-                      valueColor: theme.colorScheme.primary,
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: StatCard(
-                      label: l10n.project_detail_summary_spent,
-                      value: state.detail.totalSpent.toCompactCurrency(context),
-                      icon: RadixIcons.arrowDown,
-                      valueColor: theme.colorScheme.destructive,
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: StatCard(
-                      label: l10n.project_detail_summary_net_balance,
-                      value: state.detail.netBalance.toCompactCurrency(context),
-                      icon: RadixIcons.barChart,
-                      valueColor: state.detail.netBalance < 0
-                          ? theme.colorScheme.destructive
-                          : theme.colorScheme.primary,
-                    ),
-                  ),
-                  if (state.detail.totalBudget > 0)
-                    SizedBox(
-                      width: cardWidth,
-                      child: StatCard(
-                        label: l10n.project_detail_summary_budget,
-                        value: state.detail.totalBudget.toCompactCurrency(
-                          context,
-                        ),
-                        icon: RadixIcons.target,
-                      ),
-                    ),
-                ],
-              );
-            },
-          ),
-
-          if (state.detail.totalBudget > 0) ...[
-            const Gap(16),
-            Card(
-              padding: const EdgeInsets.all(16),
-              child: BudgetProgress(
-                budget: state.detail.totalBudget,
-                fundedAmount: state.detail.fundedAmount,
-                spent: state.detail.totalSpent,
-                formatCurrency: (v) => v.toCompactCurrency(context),
-              ),
-            ),
-          ],
+          if (state.detail.project.type == ProjectType.savingsGoal)
+            GoalMetricsSection(detail: state.detail)
+          else
+            InvestmentMetricsSection(detail: state.detail),
 
           // ── Categories ───────────────────────
           const Gap(24),
-          SectionHeader(
+          PreviewSection(
             title: l10n.project_detail_categories_title,
+            items: state.detail.projectCategories,
             actionLabel: l10n.project_detail_transactions_see_more,
             onAction: () => _openCategoryManagement(context),
+            previewCount: 3,
+            spacing: 8,
+            emptyIcon: RadixIcons.bookmark,
+            emptyTitle: l10n.category_mgmt_empty,
+            emptySubtitle: l10n.project_detail_transactions_empty_info,
+            itemBuilder: (_, cat) => OperationalTaskTile(task: cat),
           ),
-          if (state.detail.projectCategories.isNotEmpty) ...[
-            const Gap(8),
-            ...state.detail.projectCategories
-                .take(3)
-                .map((cat) => OperationalTaskTile(task: cat)),
-          ] else ...[
-            const Gap(12),
-            EmptyState(
-              icon: RadixIcons.bookmark,
-              title: l10n.category_mgmt_empty,
-              subtitle: l10n
-                  .project_detail_transactions_empty_info, // Temporary subtitle
-            ),
-          ],
 
           // ── Project-Level Transactions ───────
           const Gap(24),
-          SectionHeader(
+          PreviewSection(
             title: l10n.project_detail_transactions_title,
+            items: state.detail.projectLevelTransactions,
             actionLabel: l10n.project_detail_transactions_see_more,
             onAction: () => _openTransactionList(context),
-          ),
-          if (state.detail.projectLevelTransactions.isEmpty)
-            EmptyState(
-              icon: RadixIcons.cardStack,
-              title: l10n.project_detail_transactions_empty,
-              subtitle: l10n.project_detail_transactions_empty_info,
-            )
-          else
-            Column(
-              spacing: 8,
-              children: [
-                ..._latestTransactions(
-                  state.detail.projectLevelTransactions,
-                ).map(
-                  (t) => TransactionTile(
-                    transaction: t,
-                    operationalTasks: state.detail.projectCategories,
-                    onEdit: () => _editTransaction(context, t),
-                    onDelete: () async {
-                      await context
-                          .read<ProjectDetailCubit>()
-                          .deleteTransaction(t.id);
-                      if (context.mounted) {
-                        _refreshPlanningSummaries(context);
-                      }
-                    },
-                  ),
-                ),
-              ],
+            previewCount: 3,
+            spacing: 8,
+            emptyIcon: RadixIcons.cardStack,
+            emptyTitle: l10n.project_detail_transactions_empty,
+            emptySubtitle: l10n.project_detail_transactions_empty_info,
+            transformItems: _latestTransactions,
+            itemBuilder: (_, t) => TransactionTile(
+              transaction: t,
+              operationalTasks: state.detail.projectCategories,
+              onEdit: () => _editTransaction(context, t),
+              onDelete: () async {
+                await context.read<ProjectDetailCubit>().deleteTransaction(
+                  t.id,
+                );
+                if (context.mounted) {
+                  _refreshPlanningSummaries(context);
+                }
+              },
             ),
+          ),
 
           // ── Activities ───────────────────────
           const Gap(24),

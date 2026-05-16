@@ -26,7 +26,7 @@ class SectionHeader extends StatelessWidget {
             if (actionLabel != null && onAction != null)
               GhostButton(
                 onPressed: onAction,
-                size: ButtonSize.small,
+                size: ButtonSize.normal,
                 child: Text(actionLabel!),
               ),
             if (trailing != null) ...[

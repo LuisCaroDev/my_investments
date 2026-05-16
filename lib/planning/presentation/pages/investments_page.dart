@@ -200,14 +200,27 @@ class _ProjectsList extends StatelessWidget {
           // ── Projects Grid ────────────────────
           Text(l10n.projects_list_title).large.bold,
           const Gap(12),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: summaries
-                .map(
-                  (s) => SizedBox(width: 340, child: _ProjectCard(summary: s)),
-                )
-                .toList(),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const spacing = 16.0;
+              const minCardWidth = 300.0;
+              int columns = (constraints.maxWidth / minCardWidth).floor();
+              final cardWidth =
+                  (constraints.maxWidth - (spacing * (columns - 1))) / columns;
+
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: summaries
+                    .map(
+                      (s) => SizedBox(
+                        width: cardWidth,
+                        child: _ProjectCard(summary: s),
+                      ),
+                    )
+                    .toList(),
+              );
+            },
           ),
         ],
       ),

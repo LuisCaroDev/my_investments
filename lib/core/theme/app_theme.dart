@@ -4,16 +4,16 @@ class AppTheme {
   static ThemeData light() {
     return ThemeData(
       colorScheme: ColorSchemes.lightSlate.emerald,
-      radius: 0.75,
-      scaling: 1,
+      radius: 0.6,
+      scaling: .8,
     );
   }
 
   static ThemeData dark() {
     return ThemeData(
       colorScheme: ColorSchemes.darkSlate.emerald,
-      radius: 0.75,
-      scaling: 1,
+      radius: .6,
+      scaling: .8,
     );
   }
 }

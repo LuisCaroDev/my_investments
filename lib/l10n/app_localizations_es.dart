@@ -84,6 +84,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get projects_summary_net_balance => 'Balance Neto';
 
   @override
+  String get goals_summary_saved => 'Ahorrado';
+
+  @override
+  String get goals_summary_spent => 'Gastado';
+
+  @override
+  String get goals_summary_target => 'Objetivo';
+
+  @override
+  String get goals_summary_missing => 'Falta';
+
+  @override
   String get projects_list_title => 'Proyectos';
 
   @override
@@ -112,6 +124,18 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get project_detail_summary_budget => 'Presupuesto';
+
+  @override
+  String get goal_detail_summary_saved => 'Ahorrado';
+
+  @override
+  String get goal_detail_summary_spent => 'Gastado';
+
+  @override
+  String get goal_detail_summary_target => 'Objetivo';
+
+  @override
+  String get goal_detail_summary_missing => 'Falta';
 
   @override
   String get project_detail_categories_title => 'Tareas';
@@ -528,6 +552,18 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get widget_budget_progress_remaining => 'Por Financiar:';
+
+  @override
+  String get widget_goal_progress_target => 'Objetivo:';
+
+  @override
+  String get widget_goal_progress_saved => 'Ahorrado:';
+
+  @override
+  String get widget_goal_progress_spent => 'Gastado:';
+
+  @override
+  String get widget_goal_progress_missing => 'Falta:';
 
   @override
   String get widget_tx_tile_project_label => '(proyecto)';

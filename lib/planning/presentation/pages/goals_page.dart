@@ -101,18 +101,16 @@ class _ProjectsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    // Calculate portfolio totals
     final totalBudget = summaries.fold(0.0, (sum, s) => sum + s.totalBudget);
     final totalSpent = summaries.fold(0.0, (sum, s) => sum + s.totalSpent);
-    final totalDeposited = summaries.fold(
-      0.0,
-      (sum, s) => sum + s.totalDeposited,
-    );
     final totalFundedAmount = summaries.fold(
       0.0,
       (sum, s) => sum + s.fundedAmount,
     );
-    final totalNetBalance = summaries.fold(0.0, (sum, s) => sum + s.netBalance);
+    final totalMissing = summaries.fold(
+      0.0,
+      (sum, s) => sum + s.remainingToFund,
+    );
 
     final theme = Theme.of(context);
     return SingleChildScrollView(
@@ -143,15 +141,16 @@ class _ProjectsList extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: l10n.projects_summary_deposited,
-                      value: totalDeposited.toCompactCurrency(context),
-                      icon: RadixIcons.download,
+                      label: l10n.goals_summary_saved,
+                      value: totalFundedAmount.toCompactCurrency(context),
+                      icon: RadixIcons.archive,
+                      valueColor: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: l10n.projects_summary_spent,
+                      label: l10n.goals_summary_spent,
                       value: totalSpent.toCompactCurrency(context),
                       icon: RadixIcons.minusCircled,
                       valueColor: Theme.of(context).colorScheme.destructive,
@@ -160,7 +159,7 @@ class _ProjectsList extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: l10n.projects_summary_budget,
+                      label: l10n.goals_summary_target,
                       value: totalBudget.toCompactCurrency(context),
                       icon: RadixIcons.target,
                     ),
@@ -168,28 +167,9 @@ class _ProjectsList extends StatelessWidget {
                   SizedBox(
                     width: cardWidth,
                     child: StatCard(
-                      label: l10n.projects_summary_funded,
-                      value: totalFundedAmount.toCompactCurrency(context),
-                      icon: RadixIcons.drawingPinSolid,
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: StatCard(
-                      label: l10n.projects_summary_net_balance,
-                      value: totalNetBalance.toCompactCurrency(context),
-                      icon: RadixIcons.barChart,
-                      valueColor: totalNetBalance < 0
-                          ? Theme.of(context).colorScheme.destructive
-                          : Theme.of(context).colorScheme.primary,
-                    ),
-                  ),
-                  SizedBox(
-                    width: cardWidth,
-                    child: StatCard(
-                      label: l10n.projects_list_title,
-                      value: summaries.length.toString(),
-                      icon: RadixIcons.cube,
+                      label: l10n.goals_summary_missing,
+                      value: totalMissing.toCompactCurrency(context),
+                      icon: RadixIcons.backpack,
                     ),
                   ),
                 ],
@@ -201,14 +181,27 @@ class _ProjectsList extends StatelessWidget {
           // ── Projects Grid ────────────────────
           Text(l10n.projects_list_title).large.bold,
           const Gap(12),
-          Wrap(
-            spacing: 16,
-            runSpacing: 16,
-            children: summaries
-                .map(
-                  (s) => SizedBox(width: 340, child: _ProjectCard(summary: s)),
-                )
-                .toList(),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              const spacing = 16.0;
+              const minCardWidth = 300.0;
+              int columns = (constraints.maxWidth / minCardWidth).floor();
+              final cardWidth =
+                  (constraints.maxWidth - (spacing * (columns - 1))) / columns;
+
+              return Wrap(
+                spacing: spacing,
+                runSpacing: spacing,
+                children: summaries
+                    .map(
+                      (s) => SizedBox(
+                        width: cardWidth,
+                        child: _ProjectCard(summary: s),
+                      ),
+                    )
+                    .toList(),
+              );
+            },
           ),
         ],
       ),
@@ -285,38 +278,17 @@ class _ProjectCard extends StatelessWidget {
             ],
           ),
           const Gap(16),
-          if (summary.totalBudget > 0)
-            BudgetProgress(
-              budget: summary.totalBudget,
-              fundedAmount: summary.fundedAmount,
-              spent: summary.totalSpent,
-              formatCurrency: (v) => v.toCompactCurrency(context),
-            ),
-          if (summary.totalBudget == 0) ...[
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(l10n.projects_summary_deposited).muted.small,
-                    Text(
-                      summary.totalDeposited.toCompactCurrency(context),
-                    ).semiBold(color: theme.colorScheme.primary),
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(l10n.projects_summary_spent).muted.small,
-                    Text(
-                      summary.totalSpent.toCompactCurrency(context),
-                    ).semiBold(color: theme.colorScheme.destructive),
-                  ],
-                ),
-              ],
-            ),
-          ],
+          BudgetProgress(
+            budget: summary.totalBudget,
+            fundedAmount: summary.fundedAmount,
+            spent: summary.totalSpent,
+            formatCurrency: (v) => v.toCompactCurrency(context),
+            budgetLabel: l10n.widget_goal_progress_target,
+            fundedLabel: l10n.widget_goal_progress_saved,
+            spentLabel: l10n.widget_goal_progress_spent,
+            remainingLabel: l10n.widget_goal_progress_missing,
+            alwaysShowRemaining: true,
+          ),
         ],
       ),
     );

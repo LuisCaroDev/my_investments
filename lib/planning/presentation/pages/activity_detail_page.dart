@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import 'package:my_investments/planning/presentation/pages/operational_task_management_page.dart';
 import 'package:my_investments/accounts/presentation/pages/transaction_list_page.dart';
 import 'package:my_investments/core/widgets/app_back_button.dart';
-import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
 import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
 import 'package:my_investments/planning/data/services/planning_detail_query_service.dart';
@@ -22,7 +21,7 @@ import 'package:my_investments/planning/presentation/bloc/goals_cubit.dart';
 import 'package:my_investments/planning/presentation/bloc/investments_cubit.dart';
 import 'package:my_investments/accounts/presentation/widgets/add_transaction_dialog.dart';
 import 'package:my_investments/planning/presentation/widgets/budget_progress.dart';
-import 'package:my_investments/planning/presentation/widgets/section_header.dart';
+import 'package:my_investments/planning/presentation/widgets/preview_section.dart';
 import 'package:my_investments/accounts/presentation/widgets/transaction_tile.dart';
 import 'package:my_investments/planning/presentation/widgets/operational_task_tile.dart';
 
@@ -323,14 +322,17 @@ class _ActivityContent extends StatelessWidget {
 
           // ── Categories ───────────────────────
           const Gap(24),
-          SectionHeader(
+          PreviewSection(
             title: l10n.activity_detail_categories_title,
+            items: state.detail!.categories,
             actionLabel: l10n.activity_detail_transactions_see_more,
             onAction: () => _openCategoryManagement(context),
-          ),
-          if (state.detail!.categories.isNotEmpty) ...[
-            const Gap(8),
-            ...state.detail!.categories.take(3).map((cat) {
+            previewCount: 3,
+            spacing: 8,
+            emptyIcon: RadixIcons.bookmark,
+            emptyTitle: l10n.category_mgmt_empty,
+            emptySubtitle: l10n.activity_detail_transactions_empty_info,
+            itemBuilder: (_, cat) {
               final isActivityLevel = cat.activityId != null;
               return OperationalTaskTile(
                 task: cat,
@@ -338,52 +340,37 @@ class _ActivityContent extends StatelessWidget {
                     ? null
                     : l10n.activity_detail_category_project_label,
               );
-            }),
-          ] else ...[
-            const Gap(12),
-            EmptyState(
-              icon: RadixIcons.bookmark,
-              title: l10n.category_mgmt_empty,
-              subtitle: l10n.activity_detail_transactions_empty_info,
-            ),
-          ],
+            },
+          ),
 
           // ── Transactions ─────────────────────
           const Gap(24),
-          SectionHeader(
+          PreviewSection(
             title: l10n.activity_detail_transactions_title,
+            items: state.detail!.transactions,
             actionLabel: l10n.activity_detail_transactions_see_more,
             onAction: () => _openTransactionList(context),
-          ),
-          const Gap(12),
-
-          if (state.detail!.transactions.isEmpty)
-            EmptyState(
-              icon: RadixIcons.cardStack,
-              title: l10n.activity_detail_transactions_empty,
-              subtitle: l10n.activity_detail_transactions_empty_info,
-            )
-          else
-            Column(
-              spacing: 8,
-              children: [
-                ..._latestTransactions(state.detail!.transactions).map(
-                  (t) => TransactionTile(
-                    transaction: t,
-                    operationalTasks: state.detail!.categories,
-                    onEdit: () => _editTransaction(context, t),
-                    onDelete: () async {
-                      await context
-                          .read<ActivityDetailCubit>()
-                          .deleteTransaction(t.id);
-                      if (context.mounted) {
-                        _refreshPlanningSummaries(context);
-                      }
-                    },
-                  ),
-                ),
-              ],
+            previewCount: 3,
+            spacing: 8,
+            emptyTopSpacing: 12,
+            emptyIcon: RadixIcons.cardStack,
+            emptyTitle: l10n.activity_detail_transactions_empty,
+            emptySubtitle: l10n.activity_detail_transactions_empty_info,
+            transformItems: _latestTransactions,
+            itemBuilder: (_, t) => TransactionTile(
+              transaction: t,
+              operationalTasks: state.detail!.categories,
+              onEdit: () => _editTransaction(context, t),
+              onDelete: () async {
+                await context.read<ActivityDetailCubit>().deleteTransaction(
+                  t.id,
+                );
+                if (context.mounted) {
+                  _refreshPlanningSummaries(context);
+                }
+              },
             ),
+          ),
         ],
       ),
     );
