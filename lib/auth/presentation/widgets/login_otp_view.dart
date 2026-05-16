@@ -5,7 +5,9 @@ class LoginOtpView extends StatelessWidget {
   final TextEditingController otpController;
   final bool isLoading;
   final String currentEmail;
+  final String? errorText;
   final VoidCallback onRequestOtp;
+  final VoidCallback onOtpChanged;
   final Function(String) onVerifyOtp;
 
   const LoginOtpView({
@@ -13,7 +15,9 @@ class LoginOtpView extends StatelessWidget {
     required this.otpController,
     required this.isLoading,
     required this.currentEmail,
+    required this.errorText,
     required this.onRequestOtp,
+    required this.onOtpChanged,
     required this.onVerifyOtp,
   });
 
@@ -31,7 +35,7 @@ class LoginOtpView extends StatelessWidget {
             width: 64,
             height: 64,
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.1),
+              color: theme.colorScheme.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
@@ -92,7 +96,11 @@ class LoginOtpView extends StatelessWidget {
             ],
             onChanged: (code) {
               final textCode = code.otpToString();
+              final previousCode = otpController.text;
               otpController.text = textCode;
+              if (textCode != previousCode) {
+                onOtpChanged();
+              }
               if (textCode.length == 8 && !isLoading) {
                 onVerifyOtp(currentEmail);
               }
@@ -101,11 +109,13 @@ class LoginOtpView extends StatelessWidget {
         ),
         const Gap(8),
         Text(
-          l10n.auth_otp_helper,
+          errorText ?? l10n.auth_otp_helper,
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 12,
-            color: theme.colorScheme.mutedForeground,
+            color: errorText == null
+                ? theme.colorScheme.mutedForeground
+                : theme.colorScheme.destructive,
           ),
         ),
         const Gap(32),

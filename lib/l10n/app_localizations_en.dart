@@ -630,6 +630,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get auth_otp_helper => 'Enter the 8 digits received';
 
   @override
+  String get auth_otp_error_invalid => 'The code entered is not valid.';
+
+  @override
+  String get auth_otp_error_expired =>
+      'The code has expired. Request a new one.';
+
+  @override
+  String get auth_otp_error_invalid_or_expired =>
+      'The code entered is not valid or has expired.';
+
+  @override
   String get auth_otp_verify_button => 'Verify';
 
   @override

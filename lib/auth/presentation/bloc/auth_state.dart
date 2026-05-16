@@ -16,11 +16,17 @@ class AuthLoading extends AuthCubitState {}
 
 class AuthOtpRequested extends AuthCubitState {
   final String email;
+  final String? errorMessage;
+  final String? errorCode;
 
-  const AuthOtpRequested({required this.email});
+  const AuthOtpRequested({
+    required this.email,
+    this.errorMessage,
+    this.errorCode,
+  });
 
   @override
-  List<Object?> get props => [email];
+  List<Object?> get props => [email, errorMessage, errorCode];
 }
 
 class Authenticated extends AuthCubitState {

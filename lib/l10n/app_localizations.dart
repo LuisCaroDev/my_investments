@@ -1280,6 +1280,24 @@ abstract class AppLocalizations {
   /// **'Ingresa los 8 dígitos recibidos'**
   String get auth_otp_helper;
 
+  /// No description provided for @auth_otp_error_invalid.
+  ///
+  /// In es, this message translates to:
+  /// **'El código ingresado no es válido.'**
+  String get auth_otp_error_invalid;
+
+  /// No description provided for @auth_otp_error_expired.
+  ///
+  /// In es, this message translates to:
+  /// **'El código ha expirado. Solicita uno nuevo.'**
+  String get auth_otp_error_expired;
+
+  /// No description provided for @auth_otp_error_invalid_or_expired.
+  ///
+  /// In es, this message translates to:
+  /// **'El código ingresado no es válido o ha expirado.'**
+  String get auth_otp_error_invalid_or_expired;
+
   /// No description provided for @auth_otp_verify_button.
   ///
   /// In es, this message translates to:

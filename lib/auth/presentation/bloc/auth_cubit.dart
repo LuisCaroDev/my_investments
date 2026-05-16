@@ -5,6 +5,8 @@ import 'package:my_investments/auth/data/repositories/auth_repository.dart';
 import 'package:my_investments/auth/presentation/bloc/auth_state.dart';
 
 class AuthCubit extends Cubit<AuthCubitState> {
+  static const _otpInvalidOrExpiredCode = 'otp_invalid_or_expired';
+
   final AuthRepository _repository;
   StreamSubscription<AuthState>? _authStateSubscription;
 
@@ -23,7 +25,7 @@ class AuthCubit extends Cubit<AuthCubitState> {
         // If we are currently entering OTP, don't immediately revert to Unauthenticated
         // just because the session is null, wait for verifyOtp to succeed or fail.
         if (this.state is! AuthOtpRequested && this.state is! AuthLoading) {
-           emit(Unauthenticated());
+          emit(Unauthenticated());
         }
       }
     });
@@ -57,15 +59,28 @@ class AuthCubit extends Cubit<AuthCubitState> {
       if (response.session != null && response.user != null) {
         emit(Authenticated(user: response.user!));
       } else {
-        emit(const AuthError(message: 'Código inválido o expirado.'));
-        emit(AuthOtpRequested(email: email));
+        emit(
+          AuthOtpRequested(
+            email: email,
+            errorCode: _otpInvalidOrExpiredCode,
+          ),
+        );
       }
     } on AuthException catch (e) {
-      emit(AuthError(message: e.message));
-      emit(AuthOtpRequested(email: email));
+      emit(
+        AuthOtpRequested(
+          email: email,
+          errorMessage: e.message,
+          errorCode: e.code,
+        ),
+      );
     } catch (e) {
-      emit(AuthError(message: 'Error inesperado al verificar código.'));
-      emit(AuthOtpRequested(email: email));
+      emit(
+        AuthOtpRequested(
+          email: email,
+          errorMessage: 'Error inesperado al verificar código.',
+        ),
+      );
     }
   }
 
@@ -81,6 +96,15 @@ class AuthCubit extends Cubit<AuthCubitState> {
 
   void resetToLogin() {
     emit(Unauthenticated());
+  }
+
+  void clearOtpError() {
+    final currentState = state;
+    if (currentState is! AuthOtpRequested) return;
+    if (currentState.errorMessage == null && currentState.errorCode == null) {
+      return;
+    }
+    emit(AuthOtpRequested(email: currentState.email));
   }
 
   @override

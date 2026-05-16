@@ -41,6 +41,8 @@ class _LoginPageState extends State<LoginPage> {
   void _requestOtp() {
     final email = _emailController.text.trim();
     if (email.isEmpty) return;
+    _otpController.clear();
+    context.read<AuthCubit>().clearOtpError();
     final locale = Localizations.localeOf(context).languageCode;
     context.read<AuthCubit>().requestOtp(email, data: {'lang': locale});
   }
@@ -51,18 +53,40 @@ class _LoginPageState extends State<LoginPage> {
     context.read<AuthCubit>().verifyOtp(email, code);
   }
 
+  void _clearOtpError() {
+    context.read<AuthCubit>().clearOtpError();
+  }
+
+  String? _resolveOtpError(
+    BuildContext context,
+    AuthOtpRequested state,
+  ) {
+    final l10n = AppLocalizations.of(context)!;
+
+    switch (state.errorCode) {
+      case 'otp_expired':
+        return l10n.auth_otp_error_expired;
+      case 'bad_code_verifier':
+        return l10n.auth_otp_error_invalid;
+      case 'otp_invalid_or_expired':
+        return l10n.auth_otp_error_invalid_or_expired;
+    }
+
+    return state.errorMessage;
+  }
+
   Future<void> _handlePostAuthFlow(User user) async {
     if (_hasHandledAuth) return;
     _hasHandledAuth = true;
+    final settingsCubit = context.read<SettingsCubit>();
 
     // Show a loading dialog or just rely on the sync dialog overlaying.
     await DataConflictHandler.handleConflictOrSync(context, user);
 
     if (!mounted) return;
-    await context.read<SettingsCubit>().setActiveProfileId(
-      userProfileId(user.id),
-    );
-    await context.read<SettingsCubit>().setGuestMode(false);
+    await settingsCubit.setActiveProfileId(userProfileId(user.id));
+    await settingsCubit.setGuestMode(false);
+    if (!mounted) return;
 
     if (widget.fromSettings) {
       context.pop();
@@ -111,7 +135,12 @@ class _LoginPageState extends State<LoginPage> {
       },
       builder: (context, state) {
         final isLoading = state is AuthLoading;
-        final currentEmail = _emailController.text.trim();
+        final currentEmail = state is AuthOtpRequested
+            ? state.email
+            : _emailController.text.trim();
+        final otpError = state is AuthOtpRequested
+            ? _resolveOtpError(context, state)
+            : null;
         final l10n = AppLocalizations.of(context)!;
 
         return Scaffold(
@@ -133,7 +162,9 @@ class _LoginPageState extends State<LoginPage> {
                         otpController: _otpController,
                         isLoading: isLoading,
                         currentEmail: currentEmail,
+                        errorText: otpError,
                         onRequestOtp: _requestOtp,
+                        onOtpChanged: _clearOtpError,
                         onVerifyOtp: _verifyOtp,
                       )
                     : LoginEmailView(
