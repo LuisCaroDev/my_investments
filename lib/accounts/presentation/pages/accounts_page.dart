@@ -325,7 +325,7 @@ class _AccountsList extends StatelessWidget {
                     child: StatCard(
                       label: l10n
                           .project_detail_summary_net_balance, // generic "Balance"
-                      value: totalBalance.toCompactCurrency(context),
+                      value: totalBalance.toCurrency(context),
                       icon: RadixIcons.barChart,
                       valueColor: totalBalance < 0
                           ? Theme.of(context).colorScheme.destructive
@@ -386,7 +386,7 @@ class _AccountCard extends StatelessWidget {
           const Gap(16),
           Text('Balance').muted.small,
           Text(
-            account.balance.toCompactCurrency(context),
+            account.balance.toCurrency(context),
           ).semiBold(color: theme.colorScheme.primary),
         ],
       ),

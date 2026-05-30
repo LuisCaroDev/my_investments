@@ -7,6 +7,7 @@ class PreviewSection<T> extends StatelessWidget {
   final String? actionLabel;
   final VoidCallback? onAction;
   final Widget? trailing;
+  final Widget? headerBottom;
   final List<T> items;
   final int previewCount;
   final double spacing;
@@ -28,6 +29,7 @@ class PreviewSection<T> extends StatelessWidget {
     this.actionLabel,
     this.onAction,
     this.trailing,
+    this.headerBottom,
     this.previewCount = 3,
     this.spacing = 8,
     this.emptyTopSpacing = 12,
@@ -50,6 +52,10 @@ class PreviewSection<T> extends StatelessWidget {
           onAction: onAction,
           trailing: trailing,
         ),
+        if (headerBottom != null) ...[
+          const Gap(12),
+          headerBottom!,
+        ],
         if (items.isEmpty) ...[
           Gap(emptyTopSpacing),
           EmptyState(

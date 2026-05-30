@@ -13,6 +13,7 @@ class ProjectDetail {
   final double totalDeposited;
   final double fundedAmount;
   final double remainingToFund;
+  final double projectLevelBalance;
 
   const ProjectDetail({
     required this.project,
@@ -24,6 +25,7 @@ class ProjectDetail {
     required this.totalDeposited,
     required this.fundedAmount,
     required this.remainingToFund,
+    required this.projectLevelBalance,
   });
 
   double get operatingBalance => totalDeposited - totalSpent;

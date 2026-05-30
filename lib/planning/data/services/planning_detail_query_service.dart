@@ -119,6 +119,16 @@ class PlanningDetailQueryService {
         ? (remainingProjectNeed - fundedAmount).clamp(0.0, remainingProjectNeed)
         : 0.0;
 
+    final projectLevelSpent = _sumTransactions(
+      projectLevelTransactions,
+      TransactionType.expense,
+    );
+    final projectLevelDeposited = _sumTransactions(
+      projectLevelTransactions,
+      TransactionType.deposit,
+    );
+    final projectLevelBalance = projectLevelDeposited - projectLevelSpent;
+
     return ProjectDetail(
       project: project,
       activitySummaries: activitySummaries,
@@ -129,6 +139,7 @@ class PlanningDetailQueryService {
       totalDeposited: totalDeposited,
       fundedAmount: fundedAmount,
       remainingToFund: remainingToFund,
+      projectLevelBalance: projectLevelBalance,
     );
   }
 

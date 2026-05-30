@@ -117,7 +117,6 @@ class _AccountTransactionsView extends StatelessWidget {
                       onDelete: isAccountDeposit
                           ? () => _deleteTransaction(context, t)
                           : null,
-                      showActionsOnTap: isAccountDeposit,
                     );
                   }).toList(),
                 ),

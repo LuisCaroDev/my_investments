@@ -228,31 +228,63 @@ class _ProjectDetailContent extends StatelessWidget {
 
           // ── Project-Level Transactions ───────
           const Gap(24),
-          PreviewSection(
-            title: l10n.project_detail_transactions_title,
-            items: state.detail.projectLevelTransactions,
-            actionLabel: l10n.project_detail_transactions_see_more,
-            onAction: () => _openTransactionList(context),
-            previewCount: 3,
-            spacing: 8,
-            emptyIcon: RadixIcons.cardStack,
-            emptyTitle: l10n.project_detail_transactions_empty,
-            emptySubtitle: l10n.project_detail_transactions_empty_info,
-            transformItems: _latestTransactions,
-            itemBuilder: (_, t) => TransactionTile(
-              transaction: t,
-              operationalTasks: state.detail.projectCategories,
-              onEdit: () => _editTransaction(context, t),
-              onDelete: () async {
-                await context.read<ProjectDetailCubit>().deleteTransaction(
-                  t.id,
-                );
-                if (context.mounted) {
-                  _refreshPlanningSummaries(context);
-                }
-              },
-            ),
+          Builder(
+            builder: (context) {
+              final balance = state.detail.projectLevelBalance;
+
+              return PreviewSection(
+                title: l10n.project_detail_transactions_title,
+                items: state.detail.projectLevelTransactions,
+                actionLabel: l10n.project_detail_transactions_see_more,
+                onAction: () => _openTransactionList(context),
+                previewCount: 3,
+                spacing: 8,
+                emptyIcon: RadixIcons.cardStack,
+                emptyTitle: l10n.project_detail_transactions_empty,
+                emptySubtitle: l10n.project_detail_transactions_empty_info,
+                headerBottom: balance != 0
+                    ? Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.secondary.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(l10n.project_detail_summary_net_balance).medium,
+                            Text(
+                              balance.toCompactCurrency(context),
+                            ).medium(
+                              color: balance >= 0 
+                                  ? theme.colorScheme.primary 
+                                  : theme.colorScheme.destructive,
+                            ),
+                          ],
+                        ),
+                      )
+                    : null,
+                transformItems: _latestTransactions,
+                itemBuilder: (_, t) => TransactionTile(
+                  transaction: t,
+                  operationalTasks: state.detail.projectCategories,
+                  onEdit: () => _editTransaction(context, t),
+                  onDelete: () async {
+                    await context.read<ProjectDetailCubit>().deleteTransaction(
+                      t.id,
+                    );
+                    if (context.mounted) {
+                      _refreshPlanningSummaries(context);
+                    }
+                  },
+                ),
+              );
+            },
           ),
+
 
           // ── Activities ───────────────────────
           const Gap(24),
