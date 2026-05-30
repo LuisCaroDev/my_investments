@@ -10,6 +10,7 @@ import 'package:my_investments/planning/presentation/pages/operational_task_mana
 import 'package:my_investments/accounts/presentation/pages/transaction_list_page.dart';
 import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
+import 'package:my_investments/planning/data/repositories/activity_repository.dart';
 import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
 import 'package:my_investments/planning/data/services/planning_detail_query_service.dart';
 import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
@@ -25,6 +26,7 @@ import 'package:my_investments/planning/presentation/widgets/budget_progress.dar
 import 'package:my_investments/planning/presentation/widgets/preview_section.dart';
 import 'package:my_investments/accounts/presentation/widgets/transaction_tile.dart';
 import 'package:my_investments/planning/presentation/widgets/operational_task_tile.dart';
+import 'package:my_investments/planning/presentation/widgets/suggested_budget_banner.dart';
 
 List<FinancialAccount> _getAccountsFromContext(BuildContext context) {
   final state = context.read<AccountsCubit>().state;
@@ -68,11 +70,13 @@ class ActivityDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final accountsRepo = context.read<AccountsRepository>();
     final detailQueryService = context.read<PlanningDetailQueryService>();
+    final activityRepository = context.read<ActivityRepository>();
     final operationalTaskRepository = context.read<OperationalTaskRepository>();
     final planningLocalDataSource = context.read<PlanningLocalDataSource>();
     return BlocProvider(
       create: (_) => ActivityDetailCubit(
         detailQueryService: detailQueryService,
+        activityRepository: activityRepository,
         operationalTaskRepository: operationalTaskRepository,
         accountsRepository: accountsRepo,
         planningLocalDataSource: planningLocalDataSource,
@@ -320,6 +324,21 @@ class _ActivityContent extends StatelessWidget {
                 spent: state.detail!.summary.spent,
                 formatCurrency: (v) => v.toCompactCurrency(context),
               ),
+            ),
+          ],
+
+          if (!state.detail!.summary.activity.autoUpdateBudget &&
+              state.detail!.summary.suggestedBudget >
+                  (state.detail!.summary.activity.budget ?? 0)) ...[
+            const Gap(16),
+            SuggestedBudgetBanner(
+              suggestedBudget: state.detail!.summary.suggestedBudget,
+              onUpdate: () {
+                final updated = state.detail!.summary.activity.copyWith(
+                  budget: state.detail!.summary.suggestedBudget,
+                );
+                context.read<ActivityDetailCubit>().updateActivity(updated);
+              },
             ),
           ],
 

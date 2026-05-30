@@ -30,8 +30,8 @@ class PlanningLocalDataSource implements SyncSnapshotProvider {
   PlanningLocalDataSource({
     required SharedPreferences prefs,
     required String profileId,
-  })  : _prefs = prefs,
-        _profileId = profileId;
+  }) : _prefs = prefs,
+       _profileId = profileId;
 
   String _key(String key) => profileKey(_profileId, key);
 

@@ -42,13 +42,15 @@ class _AddOperationalTaskDialogState extends State<AddOperationalTaskDialog> {
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeOut,
       child: AlertDialog(
-        title: Text(widget.isProjectLevel
-            ? (isEditing
-                ? l10n.dialog_category_edit_project_title
-                : l10n.dialog_category_new_project_title)
-            : (isEditing
-                  ? l10n.dialog_category_edit_title
-                  : l10n.dialog_category_new_title)),
+        title: Text(
+          widget.isProjectLevel
+              ? (isEditing
+                    ? l10n.dialog_category_edit_project_title
+                    : l10n.dialog_category_new_project_title)
+              : (isEditing
+                    ? l10n.dialog_category_edit_title
+                    : l10n.dialog_category_new_title),
+        ),
         content: SizedBox(
           width: 350,
           child: SingleChildScrollView(
@@ -64,9 +66,7 @@ class _AddOperationalTaskDialogState extends State<AddOperationalTaskDialog> {
                 ),
                 if (widget.isProjectLevel) ...[
                   const Gap(8),
-                  Text(
-                    l10n.dialog_category_project_info,
-                  ).muted.small,
+                  Text(l10n.dialog_category_project_info).muted.small,
                 ],
               ],
             ),

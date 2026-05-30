@@ -71,6 +71,11 @@ class PlanningDetailQueryService {
     final totalBudget = _fundingCalculator.calculateProjectBudget(
       project: project,
       projectActivities: projectActivities,
+      projectTransactions: projectTransactions,
+    );
+    final suggestedBudget = _fundingCalculator.calculateSuggestedProjectBudget(
+      projectActivities: projectActivities,
+      projectTransactions: projectTransactions,
     );
     final fundedAmount = _fundingCalculator.calculateFundedAmountForProject(
       project: project,
@@ -140,6 +145,7 @@ class PlanningDetailQueryService {
       fundedAmount: fundedAmount,
       remainingToFund: remainingToFund,
       projectLevelBalance: projectLevelBalance,
+      suggestedBudget: suggestedBudget,
     );
   }
 

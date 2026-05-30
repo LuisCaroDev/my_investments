@@ -188,6 +188,12 @@ abstract class AppLocalizations {
   /// **'Describe el elemento...'**
   String get common_description_placeholder;
 
+  /// No description provided for @common_auto_update_budget_label.
+  ///
+  /// In es, this message translates to:
+  /// **'Autocalcular presupuesto'**
+  String get common_auto_update_budget_label;
+
   /// No description provided for @projects_title.
   ///
   /// In es, this message translates to:

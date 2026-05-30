@@ -4,10 +4,7 @@ class SyncSnapshotCodec {
   static const currentVersion = 1;
 
   static String encode(Map<String, List<Map<String, dynamic>>> data) {
-    return jsonEncode({
-      'version': currentVersion,
-      'data': data,
-    });
+    return jsonEncode({'version': currentVersion, 'data': data});
   }
 
   static Map<String, List<Map<String, dynamic>>> decode(String raw) {

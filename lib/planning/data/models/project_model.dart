@@ -12,6 +12,7 @@ class ProjectModel extends Project {
     super.globalBudget,
     super.type = ProjectType.investment,
     super.priority = 0,
+    super.autoUpdateBudget = false,
     required super.createdAt,
     this.cachedTotalSpent,
     this.cachedFundedAmount,
@@ -29,10 +30,12 @@ class ProjectModel extends Project {
         orElse: () => ProjectType.investment,
       ),
       priority: json['priority'] as int? ?? 0,
+      autoUpdateBudget: json['autoUpdateBudget'] as bool? ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
       cachedTotalSpent: (json['cachedTotalSpent'] as num?)?.toDouble(),
       cachedFundedAmount: (json['cachedFundedAmount'] as num?)?.toDouble(),
-      cachedRemainingToFund: (json['cachedRemainingToFund'] as num?)?.toDouble(),
+      cachedRemainingToFund: (json['cachedRemainingToFund'] as num?)
+          ?.toDouble(),
     );
   }
 
@@ -44,6 +47,7 @@ class ProjectModel extends Project {
       'globalBudget': globalBudget,
       'type': type.name,
       'priority': priority,
+      'autoUpdateBudget': autoUpdateBudget,
       'createdAt': createdAt.toIso8601String(),
       'cachedTotalSpent': cachedTotalSpent,
       'cachedFundedAmount': cachedFundedAmount,
@@ -60,6 +64,7 @@ class ProjectModel extends Project {
         globalBudget: entity.globalBudget,
         type: entity.type,
         priority: entity.priority,
+        autoUpdateBudget: entity.autoUpdateBudget,
         createdAt: entity.createdAt,
         cachedTotalSpent: entity.cachedTotalSpent,
         cachedFundedAmount: entity.cachedFundedAmount,
@@ -73,6 +78,7 @@ class ProjectModel extends Project {
       globalBudget: entity.globalBudget,
       type: entity.type,
       priority: entity.priority,
+      autoUpdateBudget: entity.autoUpdateBudget,
       createdAt: entity.createdAt,
     );
   }

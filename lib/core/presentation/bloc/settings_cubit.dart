@@ -30,19 +30,22 @@ class SettingsCubit extends Cubit<SettingsState> {
     );
     final isGuestMode = prefs.getBool(_guestModeKey) ?? false;
     final storedProfile = prefs.getString(_activeProfileKey);
-    final activeProfileId =
-        isGuestMode ? guestProfileId : (storedProfile ?? guestProfileId);
+    final activeProfileId = isGuestMode
+        ? guestProfileId
+        : (storedProfile ?? guestProfileId);
     final syncEnabled = _loadSyncEnabled(activeProfileId);
 
-    emit(SettingsState(
-      appLocale: appLocale,
-      currencyLocale: currencyLocale,
-      currencySymbol: currencySymbol,
-      themeMode: themeMode,
-      isGuestMode: isGuestMode,
-      activeProfileId: activeProfileId,
-      syncEnabled: syncEnabled,
-    ));
+    emit(
+      SettingsState(
+        appLocale: appLocale,
+        currencyLocale: currencyLocale,
+        currencySymbol: currencySymbol,
+        themeMode: themeMode,
+        isGuestMode: isGuestMode,
+        activeProfileId: activeProfileId,
+        syncEnabled: syncEnabled,
+      ),
+    );
   }
 
   Future<void> updateAppLocale(String locale) async {
@@ -59,11 +62,13 @@ class SettingsCubit extends Cubit<SettingsState> {
     await prefs.setBool(_guestModeKey, isGuest);
     if (isGuest) {
       await _setActiveProfile(guestProfileId);
-      emit(state.copyWith(
-        isGuestMode: true,
-        activeProfileId: guestProfileId,
-        syncEnabled: false,
-      ));
+      emit(
+        state.copyWith(
+          isGuestMode: true,
+          activeProfileId: guestProfileId,
+          syncEnabled: false,
+        ),
+      );
       return;
     }
     emit(state.copyWith(isGuestMode: false));
@@ -72,11 +77,13 @@ class SettingsCubit extends Cubit<SettingsState> {
   Future<void> setActiveProfileId(String profileId) async {
     await _setActiveProfile(profileId);
     final syncEnabled = _loadSyncEnabled(profileId);
-    emit(state.copyWith(
-      activeProfileId: profileId,
-      syncEnabled: syncEnabled,
-      isGuestMode: profileId == guestProfileId ? state.isGuestMode : false,
-    ));
+    emit(
+      state.copyWith(
+        activeProfileId: profileId,
+        syncEnabled: syncEnabled,
+        isGuestMode: profileId == guestProfileId ? state.isGuestMode : false,
+      ),
+    );
   }
 
   Future<void> setSyncEnabled(bool enabled) async {
@@ -96,10 +103,7 @@ class SettingsCubit extends Cubit<SettingsState> {
     } else {
       if (locale != null) await prefs.setString(_currencyLocaleKey, locale);
       if (symbol != null) await prefs.setString(_currencySymbolKey, symbol);
-      emit(state.copyWith(
-        currencyLocale: locale,
-        currencySymbol: symbol,
-      ));
+      emit(state.copyWith(currencyLocale: locale, currencySymbol: symbol));
     }
   }
 

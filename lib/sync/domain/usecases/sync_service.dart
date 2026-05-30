@@ -9,7 +9,7 @@ class SyncService {
   final SyncRepository _repository;
 
   const SyncService({required SyncRepository repository})
-      : _repository = repository;
+    : _repository = repository;
 
   Future<SyncPullOutcome> pullIfRemoteNewer({
     required String userId,
@@ -19,8 +19,7 @@ class SyncService {
     if (remoteManifest == null) return SyncPullOutcome.noRemote;
 
     final lastSync = _repository.getLastSync();
-    if (lastSync != null &&
-        !remoteManifest.updatedAt.isAfter(lastSync)) {
+    if (lastSync != null && !remoteManifest.updatedAt.isAfter(lastSync)) {
       return SyncPullOutcome.upToDate;
     }
 
@@ -61,8 +60,4 @@ class SyncService {
   }
 }
 
-enum SyncPullOutcome {
-  noRemote,
-  upToDate,
-  pulled,
-}
+enum SyncPullOutcome { noRemote, upToDate, pulled }

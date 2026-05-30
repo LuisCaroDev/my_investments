@@ -41,7 +41,8 @@ class _AddAccountDepositDialogState extends State<AddAccountDepositDialog> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final isEditing = widget.initialAmount != null || widget.initialDescription != null;
+    final isEditing =
+        widget.initialAmount != null || widget.initialDescription != null;
     return AnimatedPadding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,

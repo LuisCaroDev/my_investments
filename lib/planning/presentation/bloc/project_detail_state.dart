@@ -11,9 +11,7 @@ class ProjectDetailLoading extends ProjectDetailState {
 class ProjectDetailLoaded extends ProjectDetailState {
   final ProjectDetail detail;
 
-  const ProjectDetailLoaded({
-    required this.detail,
-  });
+  const ProjectDetailLoaded({required this.detail});
 }
 
 class ProjectDetailError extends ProjectDetailState {

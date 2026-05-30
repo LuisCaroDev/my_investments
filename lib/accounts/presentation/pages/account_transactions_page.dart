@@ -33,28 +33,35 @@ class AccountTransactionsPage extends StatefulWidget {
 class _AccountTransactionsPageState extends State<AccountTransactionsPage> {
   @override
   Widget build(BuildContext context) {
-    final accountsState = context.read<AccountsCubit>().state;
-    final FinancialAccount? account = accountsState is AccountsLoaded
-        ? accountsState.accounts.firstWhere((a) => a.id == widget.accountId)
-        : null;
+    return BlocBuilder<AccountsCubit, AccountsState>(
+      builder: (context, accountsState) {
+        final FinancialAccount? account = accountsState is AccountsLoaded
+            ? accountsState.accounts.firstWhere((a) => a.id == widget.accountId)
+            : null;
 
-    if (account == null) {
-      return const Scaffold(child: Center(child: CircularProgressIndicator()));
-    }
+        if (account == null) {
+          return const Scaffold(
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
 
-    final accountsRepository = context.read<AccountsRepository>();
-    final operationalTaskRepository = context.read<OperationalTaskRepository>();
-    final transactions = accountsRepository.getTransactionsForAccount(
-      account.id,
-    );
-    final operationalTasks = operationalTaskRepository.getAllOperationalTasks();
+        final accountsRepository = context.read<AccountsRepository>();
+        final operationalTaskRepository = context
+            .read<OperationalTaskRepository>();
+        final transactions = accountsRepository.getTransactionsForAccount(
+          account.id,
+        );
+        final operationalTasks = operationalTaskRepository
+            .getAllOperationalTasks();
 
-    return _AccountTransactionsView(
-      account: account,
-      transactions: transactions,
-      operationalTasks: operationalTasks,
-      accountsRepository: accountsRepository,
-      onChanged: () => setState(() {}),
+        return _AccountTransactionsView(
+          account: account,
+          transactions: transactions,
+          operationalTasks: operationalTasks,
+          accountsRepository: accountsRepository,
+          onChanged: () => setState(() {}),
+        );
+      },
     );
   }
 }

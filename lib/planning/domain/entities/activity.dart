@@ -5,6 +5,7 @@ class Activity {
   final String? description;
   final int? year;
   final double? budget;
+  final bool autoUpdateBudget;
   final DateTime createdAt;
 
   const Activity({
@@ -14,6 +15,7 @@ class Activity {
     this.description,
     this.year,
     this.budget,
+    this.autoUpdateBudget = false,
     required this.createdAt,
   });
 
@@ -24,6 +26,7 @@ class Activity {
     String? description,
     int? year,
     double? budget,
+    bool? autoUpdateBudget,
     DateTime? createdAt,
   }) {
     return Activity(
@@ -33,6 +36,7 @@ class Activity {
       description: description ?? this.description,
       year: year ?? this.year,
       budget: budget ?? this.budget,
+      autoUpdateBudget: autoUpdateBudget ?? this.autoUpdateBudget,
       createdAt: createdAt ?? this.createdAt,
     );
   }

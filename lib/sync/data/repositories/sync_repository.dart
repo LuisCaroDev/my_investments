@@ -10,8 +10,8 @@ class SyncRepository {
   const SyncRepository({
     required SyncRemoteDataSource remote,
     required SyncLocalDataSource local,
-  })  : _remote = remote,
-        _local = local;
+  }) : _remote = remote,
+       _local = local;
 
   Future<SyncManifest?> fetchRemoteManifest(String userId) {
     return _remote.fetchManifest(userId: userId);

@@ -11,10 +11,7 @@ import 'package:my_investments/planning/presentation/bloc/investments_cubit.dart
 class MainNavigationShell extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
-  const MainNavigationShell({
-    super.key,
-    required this.navigationShell,
-  });
+  const MainNavigationShell({super.key, required this.navigationShell});
 
   @override
   Widget build(BuildContext context) {
@@ -29,119 +26,119 @@ class MainNavigationShell extends StatelessWidget {
         }
       },
       child: Scaffold(
-        footers:
-            isDesktop
-                ? const []
-                : [
-                  Divider(height: 1),
-                  NavigationBar(
-                    expanded: true,
-                    alignment: NavigationBarAlignment.spaceBetween,
-                    keepMainAxisSize: true,
-                    keepCrossAxisSize: true,
+        footers: isDesktop
+            ? const []
+            : [
+                Divider(height: 1),
+                NavigationBar(
+                  expanded: true,
+                  alignment: NavigationBarAlignment.spaceBetween,
+                  keepMainAxisSize: true,
+                  keepCrossAxisSize: true,
+                  onSelected: (key) {
+                    if (key is ValueKey<int>) {
+                      navigationShell.goBranch(
+                        key.value,
+                        initialLocation:
+                            key.value == navigationShell.currentIndex,
+                      );
+                    }
+                  },
+                  selectedKey: ValueKey(navigationShell.currentIndex),
+                  children: [
+                    Expanded(
+                      child: NavigationItem(
+                        key: const ValueKey<int>(0),
+                        label: Text(l10n.nav_investments),
+                        child: const Icon(RadixIcons.cube),
+                      ),
+                    ),
+                    Gap(4),
+                    Expanded(
+                      child: NavigationItem(
+                        key: const ValueKey<int>(1),
+                        label: Text(l10n.nav_goals),
+                        child: const Icon(RadixIcons.target),
+                      ),
+                    ),
+                    Gap(4),
+                    Expanded(
+                      child: NavigationItem(
+                        key: const ValueKey<int>(2),
+                        label: Text(l10n.nav_accounts),
+                        child: const Icon(RadixIcons.pieChart),
+                      ),
+                    ),
+                    Gap(4),
+                    Expanded(
+                      child: NavigationItem(
+                        key: const ValueKey<int>(3),
+                        label: Text(l10n.settings_title),
+                        child: const Icon(RadixIcons.gear),
+                      ),
+                    ),
+                  ],
+                ),
+                Gap(MediaQuery.of(context).padding.bottom),
+              ],
+        child: isDesktop
+            ? Row(
+                children: [
+                  NavigationSidebar(
+                    header: [
+                      SliverToBoxAdapter(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(14),
+                              child: Text('Workspace').h4.muted,
+                            ),
+                            Divider(height: 1),
+                          ],
+                        ),
+                      ),
+                    ],
+                    spacing: 4,
+                    selectedKey: ValueKey(navigationShell.currentIndex),
                     onSelected: (key) {
                       if (key is ValueKey<int>) {
                         navigationShell.goBranch(
                           key.value,
-                          initialLocation: key.value == navigationShell.currentIndex,
+                          initialLocation:
+                              key.value == navigationShell.currentIndex,
                         );
                       }
                     },
-                    selectedKey: ValueKey(navigationShell.currentIndex),
                     children: [
-                      Expanded(
-                        child: NavigationItem(
-                          key: const ValueKey<int>(0),
-                          label: Text(l10n.nav_investments),
-                          child: const Icon(RadixIcons.cube),
-                        ),
+                      NavigationItem(
+                        key: const ValueKey<int>(0),
+                        label: Text(l10n.nav_investments),
+                        child: const Icon(RadixIcons.cube),
                       ),
-                      Gap(4),
-                      Expanded(
-                        child: NavigationItem(
-                          key: const ValueKey<int>(1),
-                          label: Text(l10n.nav_goals),
-                          child: const Icon(RadixIcons.target),
-                        ),
+                      NavigationItem(
+                        key: const ValueKey<int>(1),
+                        label: Text(l10n.nav_goals),
+                        child: const Icon(RadixIcons.target),
                       ),
-                      Gap(4),
-                      Expanded(
-                        child: NavigationItem(
-                          key: const ValueKey<int>(2),
-                          label: Text(l10n.nav_accounts),
-                          child: const Icon(RadixIcons.pieChart),
-                        ),
+                      NavigationItem(
+                        key: const ValueKey<int>(2),
+                        label: Text(l10n.nav_accounts),
+                        child: const Icon(RadixIcons.pieChart),
                       ),
-                      Gap(4),
-                      Expanded(
-                        child: NavigationItem(
-                          key: const ValueKey<int>(3),
-                          label: Text(l10n.settings_title),
-                          child: const Icon(RadixIcons.gear),
-                        ),
+                      NavigationItem(
+                        key: const ValueKey<int>(3),
+                        label: Text(l10n.settings_title),
+                        child: const Icon(RadixIcons.gear),
                       ),
                     ],
                   ),
-                  Gap(MediaQuery.of(context).padding.bottom),
+                  VerticalDivider(width: 1),
+                  Expanded(child: navigationShell),
                 ],
-        child:
-            isDesktop
-                ? Row(
-                  children: [
-                    NavigationSidebar(
-                      header: [
-                        SliverToBoxAdapter(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(14),
-                                child: Text('Workspace').h4.muted,
-                              ),
-                              Divider(height: 1),
-                            ],
-                          ),
-                        ),
-                      ],
-                      spacing: 4,
-                      selectedKey: ValueKey(navigationShell.currentIndex),
-                      onSelected: (key) {
-                        if (key is ValueKey<int>) {
-                          navigationShell.goBranch(
-                            key.value,
-                            initialLocation: key.value == navigationShell.currentIndex,
-                          );
-                        }
-                      },
-                      children: [
-                        NavigationItem(
-                          key: const ValueKey<int>(0),
-                          label: Text(l10n.nav_investments),
-                          child: const Icon(RadixIcons.cube),
-                        ),
-                        NavigationItem(
-                          key: const ValueKey<int>(1),
-                          label: Text(l10n.nav_goals),
-                          child: const Icon(RadixIcons.target),
-                        ),
-                        NavigationItem(
-                          key: const ValueKey<int>(2),
-                          label: Text(l10n.nav_accounts),
-                          child: const Icon(RadixIcons.pieChart),
-                        ),
-                        NavigationItem(
-                          key: const ValueKey<int>(3),
-                          label: Text(l10n.settings_title),
-                          child: const Icon(RadixIcons.gear),
-                        ),
-                      ],
-                    ),
-                    VerticalDivider(width: 1),
-                    Expanded(child: navigationShell),
-                  ],
-                )
-                : navigationShell,
+              )
+            : navigationShell,
       ),
     );
   }

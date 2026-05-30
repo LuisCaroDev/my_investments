@@ -16,13 +16,13 @@ class TransactionProjectionJob {
     required AccountsLocalDataSource accountsDs,
     required PlanningLocalDataSource planningDs,
     required PlanningFundingCalculator calculator,
-  })  : _accountsDs = accountsDs,
-        _planningDs = planningDs,
-        _calculator = calculator;
+  }) : _accountsDs = accountsDs,
+       _planningDs = planningDs,
+       _calculator = calculator;
 
   Future<void> run() async {
     final transactions = _accountsDs.getTransactions();
-    
+
     // 1. Recalculate account balances
     final accounts = _accountsDs.getFinancialAccounts();
     final totals = <String, double>{};
@@ -70,8 +70,10 @@ class TransactionProjectionJob {
     final allSummaries = [...investmentSummaries, ...savingsSummaries];
 
     for (final project in projects) {
-      final summary = allSummaries.firstWhere((s) => s.project.id == project.id);
-      
+      final summary = allSummaries.firstWhere(
+        (s) => s.project.id == project.id,
+      );
+
       updatedProjects.add(
         ProjectModel(
           id: project.id,
@@ -80,6 +82,7 @@ class TransactionProjectionJob {
           globalBudget: project.globalBudget,
           type: project.type,
           priority: project.priority,
+          autoUpdateBudget: project.autoUpdateBudget,
           createdAt: project.createdAt,
           cachedTotalSpent: summary.totalSpent,
           cachedFundedAmount: summary.fundedAmount,
@@ -87,9 +90,13 @@ class TransactionProjectionJob {
         ),
       );
 
-      final projectActivities = activities.where((a) => a.projectId == project.id).toList();
-      final projectTransactions = transactions.where((t) => t.projectId == project.id).toList();
-      
+      final projectActivities = activities
+          .where((a) => a.projectId == project.id)
+          .toList();
+      final projectTransactions = transactions
+          .where((t) => t.projectId == project.id)
+          .toList();
+
       final activityFunding = _calculator.allocateFundingSequentially(
         activities: projectActivities,
         fundedAmount: summary.fundedAmount,
@@ -97,10 +104,18 @@ class TransactionProjectionJob {
       );
 
       for (final activity in projectActivities) {
-        final activityTransactions = projectTransactions.where((t) => t.activityId == activity.id).toList();
-        final spent = _sumTransactions(activityTransactions, TransactionType.expense);
-        final deposited = _sumTransactions(activityTransactions, TransactionType.deposit);
-        
+        final activityTransactions = projectTransactions
+            .where((t) => t.activityId == activity.id)
+            .toList();
+        final spent = _sumTransactions(
+          activityTransactions,
+          TransactionType.expense,
+        );
+        final deposited = _sumTransactions(
+          activityTransactions,
+          TransactionType.deposit,
+        );
+
         updatedActivities.add(
           ActivityModel(
             id: activity.id,
@@ -109,11 +124,12 @@ class TransactionProjectionJob {
             description: activity.description,
             year: activity.year,
             budget: activity.budget,
+            autoUpdateBudget: activity.autoUpdateBudget,
             createdAt: activity.createdAt,
             cachedSpent: spent,
             cachedDeposited: deposited,
             cachedFundedAmount: activityFunding[activity.id] ?? 0.0,
-          )
+          ),
         );
       }
     }

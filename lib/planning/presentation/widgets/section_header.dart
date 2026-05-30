@@ -29,10 +29,7 @@ class SectionHeader extends StatelessWidget {
                 size: ButtonSize.normal,
                 child: Text(actionLabel!),
               ),
-            if (trailing != null) ...[
-              const Gap(4),
-              trailing!,
-            ],
+            if (trailing != null) ...[const Gap(4), trailing!],
           ],
         ),
       ],

@@ -2,10 +2,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
 import 'package:my_investments/planning/data/repositories/activity_repository.dart';
+import 'package:my_investments/planning/data/repositories/project_repository.dart';
 import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
 import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
 import 'package:my_investments/planning/data/services/planning_detail_query_service.dart';
 import 'package:my_investments/planning/domain/entities/activity.dart';
+import 'package:my_investments/planning/domain/entities/project.dart';
 import 'package:my_investments/planning/domain/entities/operational_task.dart';
 import 'package:my_investments/core/domain/entities/transaction.dart';
 import 'package:my_investments/planning/presentation/bloc/project_detail_state.dart';
@@ -13,6 +15,7 @@ import 'package:my_investments/planning/presentation/bloc/project_detail_state.d
 class ProjectDetailCubit extends Cubit<ProjectDetailState> {
   final PlanningDetailQueryService _detailQueryService;
   final ActivityRepository _activityRepository;
+  final ProjectRepository _projectRepository;
   final OperationalTaskRepository _operationalTaskRepository;
   final AccountsRepository _accountsRepository;
   final PlanningLocalDataSource _planningLocalDataSource;
@@ -23,12 +26,14 @@ class ProjectDetailCubit extends Cubit<ProjectDetailState> {
   ProjectDetailCubit({
     required PlanningDetailQueryService detailQueryService,
     required ActivityRepository activityRepository,
+    required ProjectRepository projectRepository,
     required OperationalTaskRepository operationalTaskRepository,
     required AccountsRepository accountsRepository,
     required PlanningLocalDataSource planningLocalDataSource,
     required this.projectId,
   }) : _detailQueryService = detailQueryService,
        _activityRepository = activityRepository,
+       _projectRepository = projectRepository,
        _operationalTaskRepository = operationalTaskRepository,
        _accountsRepository = accountsRepository,
        _planningLocalDataSource = planningLocalDataSource,
@@ -36,7 +41,9 @@ class ProjectDetailCubit extends Cubit<ProjectDetailState> {
     _projectsSubscription = _planningLocalDataSource.projectsStream.listen((_) {
       load();
     });
-    _activitiesSubscription = _planningLocalDataSource.activitiesStream.listen((_) {
+    _activitiesSubscription = _planningLocalDataSource.activitiesStream.listen((
+      _,
+    ) {
       load();
     });
   }
@@ -55,6 +62,12 @@ class ProjectDetailCubit extends Cubit<ProjectDetailState> {
     } catch (e) {
       emit(ProjectDetailError(message: e.toString()));
     }
+  }
+
+  // ── Project ───────────────────────────────────────────────
+
+  Future<void> updateProject(Project project) async {
+    await _projectRepository.updateProject(project);
   }
 
   // ── Activities ────────────────────────────────────────────

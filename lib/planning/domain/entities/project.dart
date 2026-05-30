@@ -7,6 +7,7 @@ class Project {
   final double? globalBudget;
   final ProjectType type;
   final int priority;
+  final bool autoUpdateBudget;
   final DateTime createdAt;
 
   const Project({
@@ -16,6 +17,7 @@ class Project {
     this.globalBudget,
     this.type = ProjectType.investment,
     this.priority = 0,
+    this.autoUpdateBudget = false,
     required this.createdAt,
   });
 
@@ -26,6 +28,7 @@ class Project {
     double? globalBudget,
     ProjectType? type,
     int? priority,
+    bool? autoUpdateBudget,
     DateTime? createdAt,
   }) {
     return Project(
@@ -35,6 +38,7 @@ class Project {
       globalBudget: globalBudget ?? this.globalBudget,
       type: type ?? this.type,
       priority: priority ?? this.priority,
+      autoUpdateBudget: autoUpdateBudget ?? this.autoUpdateBudget,
       createdAt: createdAt ?? this.createdAt,
     );
   }

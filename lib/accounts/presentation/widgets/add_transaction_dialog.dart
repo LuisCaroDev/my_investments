@@ -46,8 +46,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       text: widget.initialTransaction?.description ?? '',
     );
     _selectedDate = widget.initialTransaction?.date ?? DateTime.now();
-    _selectedOperationalTaskId =
-        widget.initialTransaction?.operationalTaskId;
+    _selectedOperationalTaskId = widget.initialTransaction?.operationalTaskId;
     final initialAccountId = widget.initialTransaction?.accountId;
     if (initialAccountId != null &&
         widget.availableAccounts.any((a) => a.id == initialAccountId)) {
@@ -83,9 +82,7 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
         ? l10n.dialog_tx_new_expense
         : l10n.dialog_tx_new_deposit;
     return AnimatedPadding(
-      padding: EdgeInsets.only(
-        bottom: media.viewInsets.bottom,
-      ),
+      padding: EdgeInsets.only(bottom: media.viewInsets.bottom),
       duration: const Duration(milliseconds: 150),
       curve: Curves.easeOut,
       child: AlertDialog(
@@ -95,10 +92,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
           constraints: BoxConstraints(
             minWidth: 400,
             maxWidth: 400,
-            maxHeight: (media.size.height - media.viewInsets.bottom - 250).clamp(
-              200,
-              media.size.height - media.viewInsets.bottom,
-            ),
+            maxHeight: (media.size.height - media.viewInsets.bottom - 250)
+                .clamp(200, media.size.height - media.viewInsets.bottom),
           ),
           child: SingleChildScrollView(
             padding: EdgeInsets.all(4),
@@ -186,7 +181,9 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
                 'amount': amount,
                 'date': _selectedDate,
                 'description': description.isEmpty ? null : description,
-                'operationalTaskId': isExpense ? _selectedOperationalTaskId : null,
+                'operationalTaskId': isExpense
+                    ? _selectedOperationalTaskId
+                    : null,
                 'accountId': _selectedAccountId,
               });
             },
@@ -255,8 +252,8 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
   Widget _buildCategorySelector(AppLocalizations l10n) {
     final selectedTask = _selectedOperationalTaskId != null
         ? widget.availableCategories
-            .where((c) => c.id == _selectedOperationalTaskId)
-            .firstOrNull
+              .where((c) => c.id == _selectedOperationalTaskId)
+              .firstOrNull
         : null;
 
     return OutlineButton(
@@ -264,12 +261,12 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
       child: Row(
         children: [
           Expanded(
-          child: selectedTask != null
-              ? Text(
-                  selectedTask.activityId == null
-                      ? '${selectedTask.name} ${l10n.widget_tx_tile_project_label}'
-                      : selectedTask.name,
-                )
+            child: selectedTask != null
+                ? Text(
+                    selectedTask.activityId == null
+                        ? '${selectedTask.name} ${l10n.widget_tx_tile_project_label}'
+                        : selectedTask.name,
+                  )
                 : Text(l10n.dialog_tx_category_select).muted,
           ),
           const Icon(RadixIcons.chevronDown, size: 14),

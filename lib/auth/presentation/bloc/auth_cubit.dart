@@ -11,8 +11,8 @@ class AuthCubit extends Cubit<AuthCubitState> {
   StreamSubscription<AuthState>? _authStateSubscription;
 
   AuthCubit({required AuthRepository repository})
-      : _repository = repository,
-        super(AuthInitial()) {
+    : _repository = repository,
+      super(AuthInitial()) {
     _init();
   }
 
@@ -60,10 +60,7 @@ class AuthCubit extends Cubit<AuthCubitState> {
         emit(Authenticated(user: response.user!));
       } else {
         emit(
-          AuthOtpRequested(
-            email: email,
-            errorCode: _otpInvalidOrExpiredCode,
-          ),
+          AuthOtpRequested(email: email, errorCode: _otpInvalidOrExpiredCode),
         );
       }
     } on AuthException catch (e) {

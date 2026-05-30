@@ -16,6 +16,7 @@
   "common_name_label": "Name",
   "common_description_label": "Description (optional)",
   "common_description_placeholder": "Describe the element...",
+  "common_auto_update_budget_label": "Auto-update budget",
 
   "projects_title": "My Investments",
   "projects_add_button": "New Project",

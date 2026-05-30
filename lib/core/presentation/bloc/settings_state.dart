@@ -22,14 +22,14 @@ class SettingsState extends Equatable {
   });
 
   factory SettingsState.initial() => const SettingsState(
-        appLocale: 'system', // 'system', 'es', 'en'
-        currencyLocale: null,
-        currencySymbol: null,
-        themeMode: ThemeMode.system,
-        isGuestMode: false,
-        activeProfileId: guestProfileId,
-        syncEnabled: false,
-      );
+    appLocale: 'system', // 'system', 'es', 'en'
+    currencyLocale: null,
+    currencySymbol: null,
+    themeMode: ThemeMode.system,
+    isGuestMode: false,
+    activeProfileId: guestProfileId,
+    syncEnabled: false,
+  );
 
   SettingsState copyWith({
     String? appLocale,
@@ -43,10 +43,12 @@ class SettingsState extends Equatable {
   }) {
     return SettingsState(
       appLocale: appLocale ?? this.appLocale,
-      currencyLocale:
-          clearCurrency ? null : (currencyLocale ?? this.currencyLocale),
-      currencySymbol:
-          clearCurrency ? null : (currencySymbol ?? this.currencySymbol),
+      currencyLocale: clearCurrency
+          ? null
+          : (currencyLocale ?? this.currencyLocale),
+      currencySymbol: clearCurrency
+          ? null
+          : (currencySymbol ?? this.currencySymbol),
       themeMode: themeMode ?? this.themeMode,
       isGuestMode: isGuestMode ?? this.isGuestMode,
       activeProfileId: activeProfileId ?? this.activeProfileId,

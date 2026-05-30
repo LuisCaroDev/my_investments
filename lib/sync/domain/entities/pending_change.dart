@@ -1,8 +1,4 @@
-enum PendingChangeOp {
-  add,
-  update,
-  delete,
-}
+enum PendingChangeOp { add, update, delete }
 
 class PendingChange {
   final PendingChangeOp op;

@@ -19,9 +19,9 @@ class AccountsRepository implements TransactionsReader {
     required AccountsLocalDataSource localDataSource,
     required TransactionProjectionJob projectionJob,
     SyncChangeRecorder? changeRecorder,
-  })  : _localDataSource = localDataSource,
-        _projectionJob = projectionJob,
-        _changeRecorder = changeRecorder;
+  }) : _localDataSource = localDataSource,
+       _projectionJob = projectionJob,
+       _changeRecorder = changeRecorder;
 
   // ── Financial Accounts ────────────────────────────────────
 
@@ -222,5 +222,4 @@ class AccountsRepository implements TransactionsReader {
       ),
     );
   }
-
 }

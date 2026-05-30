@@ -102,7 +102,7 @@ class _ProfileDependenciesScope extends StatelessWidget {
       onChange: syncCoordinator.onLocalChange,
     );
     const planningFundingCalculator = PlanningFundingCalculator();
-    
+
     final projectionJob = TransactionProjectionJob(
       accountsDs: accountsDs,
       planningDs: planningDs,

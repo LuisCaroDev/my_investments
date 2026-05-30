@@ -85,8 +85,7 @@ final appRouter = GoRouter(
       path: ProjectDetailPage.routePattern,
       builder: (context, state) {
         final projectId = state.pathParameters['projectId']!;
-        final projectName =
-            state.uri.queryParameters['name'] ?? projectId;
+        final projectName = state.uri.queryParameters['name'] ?? projectId;
         return ProjectDetailPage(
           projectId: projectId,
           projectName: projectName,

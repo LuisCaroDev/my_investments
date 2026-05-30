@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:my_investments/planning/domain/entities/activity.dart';
 import 'package:my_investments/planning/domain/entities/operational_task.dart';
 
@@ -18,7 +20,9 @@ class ActivitySummary {
     required this.transactionCount,
   });
 
-  double get budget => activity.budget ?? 0;
+  double get suggestedBudget => math.max(activity.budget ?? 0.0, spent);
+  double get budget =>
+      activity.autoUpdateBudget ? suggestedBudget : (activity.budget ?? 0.0);
   double get operatingBalance => deposited - spent;
   // Activities only care about their operating balance now
   double get netBalance => operatingBalance;

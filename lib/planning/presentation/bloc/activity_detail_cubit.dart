@@ -1,16 +1,20 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
+import 'package:my_investments/planning/data/repositories/activity_repository.dart';
 import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
 import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
 import 'package:my_investments/planning/data/services/planning_detail_query_service.dart';
 import 'package:my_investments/core/domain/entities/transaction.dart';
 import 'package:my_investments/planning/presentation/bloc/activity_detail_state.dart';
+import 'package:my_investments/planning/domain/entities/activity.dart'
+    as domain;
 import 'package:my_investments/planning/domain/entities/operational_task.dart'
     as domain;
 
 class ActivityDetailCubit extends Cubit<ActivityDetailState> {
   final PlanningDetailQueryService _detailQueryService;
+  final ActivityRepository _activityRepository;
   final OperationalTaskRepository _operationalTaskRepository;
   final AccountsRepository _accountsRepository;
   final PlanningLocalDataSource _planningLocalDataSource;
@@ -20,12 +24,14 @@ class ActivityDetailCubit extends Cubit<ActivityDetailState> {
 
   ActivityDetailCubit({
     required PlanningDetailQueryService detailQueryService,
+    required ActivityRepository activityRepository,
     required OperationalTaskRepository operationalTaskRepository,
     required AccountsRepository accountsRepository,
     required PlanningLocalDataSource planningLocalDataSource,
     required this.projectId,
     required this.activityId,
   }) : _detailQueryService = detailQueryService,
+       _activityRepository = activityRepository,
        _operationalTaskRepository = operationalTaskRepository,
        _accountsRepository = accountsRepository,
        _planningLocalDataSource = planningLocalDataSource,
@@ -51,6 +57,10 @@ class ActivityDetailCubit extends Cubit<ActivityDetailState> {
     } catch (e) {
       emit(ActivityDetailState(loading: false, error: e.toString()));
     }
+  }
+
+  Future<void> updateActivity(domain.Activity activity) async {
+    await _activityRepository.updateActivity(activity);
   }
 
   Future<void> addTransaction(Transaction transaction) async {

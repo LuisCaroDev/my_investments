@@ -6,6 +6,7 @@ class AddActivityDialog extends StatefulWidget {
   final String? initialDescription;
   final int? initialYear;
   final double? initialBudget;
+  final bool? initialAutoUpdateBudget;
 
   const AddActivityDialog({
     super.key,
@@ -13,6 +14,7 @@ class AddActivityDialog extends StatefulWidget {
     this.initialDescription,
     this.initialYear,
     this.initialBudget,
+    this.initialAutoUpdateBudget,
   });
 
   @override
@@ -24,20 +26,22 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
   late final TextEditingController _descriptionController;
   late final TextEditingController _yearController;
   late final TextEditingController _budgetController;
+  late bool _autoUpdateBudget;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.initialName ?? '');
-    _descriptionController =
-        TextEditingController(text: widget.initialDescription ?? '');
+    _descriptionController = TextEditingController(
+      text: widget.initialDescription ?? '',
+    );
     _yearController = TextEditingController(
-      text: widget.initialYear?.toString() ??
-          DateTime.now().year.toString(),
+      text: widget.initialYear?.toString() ?? DateTime.now().year.toString(),
     );
     _budgetController = TextEditingController(
       text: widget.initialBudget?.toString() ?? '',
     );
+    _autoUpdateBudget = widget.initialAutoUpdateBudget ?? false;
   }
 
   @override
@@ -61,7 +65,9 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
       curve: Curves.easeOut,
       child: AlertDialog(
         title: Text(
-          isEditing ? l10n.dialog_activity_edit_title : l10n.dialog_activity_new_title,
+          isEditing
+              ? l10n.dialog_activity_edit_title
+              : l10n.dialog_activity_new_title,
         ),
         content: SizedBox(
           width: 400,
@@ -81,7 +87,9 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
                 const Gap(4),
                 TextField(
                   controller: _descriptionController,
-                  placeholder: Text(l10n.dialog_activity_description_placeholder),
+                  placeholder: Text(
+                    l10n.dialog_activity_description_placeholder,
+                  ),
                 ),
                 const Gap(12),
                 Row(
@@ -117,6 +125,21 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
                     ),
                   ],
                 ),
+                const Gap(12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(l10n.common_auto_update_budget_label).small.medium,
+                    Switch(
+                      value: _autoUpdateBudget,
+                      onChanged: (value) {
+                        setState(() {
+                          _autoUpdateBudget = value;
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -138,6 +161,7 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
                 'description': description.isEmpty ? null : description,
                 'year': year,
                 'budget': budget,
+                'autoUpdateBudget': _autoUpdateBudget,
               });
             },
             child: Text(isEditing ? l10n.common_save : l10n.common_create),

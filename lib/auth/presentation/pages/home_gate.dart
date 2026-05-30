@@ -59,8 +59,7 @@ class _HomeGateState extends State<HomeGate> {
           _checkNavigation(context);
         },
         child: const Center(
-          child:
-              SizedBox.shrink(), // Or a loading spinner if splash is desired
+          child: SizedBox.shrink(), // Or a loading spinner if splash is desired
         ),
       ),
     );

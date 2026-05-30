@@ -24,11 +24,11 @@ class SyncCoordinator {
     required List<SyncSnapshotProvider> providers,
     required AuthRepository authRepository,
     required SettingsCubit settingsCubit,
-  })  : _service = service,
-        _repository = repository,
-        _providers = providers,
-        _authRepository = authRepository,
-        _settingsCubit = settingsCubit;
+  }) : _service = service,
+       _repository = repository,
+       _providers = providers,
+       _authRepository = authRepository,
+       _settingsCubit = settingsCubit;
 
   Future<void> ensureInitialized() async {
     if (_initialized) return;
@@ -76,10 +76,7 @@ class SyncCoordinator {
     final user = _authRepository.currentUser;
     if (user == null) return;
     try {
-      await _service.pullIfRemoteNewer(
-        userId: user.id,
-        providers: _providers,
-      );
+      await _service.pullIfRemoteNewer(userId: user.id, providers: _providers);
     } catch (_) {}
   }
 
@@ -95,10 +92,7 @@ class SyncCoordinator {
     if (user == null) return;
     _syncing = true;
     try {
-      await _service.pushSnapshot(
-        userId: user.id,
-        providers: _providers,
-      );
+      await _service.pushSnapshot(userId: user.id, providers: _providers);
     } catch (_) {
       // ignore errors to avoid blocking UI; manual backup/restore remains
     } finally {

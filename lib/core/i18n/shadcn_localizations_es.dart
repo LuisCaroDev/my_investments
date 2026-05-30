@@ -38,7 +38,8 @@ class ShadcnLocalizationsEs extends ShadcnLocalizations {
       'Debe estar entre $min y $max (exclusivo)';
 
   @override
-  String formLengthLessThan(int value) => 'Debe tener al menos $value caracteres';
+  String formLengthLessThan(int value) =>
+      'Debe tener al menos $value caracteres';
 
   @override
   String formLengthGreaterThan(int value) =>
@@ -54,7 +55,8 @@ class ShadcnLocalizationsEs extends ShadcnLocalizations {
   String get formPasswordUppercase => 'Debe contener al menos una mayúscula';
 
   @override
-  String get formPasswordSpecial => 'Debe contener al menos un carácter especial';
+  String get formPasswordSpecial =>
+      'Debe contener al menos un carácter especial';
 
   @override
   String get commandSearch => 'Escribe un comando o busca...';

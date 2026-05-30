@@ -17,19 +17,23 @@ class AccountsLocalDataSource implements SyncSnapshotProvider {
   final SharedPreferences _prefs;
   final String _profileId;
 
-  final _transactionsStream = StreamController<List<TransactionModel>>.broadcast();
-  final _accountsStream = StreamController<List<FinancialAccountModel>>.broadcast();
+  final _transactionsStream =
+      StreamController<List<TransactionModel>>.broadcast();
+  final _accountsStream =
+      StreamController<List<FinancialAccountModel>>.broadcast();
 
   TransactionProjectionJob? _projectionJob;
 
-  Stream<List<TransactionModel>> get transactionsStream => _transactionsStream.stream;
-  Stream<List<FinancialAccountModel>> get accountsStream => _accountsStream.stream;
+  Stream<List<TransactionModel>> get transactionsStream =>
+      _transactionsStream.stream;
+  Stream<List<FinancialAccountModel>> get accountsStream =>
+      _accountsStream.stream;
 
   AccountsLocalDataSource({
     required SharedPreferences prefs,
     required String profileId,
-  })  : _prefs = prefs,
-        _profileId = profileId;
+  }) : _prefs = prefs,
+       _profileId = profileId;
 
   String _key(String key) => profileKey(_profileId, key);
 
@@ -69,7 +73,9 @@ class AccountsLocalDataSource implements SyncSnapshotProvider {
         .toList();
   }
 
-  Future<void> saveFinancialAccounts(List<FinancialAccountModel> accounts) async {
+  Future<void> saveFinancialAccounts(
+    List<FinancialAccountModel> accounts,
+  ) async {
     final data = jsonEncode(accounts.map((e) => e.toJson()).toList());
     await _prefs.setString(_key(_financialAccountsKey), data);
     _accountsStream.add(accounts);

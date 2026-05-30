@@ -11,6 +11,7 @@ import 'package:my_investments/core/widgets/empty_state.dart';
 import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
 import 'package:my_investments/planning/data/repositories/activity_repository.dart';
+import 'package:my_investments/planning/data/repositories/project_repository.dart';
 import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
 import 'package:my_investments/planning/data/services/planning_detail_query_service.dart';
 import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
@@ -33,6 +34,7 @@ import 'package:my_investments/planning/presentation/widgets/preview_section.dar
 import 'package:my_investments/planning/presentation/widgets/section_header.dart';
 import 'package:my_investments/accounts/presentation/widgets/transaction_tile.dart';
 import 'package:my_investments/planning/presentation/widgets/operational_task_tile.dart';
+import 'package:my_investments/planning/presentation/widgets/suggested_budget_banner.dart';
 
 List<FinancialAccount> _getAccountsFromContext(BuildContext context) {
   final state = context.read<AccountsCubit>().state;
@@ -68,12 +70,14 @@ class ProjectDetailPage extends StatelessWidget {
     final accountsRepo = context.read<AccountsRepository>();
     final detailQueryService = context.read<PlanningDetailQueryService>();
     final activityRepository = context.read<ActivityRepository>();
+    final projectRepository = context.read<ProjectRepository>();
     final operationalTaskRepository = context.read<OperationalTaskRepository>();
     final planningLocalDataSource = context.read<PlanningLocalDataSource>();
     return BlocProvider(
       create: (_) => ProjectDetailCubit(
         detailQueryService: detailQueryService,
         activityRepository: activityRepository,
+        projectRepository: projectRepository,
         operationalTaskRepository: operationalTaskRepository,
         accountsRepository: accountsRepo,
         planningLocalDataSource: planningLocalDataSource,
@@ -211,6 +215,21 @@ class _ProjectDetailContent extends StatelessWidget {
           else
             InvestmentMetricsSection(detail: state.detail),
 
+          if (!state.detail.project.autoUpdateBudget &&
+              state.detail.suggestedBudget >
+                  (state.detail.project.globalBudget ?? 0)) ...[
+            const Gap(24),
+            SuggestedBudgetBanner(
+              suggestedBudget: state.detail.suggestedBudget,
+              onUpdate: () {
+                final updated = state.detail.project.copyWith(
+                  globalBudget: state.detail.suggestedBudget,
+                );
+                context.read<ProjectDetailCubit>().updateProject(updated);
+              },
+            ),
+          ],
+
           // ── Categories ───────────────────────
           const Gap(24),
           PreviewSection(
@@ -249,18 +268,20 @@ class _ProjectDetailContent extends StatelessWidget {
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.secondary.withValues(alpha: 0.2),
+                          color: theme.colorScheme.secondary.withValues(
+                            alpha: 0.2,
+                          ),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(l10n.project_detail_summary_net_balance).medium,
                             Text(
-                              balance.toCompactCurrency(context),
-                            ).medium(
-                              color: balance >= 0 
-                                  ? theme.colorScheme.primary 
+                              l10n.project_detail_summary_net_balance,
+                            ).medium,
+                            Text(balance.toCompactCurrency(context)).medium(
+                              color: balance >= 0
+                                  ? theme.colorScheme.primary
                                   : theme.colorScheme.destructive,
                             ),
                           ],
@@ -284,7 +305,6 @@ class _ProjectDetailContent extends StatelessWidget {
               );
             },
           ),
-
 
           // ── Activities ───────────────────────
           const Gap(24),

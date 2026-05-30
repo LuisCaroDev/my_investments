@@ -34,8 +34,8 @@ class TransactionListLoaded extends TransactionListState {
     final filtered = selectedOperationalTaskId == null
         ? transactions
         : transactions
-            .where((t) => t.operationalTaskId == selectedOperationalTaskId)
-            .toList();
+              .where((t) => t.operationalTaskId == selectedOperationalTaskId)
+              .toList();
 
     final sorted = List<Transaction>.from(filtered);
     sorted.sort((a, b) {

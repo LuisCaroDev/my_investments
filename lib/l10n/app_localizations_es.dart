@@ -56,6 +56,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get common_description_placeholder => 'Describe el elemento...';
 
   @override
+  String get common_auto_update_budget_label => 'Autocalcular presupuesto';
+
+  @override
   String get projects_title => 'Mis Inversiones';
 
   @override

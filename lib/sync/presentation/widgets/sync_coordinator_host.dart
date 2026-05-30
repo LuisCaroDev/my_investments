@@ -54,8 +54,7 @@ class _SyncCoordinatorHostState extends State<SyncCoordinatorHost> {
           },
         ),
         BlocListener<SettingsCubit, SettingsState>(
-          listenWhen: (prev, next) =>
-              prev.syncEnabled != next.syncEnabled,
+          listenWhen: (prev, next) => prev.syncEnabled != next.syncEnabled,
           listener: (context, state) {
             widget.coordinator.onSyncEnabledChanged(state.syncEnabled);
           },

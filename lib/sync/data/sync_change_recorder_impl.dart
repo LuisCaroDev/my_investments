@@ -10,8 +10,8 @@ class SyncChangeRecorderImpl implements SyncChangeRecorder {
   const SyncChangeRecorderImpl({
     required SyncLocalDataSource local,
     VoidCallback? onChange,
-  })  : _local = local,
-        _onChange = onChange;
+  }) : _local = local,
+       _onChange = onChange;
 
   @override
   Future<void> recordChange({

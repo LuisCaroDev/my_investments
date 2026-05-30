@@ -57,10 +57,7 @@ class _LoginPageState extends State<LoginPage> {
     context.read<AuthCubit>().clearOtpError();
   }
 
-  String? _resolveOtpError(
-    BuildContext context,
-    AuthOtpRequested state,
-  ) {
+  String? _resolveOtpError(BuildContext context, AuthOtpRequested state) {
     final l10n = AppLocalizations.of(context)!;
 
     switch (state.errorCode) {

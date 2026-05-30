@@ -26,19 +26,14 @@ class OperationalTaskTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       child: Row(
         children: [
-          Icon(
-            RadixIcons.bookmark,
-            size: 14,
-            color: theme.colorScheme.primary,
-          ),
+          Icon(RadixIcons.bookmark, size: 14, color: theme.colorScheme.primary),
           const Gap(10),
           Expanded(
             child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Text(task.name).small,
-                if (subtitle != null)
-                  Text(subtitle!).muted.xSmall,
+                if (subtitle != null) Text(subtitle!).muted.xSmall,
               ],
             ),
           ),

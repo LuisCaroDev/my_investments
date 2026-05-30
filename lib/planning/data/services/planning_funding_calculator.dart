@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:my_investments/core/domain/entities/transaction.dart';
 import 'package:my_investments/planning/domain/entities/activity.dart';
 import 'package:my_investments/planning/domain/entities/project.dart';
@@ -37,6 +39,7 @@ class PlanningFundingCalculator {
       final totalBudget = calculateProjectBudget(
         project: project,
         projectActivities: projectActivities,
+        projectTransactions: projectTransactions,
       );
       final remainingNeed = calculateRemainingProjectNeed(
         totalBudget: totalBudget,
@@ -96,6 +99,7 @@ class PlanningFundingCalculator {
       final projectBudget = calculateProjectBudget(
         project: currentProject,
         projectActivities: projectActivities,
+        projectTransactions: projectTransactions,
       );
       final projectSpent = _sumTransactions(
         projectTransactions,
@@ -177,12 +181,45 @@ class PlanningFundingCalculator {
   double calculateProjectBudget({
     required Project project,
     required List<Activity> projectActivities,
+    required List<Transaction> projectTransactions,
   }) {
+    if (project.autoUpdateBudget) {
+      return calculateSuggestedProjectBudget(
+        projectActivities: projectActivities,
+        projectTransactions: projectTransactions,
+      );
+    }
     return project.globalBudget ??
         projectActivities.fold<double>(
           0.0,
           (sum, activity) => sum + (activity.budget ?? 0.0),
         );
+  }
+
+  double calculateSuggestedProjectBudget({
+    required List<Activity> projectActivities,
+    required List<Transaction> projectTransactions,
+  }) {
+    final activitiesBudget = projectActivities.fold<double>(0.0, (
+      sum,
+      activity,
+    ) {
+      final activitySpent = _sumTransactions(
+        projectTransactions.where((t) => t.activityId == activity.id),
+        TransactionType.expense,
+      );
+      final dynamicActivityBudget = activity.autoUpdateBudget
+          ? math.max(activity.budget ?? 0.0, activitySpent)
+          : (activity.budget ?? 0.0);
+      return sum + dynamicActivityBudget;
+    });
+
+    final projectLevelSpent = _sumTransactions(
+      projectTransactions.where((t) => t.activityId == null),
+      TransactionType.expense,
+    );
+
+    return activitiesBudget + projectLevelSpent;
   }
 
   double calculateRemainingProjectNeed({

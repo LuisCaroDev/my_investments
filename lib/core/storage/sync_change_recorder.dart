@@ -1,8 +1,4 @@
-enum SyncChangeOp {
-  add,
-  update,
-  delete,
-}
+enum SyncChangeOp { add, update, delete }
 
 abstract class SyncChangeRecorder {
   Future<void> recordChange({

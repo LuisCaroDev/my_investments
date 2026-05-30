@@ -5,12 +5,14 @@ class AddProjectDialog extends StatefulWidget {
   final String? initialName;
   final String? initialDescription;
   final double? initialBudget;
+  final bool? initialAutoUpdateBudget;
 
   const AddProjectDialog({
     super.key,
     this.initialName,
     this.initialDescription,
     this.initialBudget,
+    this.initialAutoUpdateBudget,
   });
 
   @override
@@ -21,16 +23,19 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
   late final TextEditingController _nameController;
   late final TextEditingController _descriptionController;
   late final TextEditingController _budgetController;
+  late bool _autoUpdateBudget;
 
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController(text: widget.initialName ?? '');
-    _descriptionController =
-        TextEditingController(text: widget.initialDescription ?? '');
+    _descriptionController = TextEditingController(
+      text: widget.initialDescription ?? '',
+    );
     _budgetController = TextEditingController(
       text: widget.initialBudget?.toString() ?? '',
     );
+    _autoUpdateBudget = widget.initialAutoUpdateBudget ?? false;
   }
 
   @override
@@ -53,7 +58,9 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
       curve: Curves.easeOut,
       child: AlertDialog(
         title: Text(
-          isEditing ? l10n.dialog_project_edit_title : l10n.dialog_project_new_title,
+          isEditing
+              ? l10n.dialog_project_edit_title
+              : l10n.dialog_project_new_title,
         ),
         content: SizedBox(
           width: 400,
@@ -73,7 +80,9 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
                 const Gap(4),
                 TextField(
                   controller: _descriptionController,
-                  placeholder: Text(l10n.dialog_project_description_placeholder),
+                  placeholder: Text(
+                    l10n.dialog_project_description_placeholder,
+                  ),
                   maxLines: 3,
                 ),
                 const Gap(12),
@@ -83,6 +92,21 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
                   controller: _budgetController,
                   placeholder: const Text('0.00'),
                   keyboardType: TextInputType.number,
+                ),
+                const Gap(12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(l10n.common_auto_update_budget_label).small.medium,
+                    Switch(
+                      value: _autoUpdateBudget,
+                      onChanged: (value) {
+                        setState(() {
+                          _autoUpdateBudget = value;
+                        });
+                      },
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -103,6 +127,7 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
                 'name': name,
                 'description': description.isEmpty ? null : description,
                 'budget': budget,
+                'autoUpdateBudget': _autoUpdateBudget,
               });
             },
             child: Text(isEditing ? l10n.common_save : l10n.common_create),

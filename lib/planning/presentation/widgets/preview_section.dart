@@ -52,10 +52,7 @@ class PreviewSection<T> extends StatelessWidget {
           onAction: onAction,
           trailing: trailing,
         ),
-        if (headerBottom != null) ...[
-          const Gap(12),
-          headerBottom!,
-        ],
+        if (headerBottom != null) ...[const Gap(12), headerBottom!],
         if (items.isEmpty) ...[
           Gap(emptyTopSpacing),
           EmptyState(
@@ -67,7 +64,9 @@ class PreviewSection<T> extends StatelessWidget {
           Gap(spacing),
           Column(
             spacing: spacing,
-            children: visibleItems.map((item) => itemBuilder(context, item)).toList(),
+            children: visibleItems
+                .map((item) => itemBuilder(context, item))
+                .toList(),
           ),
         ],
       ],

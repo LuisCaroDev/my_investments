@@ -82,15 +82,9 @@ class _ImportExportPageState extends State<ImportExportPage> {
               AppLocalizations.of(context)!.import_export_export_tab,
             ).large.bold,
             const Gap(8),
-            Text(
-              AppLocalizations.of(context)!.import_export_export_info,
-            ).small,
+            Text(AppLocalizations.of(context)!.import_export_export_info).small,
             const Gap(12),
-            TextArea(
-              initialValue: exportText,
-              readOnly: true,
-              minHeight: 320,
-            ),
+            TextArea(initialValue: exportText, readOnly: true, minHeight: 320),
             const Gap(12),
             Align(
               alignment: Alignment.centerRight,
@@ -110,9 +104,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
               AppLocalizations.of(context)!.import_export_import_tab,
             ).large.bold,
             const Gap(8),
-            Text(
-              AppLocalizations.of(context)!.import_export_import_info,
-            ).small,
+            Text(AppLocalizations.of(context)!.import_export_import_info).small,
             const Gap(12),
             TextArea(
               controller: _importController,
@@ -127,11 +119,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
               child: PrimaryButton(
                 onPressed: _importing
                     ? null
-                    : () => _importData(
-                      context,
-                      planningDs,
-                      accountsDs,
-                    ),
+                    : () => _importData(context, planningDs, accountsDs),
                 child: Text(
                   AppLocalizations.of(context)!.import_export_import_tab,
                 ),

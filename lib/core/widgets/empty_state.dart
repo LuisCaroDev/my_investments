@@ -23,21 +23,14 @@ class EmptyState extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
-              icon,
-              size: 48,
-              color: theme.colorScheme.mutedForeground,
-            ),
+            Icon(icon, size: 48, color: theme.colorScheme.mutedForeground),
             const Gap(16),
             Text(title).large.medium,
             if (subtitle != null) ...[
               const Gap(8),
               Text(subtitle!).muted.textCenter,
             ],
-            if (action != null) ...[
-              const Gap(20),
-              action!,
-            ],
+            if (action != null) ...[const Gap(20), action!],
           ],
         ),
       ),

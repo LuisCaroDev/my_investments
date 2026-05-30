@@ -17,8 +17,8 @@ class SyncLocalDataSource {
   const SyncLocalDataSource({
     required SharedPreferences prefs,
     required String profileId,
-  })  : _prefs = prefs,
-        _profileId = profileId;
+  }) : _prefs = prefs,
+       _profileId = profileId;
 
   String _key(String key) => profileKey(_profileId, key);
 
