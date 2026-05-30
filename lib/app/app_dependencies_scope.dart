@@ -25,6 +25,7 @@ import 'package:my_investments/sync/data/sync_change_recorder_impl.dart';
 import 'package:my_investments/sync/domain/usecases/sync_coordinator.dart';
 import 'package:my_investments/sync/domain/usecases/sync_service.dart';
 import 'package:my_investments/sync/presentation/widgets/sync_coordinator_host.dart';
+import 'package:my_investments/core/domain/jobs/transaction_projection_job.dart';
 
 class AppDependenciesScope extends StatelessWidget {
   final SharedPreferences prefs;
@@ -100,8 +101,19 @@ class _ProfileDependenciesScope extends StatelessWidget {
       local: syncLocalDs,
       onChange: syncCoordinator.onLocalChange,
     );
+    const planningFundingCalculator = PlanningFundingCalculator();
+    
+    final projectionJob = TransactionProjectionJob(
+      accountsDs: accountsDs,
+      planningDs: planningDs,
+      calculator: planningFundingCalculator,
+    );
+    accountsDs.setProjectionJob(projectionJob);
+    planningDs.setProjectionJob(projectionJob);
+
     final accountsRepo = AccountsRepository(
       localDataSource: accountsDs,
+      projectionJob: projectionJob,
       changeRecorder: changeRecorder,
     );
     final projectRepository = ProjectRepository(
@@ -116,7 +128,6 @@ class _ProfileDependenciesScope extends StatelessWidget {
       localDataSource: planningDs,
       changeRecorder: changeRecorder,
     );
-    const planningFundingCalculator = PlanningFundingCalculator();
     final planningDetailQueryService = PlanningDetailQueryService(
       localDataSource: planningDs,
       transactionsReader: accountsRepo,
@@ -149,6 +160,7 @@ class _ProfileDependenciesScope extends StatelessWidget {
                 projectRepository: projectRepository,
                 detailQueryService: planningDetailQueryService,
                 accountsRepository: accountsRepo,
+                planningLocalDataSource: planningDs,
               )..loadInvestments(),
             ),
             BlocProvider(
@@ -156,11 +168,13 @@ class _ProfileDependenciesScope extends StatelessWidget {
                 projectRepository: projectRepository,
                 detailQueryService: planningDetailQueryService,
                 accountsRepository: accountsRepo,
+                planningLocalDataSource: planningDs,
               )..loadGoals(),
             ),
             BlocProvider(
               create: (_) => AccountsCubit(
                 repository: accountsRepo,
+                localDataSource: accountsDs,
                 projectRepository: projectRepository,
               )..loadAccounts(),
             ),

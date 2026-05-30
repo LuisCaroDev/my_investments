@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:my_investments/core/constants/ledger.dart';
 import 'package:my_investments/core/domain/repositories/transactions_reader.dart';
 import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
@@ -6,23 +8,25 @@ import 'package:my_investments/accounts/data/models/transaction_model.dart';
 import 'package:my_investments/accounts/domain/entities/financial_account.dart';
 import 'package:my_investments/accounts/domain/entities/transaction.dart';
 import 'package:my_investments/core/storage/sync_change_recorder.dart';
+import 'package:my_investments/core/domain/jobs/transaction_projection_job.dart';
 
 class AccountsRepository implements TransactionsReader {
   final AccountsLocalDataSource _localDataSource;
   final SyncChangeRecorder? _changeRecorder;
+  final TransactionProjectionJob _projectionJob;
 
   const AccountsRepository({
     required AccountsLocalDataSource localDataSource,
+    required TransactionProjectionJob projectionJob,
     SyncChangeRecorder? changeRecorder,
   })  : _localDataSource = localDataSource,
+        _projectionJob = projectionJob,
         _changeRecorder = changeRecorder;
 
   // ── Financial Accounts ────────────────────────────────────
 
   List<FinancialAccount> getAccounts() {
-    final accounts = _localDataSource.getFinancialAccounts();
-    final transactions = _localDataSource.getTransactions();
-    return _withComputedBalances(accounts, transactions);
+    return _localDataSource.getFinancialAccounts();
   }
 
   Future<void> addAccount(FinancialAccount account) async {
@@ -132,6 +136,7 @@ class AccountsRepository implements TransactionsReader {
       id: transaction.id,
       payload: TransactionModel.fromEntity(transaction).toJson(),
     );
+    unawaited(_projectionJob.run());
   }
 
   Future<void> updateTransaction(Transaction transaction) async {
@@ -146,6 +151,7 @@ class AccountsRepository implements TransactionsReader {
         id: transaction.id,
         payload: transactions[index].toJson(),
       );
+      unawaited(_projectionJob.run());
     }
   }
 
@@ -158,6 +164,7 @@ class AccountsRepository implements TransactionsReader {
       op: SyncChangeOp.delete,
       id: transactionId,
     );
+    unawaited(_projectionJob.run());
   }
 
   Future<void> deleteTransactionsForProject(String projectId) async {
@@ -174,6 +181,7 @@ class AccountsRepository implements TransactionsReader {
         id: tx.id,
       );
     }
+    unawaited(_projectionJob.run());
   }
 
   Future<void> deleteTransactionsForActivity(String activityId) async {
@@ -190,6 +198,7 @@ class AccountsRepository implements TransactionsReader {
         id: tx.id,
       );
     }
+    unawaited(_projectionJob.run());
   }
 
   Future<void> addAccountDeposit({
@@ -214,28 +223,4 @@ class AccountsRepository implements TransactionsReader {
     );
   }
 
-  List<FinancialAccount> _withComputedBalances(
-    List<FinancialAccount> accounts,
-    List<Transaction> transactions,
-  ) {
-    final totals = <String, double>{};
-    for (final transaction in transactions) {
-      final delta = transaction.type == TransactionType.deposit
-          ? transaction.amount
-          : -transaction.amount;
-      totals.update(
-        transaction.accountId,
-        (value) => value + delta,
-        ifAbsent: () => delta,
-      );
-    }
-
-    return accounts
-        .map(
-          (account) => account.copyWith(
-            balance: totals[account.id] ?? 0.0,
-          ),
-        )
-        .toList();
-  }
 }

@@ -13,6 +13,7 @@ import 'package:my_investments/accounts/data/repositories/accounts_repository.da
 import 'package:my_investments/planning/data/repositories/activity_repository.dart';
 import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
 import 'package:my_investments/planning/data/services/planning_detail_query_service.dart';
+import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
 import 'package:my_investments/planning/domain/entities/activity.dart';
 import 'package:my_investments/planning/domain/entities/project.dart';
 import 'package:my_investments/core/domain/entities/transaction.dart';
@@ -68,12 +69,14 @@ class ProjectDetailPage extends StatelessWidget {
     final detailQueryService = context.read<PlanningDetailQueryService>();
     final activityRepository = context.read<ActivityRepository>();
     final operationalTaskRepository = context.read<OperationalTaskRepository>();
+    final planningLocalDataSource = context.read<PlanningLocalDataSource>();
     return BlocProvider(
       create: (_) => ProjectDetailCubit(
         detailQueryService: detailQueryService,
         activityRepository: activityRepository,
         operationalTaskRepository: operationalTaskRepository,
         accountsRepository: accountsRepo,
+        planningLocalDataSource: planningLocalDataSource,
         projectId: projectId,
       )..load(),
       child: _ProjectDetailView(projectName: projectName),

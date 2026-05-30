@@ -2,10 +2,13 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'dart:async';
+
 import 'package:my_investments/core/storage/sync_snapshot_provider.dart';
 import 'package:my_investments/core/storage/profile_keys.dart';
 import 'package:my_investments/accounts/data/models/transaction_model.dart';
 import 'package:my_investments/accounts/data/models/financial_account_model.dart';
+import 'package:my_investments/core/domain/jobs/transaction_projection_job.dart';
 
 class AccountsLocalDataSource implements SyncSnapshotProvider {
   static const _transactionsKey = 'transactions';
@@ -14,13 +17,25 @@ class AccountsLocalDataSource implements SyncSnapshotProvider {
   final SharedPreferences _prefs;
   final String _profileId;
 
-  const AccountsLocalDataSource({
+  final _transactionsStream = StreamController<List<TransactionModel>>.broadcast();
+  final _accountsStream = StreamController<List<FinancialAccountModel>>.broadcast();
+
+  TransactionProjectionJob? _projectionJob;
+
+  Stream<List<TransactionModel>> get transactionsStream => _transactionsStream.stream;
+  Stream<List<FinancialAccountModel>> get accountsStream => _accountsStream.stream;
+
+  AccountsLocalDataSource({
     required SharedPreferences prefs,
     required String profileId,
   })  : _prefs = prefs,
         _profileId = profileId;
 
   String _key(String key) => profileKey(_profileId, key);
+
+  void setProjectionJob(TransactionProjectionJob job) {
+    _projectionJob = job;
+  }
 
   // ── Transactions ──────────────────────────────────────────
 
@@ -36,6 +51,7 @@ class AccountsLocalDataSource implements SyncSnapshotProvider {
   Future<void> saveTransactions(List<TransactionModel> transactions) async {
     final data = jsonEncode(transactions.map((e) => e.toJson()).toList());
     await _prefs.setString(_key(_transactionsKey), data);
+    _transactionsStream.add(transactions);
   }
 
   // ── Financial Accounts ────────────────────────────────────
@@ -56,6 +72,7 @@ class AccountsLocalDataSource implements SyncSnapshotProvider {
   Future<void> saveFinancialAccounts(List<FinancialAccountModel> accounts) async {
     final data = jsonEncode(accounts.map((e) => e.toJson()).toList());
     await _prefs.setString(_key(_financialAccountsKey), data);
+    _accountsStream.add(accounts);
   }
 
   @override
@@ -79,5 +96,8 @@ class AccountsLocalDataSource implements SyncSnapshotProvider {
 
     await saveTransactions(transactions);
     await saveFinancialAccounts(accounts);
+    if (_projectionJob != null) {
+      _projectionJob!.run().ignore();
+    }
   }
 }

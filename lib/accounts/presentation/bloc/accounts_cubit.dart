@@ -1,19 +1,35 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'dart:async';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
+import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
 import 'package:my_investments/core/domain/entities/financial_account.dart';
 import 'package:my_investments/accounts/presentation/bloc/accounts_state.dart';
 import 'package:my_investments/planning/data/repositories/project_repository.dart';
 
 class AccountsCubit extends Cubit<AccountsState> {
   final AccountsRepository _repository;
+  final AccountsLocalDataSource _localDataSource;
   final ProjectRepository _projectRepository;
+  StreamSubscription? _subscription;
 
   AccountsCubit({
     required AccountsRepository repository,
+    required AccountsLocalDataSource localDataSource,
     required ProjectRepository projectRepository,
   }) : _repository = repository,
+       _localDataSource = localDataSource,
        _projectRepository = projectRepository,
-       super(const AccountsInitial());
+       super(const AccountsInitial()) {
+    _subscription = _localDataSource.accountsStream.listen((models) {
+      emit(AccountsLoaded(accounts: models));
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _subscription?.cancel();
+    return super.close();
+  }
 
   void loadAccounts() {
     emit(const AccountsLoading());
@@ -27,17 +43,14 @@ class AccountsCubit extends Cubit<AccountsState> {
 
   Future<void> addAccount(FinancialAccount account) async {
     await _repository.addAccount(account);
-    loadAccounts();
   }
 
   Future<void> updateAccount(FinancialAccount account) async {
     await _repository.updateAccount(account);
-    loadAccounts();
   }
 
   Future<void> deleteAccount(String accountId) async {
     await _repository.deleteAccount(accountId);
-    loadAccounts();
   }
 
   Future<void> addAccountDeposit({
@@ -50,7 +63,6 @@ class AccountsCubit extends Cubit<AccountsState> {
       amount: amount,
       description: description,
     );
-    loadAccounts();
   }
 
   Future<void> reorderProjectPriorities(List<String> orderedIds) async {

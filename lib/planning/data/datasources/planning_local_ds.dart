@@ -2,11 +2,14 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'dart:async';
+
 import 'package:my_investments/core/storage/sync_snapshot_provider.dart';
 import 'package:my_investments/core/storage/profile_keys.dart';
 import 'package:my_investments/planning/data/models/project_model.dart';
 import 'package:my_investments/planning/data/models/activity_model.dart';
 import 'package:my_investments/planning/data/models/operational_task_model.dart';
+import 'package:my_investments/core/domain/jobs/transaction_projection_job.dart';
 
 class PlanningLocalDataSource implements SyncSnapshotProvider {
   static const _projectsKey = 'projects';
@@ -16,13 +19,25 @@ class PlanningLocalDataSource implements SyncSnapshotProvider {
   final SharedPreferences _prefs;
   final String _profileId;
 
-  const PlanningLocalDataSource({
+  final _projectsStream = StreamController<List<ProjectModel>>.broadcast();
+  final _activitiesStream = StreamController<List<ActivityModel>>.broadcast();
+
+  TransactionProjectionJob? _projectionJob;
+
+  Stream<List<ProjectModel>> get projectsStream => _projectsStream.stream;
+  Stream<List<ActivityModel>> get activitiesStream => _activitiesStream.stream;
+
+  PlanningLocalDataSource({
     required SharedPreferences prefs,
     required String profileId,
   })  : _prefs = prefs,
         _profileId = profileId;
 
   String _key(String key) => profileKey(_profileId, key);
+
+  void setProjectionJob(TransactionProjectionJob job) {
+    _projectionJob = job;
+  }
 
   // ── Projects ──────────────────────────────────────────────
 
@@ -38,6 +53,7 @@ class PlanningLocalDataSource implements SyncSnapshotProvider {
   Future<void> saveProjects(List<ProjectModel> projects) async {
     final data = jsonEncode(projects.map((e) => e.toJson()).toList());
     await _prefs.setString(_key(_projectsKey), data);
+    _projectsStream.add(projects);
   }
 
   // ── Activities ────────────────────────────────────────────
@@ -54,6 +70,7 @@ class PlanningLocalDataSource implements SyncSnapshotProvider {
   Future<void> saveActivities(List<ActivityModel> activities) async {
     final data = jsonEncode(activities.map((e) => e.toJson()).toList());
     await _prefs.setString(_key(_activitiesKey), data);
+    _activitiesStream.add(activities);
   }
 
   // ── Categories ────────────────────────────────────────────
@@ -98,5 +115,8 @@ class PlanningLocalDataSource implements SyncSnapshotProvider {
     await saveProjects(projects);
     await saveActivities(activities);
     await saveCategories(categories);
+    if (_projectionJob != null) {
+      _projectionJob!.run().ignore();
+    }
   }
 }

@@ -12,6 +12,7 @@ import 'package:my_investments/core/widgets/app_back_button.dart';
 import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
 import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
 import 'package:my_investments/planning/data/services/planning_detail_query_service.dart';
+import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
 
 import 'package:my_investments/core/domain/entities/financial_account.dart';
 import 'package:my_investments/core/domain/entities/transaction.dart';
@@ -68,11 +69,13 @@ class ActivityDetailPage extends StatelessWidget {
     final accountsRepo = context.read<AccountsRepository>();
     final detailQueryService = context.read<PlanningDetailQueryService>();
     final operationalTaskRepository = context.read<OperationalTaskRepository>();
+    final planningLocalDataSource = context.read<PlanningLocalDataSource>();
     return BlocProvider(
       create: (_) => ActivityDetailCubit(
         detailQueryService: detailQueryService,
         operationalTaskRepository: operationalTaskRepository,
         accountsRepository: accountsRepo,
+        planningLocalDataSource: planningLocalDataSource,
         projectId: projectId,
         activityId: activityId,
       )..load(),
