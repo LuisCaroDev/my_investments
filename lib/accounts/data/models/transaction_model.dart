@@ -15,19 +15,13 @@ class TransactionModel extends Transaction {
   });
 
   factory TransactionModel.fromJson(Map<String, dynamic> json) {
-    // For migration: if type is 'capitalInjection' (legacy), convert to 'deposit'
-    final rawType = json['type'] as String;
-    final type = rawType == 'capitalInjection'
-        ? TransactionType.deposit
-        : TransactionType.values.byName(rawType);
-
     return TransactionModel(
       id: json['id'] as String,
       projectId: json['projectId'] as String,
       activityId: json['activityId'] as String?,
       operationalTaskId: json['categoryId'] as String?,
       accountId: json['accountId'] as String? ?? 'initial_statement',
-      type: type,
+      type: TransactionType.values.byName(json['type'] as String),
       amountCents: json['amount_cents'] as int,
       date: DateTime.parse(json['date'] as String),
       description: json['description'] as String?,

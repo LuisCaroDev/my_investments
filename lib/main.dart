@@ -11,8 +11,6 @@ import 'package:capitalflow/core/theme/app_theme.dart';
 import 'package:capitalflow/core/router/app_router.dart';
 import 'package:capitalflow/core/i18n/shadcn_localizations_es.dart';
 import 'package:capitalflow/auth/data/repositories/auth_repository.dart';
-import 'package:capitalflow/core/storage/profile_keys.dart';
-import 'package:capitalflow/core/storage/profile_ids.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,33 +21,10 @@ void main() async {
     );
   }
   final prefs = await SharedPreferences.getInstance();
-  await _migrateLegacyKeysToGuest(prefs);
 
   final authRepo = AuthRepository();
 
   runApp(MyInvestmentsApp(prefs: prefs, authRepository: authRepo));
-}
-
-Future<void> _migrateLegacyKeysToGuest(SharedPreferences prefs) async {
-  const legacyKeys = [
-    'projects',
-    'activities',
-    'categories',
-    'transactions',
-    'financial_accounts',
-    'sync_pending_changes',
-    'sync_last_sync',
-  ];
-
-  for (final key in legacyKeys) {
-    final legacyValue = prefs.getString(key);
-    if (legacyValue == null) continue;
-    final newKey = profileKey(guestProfileId, key);
-    if (!prefs.containsKey(newKey)) {
-      await prefs.setString(newKey, legacyValue);
-    }
-    await prefs.remove(key);
-  }
 }
 
 class FallbackShadcnLocalizationsDelegate

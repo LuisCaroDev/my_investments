@@ -390,16 +390,12 @@ class _ImportExportPageState extends State<ImportExportPage> {
     final header = rows.first;
     return rows.skip(1).where((r) => r.length == header.length).map((r) {
       final map = _rowToMap(header, r);
-      final typeRaw = (map['type'] ?? 'investment').trim();
-      final type = ProjectType.values.byName(
-        typeRaw == 'savings_goal' ? 'savingsGoal' : typeRaw,
-      );
       return ProjectModel(
         id: map['id'] ?? '',
         name: map['name'] ?? '',
         description: _nullIfEmpty(map['description']),
         globalBudgetCents: _toInt(map['global_budget_cents']),
-        type: type,
+        type: ProjectType.values.byName((map['type'] ?? 'investment').trim()),
         priority: _toInt(map['priority']) ?? 0,
         createdAt: DateTime.parse(
           map['created_at'] ?? DateTime.now().toString(),
@@ -472,14 +468,10 @@ class _ImportExportPageState extends State<ImportExportPage> {
     final header = rows.first;
     return rows.skip(1).where((r) => r.length == header.length).map((r) {
       final map = _rowToMap(header, r);
-      final typeRaw = (map['type'] ?? 'bank').trim();
-      final type = FinancialAccountType.values.byName(
-        typeRaw == 'loan_account' ? 'loan' : typeRaw,
-      );
       return FinancialAccountModel(
         id: map['id'] ?? '',
         name: map['name'] ?? '',
-        type: type,
+        type: FinancialAccountType.values.byName((map['type'] ?? 'bank').trim()),
         balanceCents: _toInt(map['balance_cents']) ?? 0,
         createdAt: DateTime.parse(
           map['created_at'] ?? DateTime.now().toString(),
@@ -544,12 +536,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
   }
 
   TransactionType _parseTransactionType(String? value) {
-    final v = value?.trim();
-    return switch (v) {
-      'deposit' => TransactionType.deposit,
-      'capitalInjection' => TransactionType.deposit, // Legacy migration
-      _ => TransactionType.expense,
-    };
+    return TransactionType.values.byName((value ?? 'expense').trim());
   }
 }
 

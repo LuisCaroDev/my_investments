@@ -13,10 +13,7 @@ class FinancialAccountModel extends FinancialAccount {
     return FinancialAccountModel(
       id: json['id'],
       name: json['name'],
-      type: FinancialAccountType.values.firstWhere(
-        (e) => e.name == json['type'],
-        orElse: () => FinancialAccountType.bank,
-      ),
+      type: FinancialAccountType.values.byName(json['type'] as String),
       balanceCents: json['balance_cents'] as int,
       createdAt: DateTime.parse(json['created_at']),
     );
