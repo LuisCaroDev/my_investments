@@ -4,14 +4,14 @@ class FinancialAccount {
   final String id;
   final String name;
   final FinancialAccountType type;
-  final double balance;
+  final int balanceCents;
   final DateTime createdAt;
 
   const FinancialAccount({
     required this.id,
     required this.name,
     required this.type,
-    required this.balance,
+    required this.balanceCents,
     required this.createdAt,
   });
 
@@ -19,14 +19,14 @@ class FinancialAccount {
     String? id,
     String? name,
     FinancialAccountType? type,
-    double? balance,
+    int? balanceCents,
     DateTime? createdAt,
   }) {
     return FinancialAccount(
       id: id ?? this.id,
       name: name ?? this.name,
       type: type ?? this.type,
-      balance: balance ?? this.balance,
+      balanceCents: balanceCents ?? this.balanceCents,
       createdAt: createdAt ?? this.createdAt,
     );
   }

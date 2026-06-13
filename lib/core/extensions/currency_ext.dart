@@ -4,8 +4,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:capitalflow/core/presentation/bloc/settings_cubit.dart';
+import 'package:capitalflow/core/utils/money.dart';
 
-extension CurrencyExtension on num {
+extension CurrencyCentsExtension on int {
   String toCurrency(BuildContext context, {String? locale, String? symbol}) {
     final settings = context.read<SettingsCubit>().state;
     final effectiveLocale =
@@ -21,7 +22,7 @@ extension CurrencyExtension on num {
       locale: parseLocale,
       symbol: effectiveSymbol,
     );
-    return formatter.format(this);
+    return formatter.format(centsToDecimal(this));
   }
 
   String toCompactCurrency(
@@ -43,6 +44,6 @@ extension CurrencyExtension on num {
       locale: parseLocale,
       symbol: effectiveSymbol,
     );
-    return formatter.format(this);
+    return formatter.format(centsToDecimal(this));
   }
 }

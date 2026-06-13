@@ -2,27 +2,31 @@ import 'package:capitalflow/planning/domain/entities/project.dart';
 
 class ProjectSummary {
   final Project project;
-  final double totalBudget;
-  final double totalSpent;
-  final double totalDeposited;
-  final double fundedAmount;
-  final double remainingToFund;
+  final int totalBudgetCents;
+  final int totalSpentCents;
+  final int totalDepositedCents;
+  final int fundedAmountCents;
+  final int remainingToFundCents;
   final int activityCount;
 
   const ProjectSummary({
     required this.project,
-    required this.totalBudget,
-    required this.totalSpent,
-    required this.totalDeposited,
-    required this.fundedAmount,
-    required this.remainingToFund,
+    required this.totalBudgetCents,
+    required this.totalSpentCents,
+    required this.totalDepositedCents,
+    required this.fundedAmountCents,
+    required this.remainingToFundCents,
     required this.activityCount,
   });
 
-  double get operatingBalance => totalDeposited - totalSpent;
-  double get netBalance => operatingBalance;
+  int get operatingBalanceCents => totalDepositedCents - totalSpentCents;
+  int get netBalanceCents => operatingBalanceCents;
   double get budgetProgress =>
-      totalBudget > 0 ? (totalSpent / totalBudget).clamp(0.0, 1.0) : 0.0;
+      totalBudgetCents > 0
+      ? (totalSpentCents / totalBudgetCents).clamp(0.0, 1.0)
+      : 0.0;
   double get fundingProgress =>
-      totalBudget > 0 ? (fundedAmount / totalBudget).clamp(0.0, 1.0) : 0.0;
+      totalBudgetCents > 0
+      ? (fundedAmountCents / totalBudgetCents).clamp(0.0, 1.0)
+      : 0.0;
 }

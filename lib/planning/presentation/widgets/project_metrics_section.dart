@@ -22,39 +22,39 @@ class InvestmentMetricsSection extends StatelessWidget {
           children: [
             StatCard(
               label: l10n.project_detail_summary_deposited,
-              value: detail.totalDeposited.toCompactCurrency(context),
+              value: detail.totalDepositedCents.toCompactCurrency(context),
               icon: RadixIcons.arrowUp,
               valueColor: theme.colorScheme.primary,
             ),
             StatCard(
               label: l10n.project_detail_summary_spent,
-              value: detail.totalSpent.toCompactCurrency(context),
+              value: detail.totalSpentCents.toCompactCurrency(context),
               icon: RadixIcons.arrowDown,
               valueColor: theme.colorScheme.destructive,
             ),
             StatCard(
               label: l10n.project_detail_summary_net_balance,
-              value: detail.netBalance.toCompactCurrency(context),
+              value: detail.netBalanceCents.toCompactCurrency(context),
               icon: RadixIcons.barChart,
-              valueColor: detail.netBalance < 0
+              valueColor: detail.netBalanceCents < 0
                   ? theme.colorScheme.destructive
                   : theme.colorScheme.primary,
             ),
             StatCard(
               label: l10n.project_detail_summary_budget,
-              value: detail.totalBudget.toCompactCurrency(context),
+              value: detail.totalBudgetCents.toCompactCurrency(context),
               icon: RadixIcons.target,
             ),
           ],
         ),
-        if (detail.totalBudget > 0) ...[
+        if (detail.totalBudgetCents > 0) ...[
           const Gap(16),
           Card(
             padding: const EdgeInsets.all(16),
             child: BudgetProgress(
-              budget: detail.totalBudget,
-              fundedAmount: detail.fundedAmount,
-              spent: detail.totalSpent,
+              budgetCents: detail.totalBudgetCents,
+              fundedAmountCents: detail.fundedAmountCents,
+              spentCents: detail.totalSpentCents,
               formatCurrency: (v) => v.toCompactCurrency(context),
             ),
           ),
@@ -81,36 +81,36 @@ class GoalMetricsSection extends StatelessWidget {
           children: [
             StatCard(
               label: l10n.goal_detail_summary_saved,
-              value: detail.fundedAmount.toCompactCurrency(context),
+              value: detail.fundedAmountCents.toCompactCurrency(context),
               icon: RadixIcons.archive,
               valueColor: theme.colorScheme.primary,
             ),
             StatCard(
               label: l10n.goal_detail_summary_spent,
-              value: detail.totalSpent.toCompactCurrency(context),
+              value: detail.totalSpentCents.toCompactCurrency(context),
               icon: RadixIcons.arrowDown,
               valueColor: theme.colorScheme.destructive,
             ),
             StatCard(
               label: l10n.goal_detail_summary_target,
-              value: detail.totalBudget.toCompactCurrency(context),
+              value: detail.totalBudgetCents.toCompactCurrency(context),
               icon: RadixIcons.target,
             ),
             StatCard(
               label: l10n.goal_detail_summary_missing,
-              value: detail.remainingToFund.toCompactCurrency(context),
+              value: detail.remainingToFundCents.toCompactCurrency(context),
               icon: RadixIcons.backpack,
             ),
           ],
         ),
-        if (detail.totalBudget > 0) ...[
+        if (detail.totalBudgetCents > 0) ...[
           const Gap(16),
           Card(
             padding: const EdgeInsets.all(16),
             child: BudgetProgress(
-              budget: detail.totalBudget,
-              fundedAmount: detail.fundedAmount,
-              spent: detail.totalSpent,
+              budgetCents: detail.totalBudgetCents,
+              fundedAmountCents: detail.fundedAmountCents,
+              spentCents: detail.totalSpentCents,
               formatCurrency: (v) => v.toCompactCurrency(context),
               budgetLabel: l10n.widget_goal_progress_target,
               fundedLabel: l10n.widget_goal_progress_saved,

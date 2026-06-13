@@ -293,7 +293,7 @@ class _AccountsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final totalBalance = accounts.fold(0.0, (sum, a) => sum + a.balance);
+    final totalBalanceCents = accounts.fold(0, (sum, a) => sum + a.balanceCents);
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     return SingleChildScrollView(
@@ -325,9 +325,9 @@ class _AccountsList extends StatelessWidget {
                     child: StatCard(
                       label: l10n
                           .project_detail_summary_net_balance, // generic "Balance"
-                      value: totalBalance.toCurrency(context),
+                      value: totalBalanceCents.toCurrency(context),
                       icon: RadixIcons.barChart,
-                      valueColor: totalBalance < 0
+                      valueColor: totalBalanceCents < 0
                           ? Theme.of(context).colorScheme.destructive
                           : Theme.of(context).colorScheme.primary,
                     ),
@@ -386,7 +386,7 @@ class _AccountCard extends StatelessWidget {
           const Gap(16),
           Text('Balance').muted.small,
           Text(
-            account.balance.toCurrency(context),
+            account.balanceCents.toCurrency(context),
           ).semiBold(color: theme.colorScheme.primary),
         ],
       ),
@@ -416,7 +416,7 @@ class _AccountCard extends StatelessWidget {
               if (result != null && context.mounted) {
                 await context.read<AccountsCubit>().addAccountDeposit(
                   accountId: account.id,
-                  amount: result['amount'] as double,
+                  amountCents: result['amountCents'] as int,
                   description: result['description'] as String?,
                 );
               }

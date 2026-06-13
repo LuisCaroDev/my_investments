@@ -1,11 +1,12 @@
 import 'package:capitalflow/l10n/app_localizations.dart';
+import 'package:capitalflow/core/utils/money.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class AddActivityDialog extends StatefulWidget {
   final String? initialName;
   final String? initialDescription;
   final int? initialYear;
-  final double? initialBudget;
+  final int? initialBudgetCents;
   final bool? initialAutoUpdateBudget;
 
   const AddActivityDialog({
@@ -13,7 +14,7 @@ class AddActivityDialog extends StatefulWidget {
     this.initialName,
     this.initialDescription,
     this.initialYear,
-    this.initialBudget,
+    this.initialBudgetCents,
     this.initialAutoUpdateBudget,
   });
 
@@ -39,7 +40,9 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
       text: widget.initialYear?.toString() ?? DateTime.now().year.toString(),
     );
     _budgetController = TextEditingController(
-      text: widget.initialBudget?.toString() ?? '',
+      text: widget.initialBudgetCents != null
+          ? formatCentsForInput(widget.initialBudgetCents!)
+          : '',
     );
     _autoUpdateBudget = widget.initialAutoUpdateBudget ?? false;
   }
@@ -153,14 +156,14 @@ class _AddActivityDialogState extends State<AddActivityDialog> {
             onPressed: () {
               final name = _nameController.text.trim();
               if (name.isEmpty) return;
-              final budget = double.tryParse(_budgetController.text.trim());
+              final budgetCents = parseMoneyToCents(_budgetController.text);
               final year = int.tryParse(_yearController.text.trim());
               final description = _descriptionController.text.trim();
               Navigator.of(context).pop({
                 'name': name,
                 'description': description.isEmpty ? null : description,
                 'year': year,
-                'budget': budget,
+                'budgetCents': budgetCents,
                 'autoUpdateBudget': _autoUpdateBudget,
               });
             },

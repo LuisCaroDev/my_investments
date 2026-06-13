@@ -67,7 +67,7 @@ class TransactionTile extends StatelessWidget {
                 '${transaction.date.day}/${transaction.date.month}/${transaction.date.year}',
               ).muted.xSmall,
               Text(
-                '$sign${transaction.amount.toCompactCurrency(context)}',
+                '$sign${transaction.amountCents.toCompactCurrency(context)}',
               ).small.semiBold(color: valueColor),
             ],
           ),

@@ -60,24 +60,24 @@ class PlanningDetailQueryService {
         .where((task) => task.projectId == projectId && task.activityId == null)
         .toList();
 
-    final totalSpent = _sumTransactions(
+    final totalSpentCents = _sumTransactions(
       projectTransactions,
       TransactionType.expense,
     );
-    final totalDeposited = _sumTransactions(
+    final totalDepositedCents = _sumTransactions(
       projectTransactions,
       TransactionType.deposit,
     );
-    final totalBudget = _fundingCalculator.calculateProjectBudget(
+    final totalBudgetCents = _fundingCalculator.calculateProjectBudget(
       project: project,
       projectActivities: projectActivities,
       projectTransactions: projectTransactions,
     );
-    final suggestedBudget = _fundingCalculator.calculateSuggestedProjectBudget(
+    final suggestedBudgetCents = _fundingCalculator.calculateSuggestedProjectBudget(
       projectActivities: projectActivities,
       projectTransactions: projectTransactions,
     );
-    final fundedAmount = _fundingCalculator.calculateFundedAmountForProject(
+    final fundedAmountCents = _fundingCalculator.calculateFundedAmountForProject(
       project: project,
       projects: projects,
       allActivities: allActivities,
@@ -85,7 +85,7 @@ class PlanningDetailQueryService {
     );
     final activityFunding = _fundingCalculator.allocateFundingSequentially(
       activities: projectActivities,
-      fundedAmount: fundedAmount,
+      fundedAmountCents: fundedAmountCents,
       transactions: projectTransactions,
     );
 
@@ -93,11 +93,11 @@ class PlanningDetailQueryService {
       final activityTransactions = projectTransactions
           .where((transaction) => transaction.activityId == activity.id)
           .toList();
-      final spent = _sumTransactions(
+      final spentCents = _sumTransactions(
         activityTransactions,
         TransactionType.expense,
       );
-      final deposited = _sumTransactions(
+      final depositedCents = _sumTransactions(
         activityTransactions,
         TransactionType.deposit,
       );
@@ -107,45 +107,49 @@ class PlanningDetailQueryService {
 
       return ActivitySummary(
         activity: activity,
-        spent: spent,
-        deposited: deposited,
-        fundedAmount: activityFunding[activity.id] ?? 0.0,
+        spentCents: spentCents,
+        depositedCents: depositedCents,
+        fundedAmountCents: activityFunding[activity.id] ?? 0,
         categories: categories,
         transactionCount: activityTransactions.length,
       );
     }).toList();
 
-    final remainingProjectNeed = _fundingCalculator
+    final remainingProjectNeedCents = _fundingCalculator
         .calculateRemainingProjectNeed(
-          totalBudget: totalBudget,
-          totalSpent: totalSpent,
+          totalBudgetCents: totalBudgetCents,
+          totalSpentCents: totalSpentCents,
         );
-    final remainingToFund = remainingProjectNeed > 0
-        ? (remainingProjectNeed - fundedAmount).clamp(0.0, remainingProjectNeed)
-        : 0.0;
+    final remainingToFundCents = remainingProjectNeedCents > 0
+        ? (remainingProjectNeedCents - fundedAmountCents).clamp(
+            0,
+            remainingProjectNeedCents,
+          )
+        : 0;
 
-    final projectLevelSpent = _sumTransactions(
+    final projectLevelSpentCents = _sumTransactions(
       projectLevelTransactions,
       TransactionType.expense,
     );
-    final projectLevelDeposited = _sumTransactions(
+    final projectLevelDepositedCents = _sumTransactions(
       projectLevelTransactions,
       TransactionType.deposit,
     );
-    final projectLevelBalance = projectLevelDeposited - projectLevelSpent;
+    final projectLevelBalanceCents =
+        projectLevelDepositedCents - projectLevelSpentCents;
 
     return ProjectDetail(
       project: project,
       activitySummaries: activitySummaries,
       projectLevelTransactions: projectLevelTransactions,
       projectCategories: projectTasks,
-      totalBudget: totalBudget,
-      totalSpent: totalSpent,
-      totalDeposited: totalDeposited,
-      fundedAmount: fundedAmount,
-      remainingToFund: remainingToFund,
-      projectLevelBalance: projectLevelBalance,
-      suggestedBudget: suggestedBudget,
+      totalBudgetCents: totalBudgetCents,
+      totalSpentCents: totalSpentCents,
+      totalDepositedCents: totalDepositedCents,
+      fundedAmountCents: fundedAmountCents,
+      remainingToFundCents: remainingToFundCents,
+      projectLevelBalanceCents: projectLevelBalanceCents,
+      suggestedBudgetCents: suggestedBudgetCents,
     );
   }
 
@@ -167,12 +171,15 @@ class PlanningDetailQueryService {
       activityId,
     );
 
-    final spent = _sumTransactions(transactions, TransactionType.expense);
-    final deposited = _sumTransactions(transactions, TransactionType.deposit);
+    final spentCents = _sumTransactions(transactions, TransactionType.expense);
+    final depositedCents = _sumTransactions(
+      transactions,
+      TransactionType.deposit,
+    );
     final projectActivities = activities
         .where((currentActivity) => currentActivity.projectId == projectId)
         .toList();
-    final projectFundedAmount = _fundingCalculator
+    final projectFundedAmountCents = _fundingCalculator
         .calculateFundedAmountForProject(
           project: project,
           projects: projects,
@@ -181,7 +188,7 @@ class PlanningDetailQueryService {
         );
     final activityFunding = _fundingCalculator.allocateFundingSequentially(
       activities: projectActivities,
-      fundedAmount: projectFundedAmount,
+      fundedAmountCents: projectFundedAmountCents,
       transactions: allTransactions
           .where((transaction) => transaction.projectId == projectId)
           .toList(),
@@ -189,9 +196,9 @@ class PlanningDetailQueryService {
 
     final summary = ActivitySummary(
       activity: activity,
-      spent: spent,
-      deposited: deposited,
-      fundedAmount: activityFunding[activityId] ?? 0.0,
+      spentCents: spentCents,
+      depositedCents: depositedCents,
+      fundedAmountCents: activityFunding[activityId] ?? 0,
       categories: _operationalTaskRepository.getActivityOperationalTasks(
         activityId,
       ),
@@ -205,12 +212,12 @@ class PlanningDetailQueryService {
     );
   }
 
-  double _sumTransactions(
+  int _sumTransactions(
     Iterable<Transaction> transactions,
     TransactionType type,
   ) {
     return transactions
         .where((transaction) => transaction.type == type)
-        .fold(0.0, (sum, transaction) => sum + transaction.amount);
+        .fold(0, (sum, transaction) => sum + transaction.amountCents);
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:capitalflow/l10n/app_localizations.dart';
+import 'package:capitalflow/core/utils/money.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 import 'package:capitalflow/core/domain/entities/financial_account.dart';
@@ -25,7 +26,9 @@ class _AddFinancialAccountDialogState extends State<AddFinancialAccountDialog> {
     super.initState();
     _nameController = TextEditingController(text: widget.initialAccount?.name);
     _balanceController = TextEditingController(
-      text: widget.initialAccount?.balance.toString() ?? '',
+      text: widget.initialAccount != null
+          ? formatCentsForInput(widget.initialAccount!.balanceCents)
+          : '',
     );
     if (widget.initialAccount != null) {
       _type = widget.initialAccount!.type;
@@ -110,14 +113,15 @@ class _AddFinancialAccountDialogState extends State<AddFinancialAccountDialog> {
           PrimaryButton(
             onPressed: () {
               final name = _nameController.text.trim();
-              final balance = double.tryParse(_balanceController.text) ?? 0.0;
+              final balanceCents =
+                  parseMoneyToCents(_balanceController.text) ?? 0;
               if (name.isEmpty) return;
 
               if (isEditing) {
                 context.read<AccountsCubit>().updateAccount(
                   widget.initialAccount!.copyWith(
                     name: name,
-                    balance: balance,
+                    balanceCents: balanceCents,
                     type: _type,
                   ),
                 );
@@ -126,7 +130,7 @@ class _AddFinancialAccountDialogState extends State<AddFinancialAccountDialog> {
                   FinancialAccount(
                     id: DateTime.now().millisecondsSinceEpoch.toString(),
                     name: name,
-                    balance: balance,
+                    balanceCents: balanceCents,
                     type: _type,
                     createdAt: DateTime.now(),
                   ),

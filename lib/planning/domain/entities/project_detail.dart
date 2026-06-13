@@ -8,31 +8,33 @@ class ProjectDetail {
   final List<ActivitySummary> activitySummaries;
   final List<Transaction> projectLevelTransactions;
   final List<OperationalTask> projectCategories;
-  final double totalBudget;
-  final double totalSpent;
-  final double totalDeposited;
-  final double fundedAmount;
-  final double remainingToFund;
-  final double projectLevelBalance;
-  final double suggestedBudget;
+  final int totalBudgetCents;
+  final int totalSpentCents;
+  final int totalDepositedCents;
+  final int fundedAmountCents;
+  final int remainingToFundCents;
+  final int projectLevelBalanceCents;
+  final int suggestedBudgetCents;
 
   const ProjectDetail({
     required this.project,
     required this.activitySummaries,
     required this.projectLevelTransactions,
     required this.projectCategories,
-    required this.totalBudget,
-    required this.totalSpent,
-    required this.totalDeposited,
-    required this.fundedAmount,
-    required this.remainingToFund,
-    required this.projectLevelBalance,
-    required this.suggestedBudget,
+    required this.totalBudgetCents,
+    required this.totalSpentCents,
+    required this.totalDepositedCents,
+    required this.fundedAmountCents,
+    required this.remainingToFundCents,
+    required this.projectLevelBalanceCents,
+    required this.suggestedBudgetCents,
   });
 
-  double get operatingBalance => totalDeposited - totalSpent;
-  double get netBalance => operatingBalance;
-  double get remainingBudget => totalBudget - totalDeposited;
+  int get operatingBalanceCents => totalDepositedCents - totalSpentCents;
+  int get netBalanceCents => operatingBalanceCents;
+  int get remainingBudgetCents => totalBudgetCents - totalDepositedCents;
   double get budgetProgress =>
-      totalBudget > 0 ? (totalSpent / totalBudget).clamp(0.0, 1.0) : 0.0;
+      totalBudgetCents > 0
+      ? (totalSpentCents / totalBudgetCents).clamp(0.0, 1.0)
+      : 0.0;
 }

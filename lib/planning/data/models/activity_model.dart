@@ -1,9 +1,9 @@
 import 'package:capitalflow/planning/domain/entities/activity.dart';
 
 class ActivityModel extends Activity {
-  final double? cachedSpent;
-  final double? cachedDeposited;
-  final double? cachedFundedAmount;
+  final int? cachedSpentCents;
+  final int? cachedDepositedCents;
+  final int? cachedFundedAmountCents;
 
   const ActivityModel({
     required super.id,
@@ -11,12 +11,12 @@ class ActivityModel extends Activity {
     required super.name,
     super.description,
     super.year,
-    super.budget,
+    super.budgetCents,
     super.autoUpdateBudget = false,
     required super.createdAt,
-    this.cachedSpent,
-    this.cachedDeposited,
-    this.cachedFundedAmount,
+    this.cachedSpentCents,
+    this.cachedDepositedCents,
+    this.cachedFundedAmountCents,
   });
 
   factory ActivityModel.fromJson(Map<String, dynamic> json) {
@@ -26,12 +26,12 @@ class ActivityModel extends Activity {
       name: json['name'] as String,
       description: json['description'] as String?,
       year: json['year'] as int?,
-      budget: (json['budget'] as num?)?.toDouble(),
+      budgetCents: json['budget_cents'] as int?,
       autoUpdateBudget: json['autoUpdateBudget'] as bool? ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
-      cachedSpent: (json['cachedSpent'] as num?)?.toDouble(),
-      cachedDeposited: (json['cachedDeposited'] as num?)?.toDouble(),
-      cachedFundedAmount: (json['cachedFundedAmount'] as num?)?.toDouble(),
+      cachedSpentCents: json['cachedSpent_cents'] as int?,
+      cachedDepositedCents: json['cachedDeposited_cents'] as int?,
+      cachedFundedAmountCents: json['cachedFundedAmount_cents'] as int?,
     );
   }
 
@@ -42,12 +42,12 @@ class ActivityModel extends Activity {
       'name': name,
       'description': description,
       'year': year,
-      'budget': budget,
+      'budget_cents': budgetCents,
       'autoUpdateBudget': autoUpdateBudget,
       'createdAt': createdAt.toIso8601String(),
-      'cachedSpent': cachedSpent,
-      'cachedDeposited': cachedDeposited,
-      'cachedFundedAmount': cachedFundedAmount,
+      'cachedSpent_cents': cachedSpentCents,
+      'cachedDeposited_cents': cachedDepositedCents,
+      'cachedFundedAmount_cents': cachedFundedAmountCents,
     };
   }
 
@@ -59,12 +59,12 @@ class ActivityModel extends Activity {
         name: entity.name,
         description: entity.description,
         year: entity.year,
-        budget: entity.budget,
+        budgetCents: entity.budgetCents,
         autoUpdateBudget: entity.autoUpdateBudget,
         createdAt: entity.createdAt,
-        cachedSpent: entity.cachedSpent,
-        cachedDeposited: entity.cachedDeposited,
-        cachedFundedAmount: entity.cachedFundedAmount,
+        cachedSpentCents: entity.cachedSpentCents,
+        cachedDepositedCents: entity.cachedDepositedCents,
+        cachedFundedAmountCents: entity.cachedFundedAmountCents,
       );
     }
     return ActivityModel(
@@ -73,7 +73,7 @@ class ActivityModel extends Activity {
       name: entity.name,
       description: entity.description,
       year: entity.year,
-      budget: entity.budget,
+      budgetCents: entity.budgetCents,
       autoUpdateBudget: entity.autoUpdateBudget,
       createdAt: entity.createdAt,
     );

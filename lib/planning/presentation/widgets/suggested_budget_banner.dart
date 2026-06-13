@@ -3,19 +3,19 @@ import 'package:capitalflow/l10n/app_localizations.dart';
 import 'package:capitalflow/core/extensions/currency_ext.dart';
 
 class SuggestedBudgetBanner extends StatelessWidget {
-  final double suggestedBudget;
+  final int suggestedBudgetCents;
   final VoidCallback onUpdate;
 
   const SuggestedBudgetBanner({
     super.key,
-    required this.suggestedBudget,
+    required this.suggestedBudgetCents,
     required this.onUpdate,
   });
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final formattedBudget = suggestedBudget.toCompactCurrency(context);
+    final formattedBudget = suggestedBudgetCents.toCompactCurrency(context);
 
     return Alert(
       title: Row(

@@ -55,12 +55,12 @@ class AccountsCubit extends Cubit<AccountsState> {
 
   Future<void> addAccountDeposit({
     required String accountId,
-    required double amount,
+    required int amountCents,
     String? description,
   }) async {
     await _repository.addAccountDeposit(
       accountId: accountId,
-      amount: amount,
+      amountCents: amountCents,
       description: description,
     );
   }

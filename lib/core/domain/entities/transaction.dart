@@ -7,7 +7,7 @@ class Transaction {
   final String? operationalTaskId;
   final String accountId;
   final TransactionType type;
-  final double amount;
+  final int amountCents;
   final DateTime date;
   final String? description;
   final DateTime createdAt;
@@ -19,7 +19,7 @@ class Transaction {
     this.operationalTaskId,
     required this.accountId,
     required this.type,
-    required this.amount,
+    required this.amountCents,
     required this.date,
     this.description,
     required this.createdAt,
@@ -32,7 +32,7 @@ class Transaction {
     String? operationalTaskId,
     String? accountId,
     TransactionType? type,
-    double? amount,
+    int? amountCents,
     DateTime? date,
     String? description,
     DateTime? createdAt,
@@ -44,7 +44,7 @@ class Transaction {
       operationalTaskId: operationalTaskId ?? this.operationalTaskId,
       accountId: accountId ?? this.accountId,
       type: type ?? this.type,
-      amount: amount ?? this.amount,
+      amountCents: amountCents ?? this.amountCents,
       date: date ?? this.date,
       description: description ?? this.description,
       createdAt: createdAt ?? this.createdAt,

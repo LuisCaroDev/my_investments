@@ -30,10 +30,12 @@ class AccountsRepository implements TransactionsReader {
   }
 
   Future<void> addAccount(FinancialAccount account) async {
-    final initialDeposit = account.balance > 0 ? account.balance : 0.0;
+    final initialDepositCents = account.balanceCents > 0
+        ? account.balanceCents
+        : 0;
     final accounts = _localDataSource.getFinancialAccounts();
     accounts.add(
-      FinancialAccountModel.fromEntity(account.copyWith(balance: 0)),
+      FinancialAccountModel.fromEntity(account.copyWith(balanceCents: 0)),
     );
     await _localDataSource.saveFinancialAccounts(accounts);
     await _changeRecorder?.recordChange(
@@ -41,10 +43,10 @@ class AccountsRepository implements TransactionsReader {
       op: SyncChangeOp.add,
       id: account.id,
       payload: FinancialAccountModel.fromEntity(
-        account.copyWith(balance: 0),
+        account.copyWith(balanceCents: 0),
       ).toJson(),
     );
-    if (initialDeposit > 0) {
+    if (initialDepositCents > 0) {
       await addTransaction(
         Transaction(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -53,7 +55,7 @@ class AccountsRepository implements TransactionsReader {
           operationalTaskId: null,
           accountId: account.id,
           type: TransactionType.deposit,
-          amount: initialDeposit,
+          amountCents: initialDepositCents,
           date: DateTime.now(),
           description: 'Initial balance',
           createdAt: DateTime.now(),
@@ -68,7 +70,7 @@ class AccountsRepository implements TransactionsReader {
     if (index != -1) {
       final current = accounts[index];
       accounts[index] = FinancialAccountModel.fromEntity(
-        account.copyWith(balance: current.balance),
+        account.copyWith(balanceCents: current.balanceCents),
       );
       await _localDataSource.saveFinancialAccounts(accounts);
       await _changeRecorder?.recordChange(
@@ -203,7 +205,7 @@ class AccountsRepository implements TransactionsReader {
 
   Future<void> addAccountDeposit({
     required String accountId,
-    required double amount,
+    required int amountCents,
     String? description,
     DateTime? date,
   }) async {
@@ -215,7 +217,7 @@ class AccountsRepository implements TransactionsReader {
         operationalTaskId: null,
         accountId: accountId,
         type: TransactionType.deposit,
-        amount: amount,
+        amountCents: amountCents,
         date: date ?? DateTime.now(),
         description: description,
         createdAt: DateTime.now(),

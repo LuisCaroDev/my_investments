@@ -4,7 +4,7 @@ class Activity {
   final String name;
   final String? description;
   final int? year;
-  final double? budget;
+  final int? budgetCents;
   final bool autoUpdateBudget;
   final DateTime createdAt;
 
@@ -14,7 +14,7 @@ class Activity {
     required this.name,
     this.description,
     this.year,
-    this.budget,
+    this.budgetCents,
     this.autoUpdateBudget = false,
     required this.createdAt,
   });
@@ -25,7 +25,7 @@ class Activity {
     String? name,
     String? description,
     int? year,
-    double? budget,
+    int? budgetCents,
     bool? autoUpdateBudget,
     DateTime? createdAt,
   }) {
@@ -35,7 +35,7 @@ class Activity {
       name: name ?? this.name,
       description: description ?? this.description,
       year: year ?? this.year,
-      budget: budget ?? this.budget,
+      budgetCents: budgetCents ?? this.budgetCents,
       autoUpdateBudget: autoUpdateBudget ?? this.autoUpdateBudget,
       createdAt: createdAt ?? this.createdAt,
     );

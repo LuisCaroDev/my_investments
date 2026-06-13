@@ -4,7 +4,7 @@ class Project {
   final String id;
   final String name;
   final String? description;
-  final double? globalBudget;
+  final int? globalBudgetCents;
   final ProjectType type;
   final int priority;
   final bool autoUpdateBudget;
@@ -14,7 +14,7 @@ class Project {
     required this.id,
     required this.name,
     this.description,
-    this.globalBudget,
+    this.globalBudgetCents,
     this.type = ProjectType.investment,
     this.priority = 0,
     this.autoUpdateBudget = false,
@@ -25,7 +25,7 @@ class Project {
     String? id,
     String? name,
     String? description,
-    double? globalBudget,
+    int? globalBudgetCents,
     ProjectType? type,
     int? priority,
     bool? autoUpdateBudget,
@@ -35,7 +35,7 @@ class Project {
       id: id ?? this.id,
       name: name ?? this.name,
       description: description ?? this.description,
-      globalBudget: globalBudget ?? this.globalBudget,
+      globalBudgetCents: globalBudgetCents ?? this.globalBudgetCents,
       type: type ?? this.type,
       priority: priority ?? this.priority,
       autoUpdateBudget: autoUpdateBudget ?? this.autoUpdateBudget,

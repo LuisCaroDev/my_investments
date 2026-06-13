@@ -164,7 +164,7 @@ class _ActivityDetailView extends StatelessWidget {
         activityId: cubit.activityId,
         accountId: result['accountId'] as String? ?? 'initial_statement',
         type: result['type'] as TransactionType,
-        amount: result['amount'] as double,
+        amountCents: result['amountCents'] as int,
         date: result['date'] as DateTime,
         description: result['description'] as String?,
         operationalTaskId: result['operationalTaskId'] as String?,
@@ -237,7 +237,8 @@ class _ActivityContent extends StatelessWidget {
                           ).muted.small,
                           const Gap(4),
                           Text(
-                            state.detail!.summary.deposited.toCompactCurrency(
+                            state.detail!.summary.depositedCents
+                                .toCompactCurrency(
                               context,
                             ),
                           ).bold(color: theme.colorScheme.primary),
@@ -256,7 +257,7 @@ class _ActivityContent extends StatelessWidget {
                           Text(l10n.activity_detail_summary_spent).muted.small,
                           const Gap(4),
                           Text(
-                            state.detail!.summary.spent.toCompactCurrency(
+                            state.detail!.summary.spentCents.toCompactCurrency(
                               context,
                             ),
                           ).bold(color: theme.colorScheme.destructive),
@@ -277,7 +278,7 @@ class _ActivityContent extends StatelessWidget {
                           ).muted.small,
                           const Gap(4),
                           Text(
-                            state.detail!.summary.operatingBalance
+                            state.detail!.summary.operatingBalanceCents
                                 .toCompactCurrency(context),
                           ).bold,
                         ],
@@ -297,11 +298,12 @@ class _ActivityContent extends StatelessWidget {
                           ).muted.small,
                           const Gap(4),
                           Text(
-                            state.detail!.summary.netBalance.toCompactCurrency(
+                            state.detail!.summary.netBalanceCents
+                                .toCompactCurrency(
                               context,
                             ),
                           ).bold(
-                            color: state.detail!.summary.netBalance < 0
+                            color: state.detail!.summary.netBalanceCents < 0
                                 ? theme.colorScheme.destructive
                                 : theme.colorScheme.primary,
                           ),
@@ -314,28 +316,28 @@ class _ActivityContent extends StatelessWidget {
             },
           ),
 
-          if (state.detail!.summary.budget > 0) ...[
+          if (state.detail!.summary.budgetCents > 0) ...[
             const Gap(16),
             Card(
               padding: const EdgeInsets.all(16),
               child: BudgetProgress(
-                budget: state.detail!.summary.budget,
-                fundedAmount: state.detail!.summary.fundedAmount,
-                spent: state.detail!.summary.spent,
+                budgetCents: state.detail!.summary.budgetCents,
+                fundedAmountCents: state.detail!.summary.fundedAmountCents,
+                spentCents: state.detail!.summary.spentCents,
                 formatCurrency: (v) => v.toCompactCurrency(context),
               ),
             ),
           ],
 
           if (!state.detail!.summary.activity.autoUpdateBudget &&
-              state.detail!.summary.suggestedBudget >
-                  (state.detail!.summary.activity.budget ?? 0)) ...[
+              state.detail!.summary.suggestedBudgetCents >
+                  (state.detail!.summary.activity.budgetCents ?? 0)) ...[
             const Gap(16),
             SuggestedBudgetBanner(
-              suggestedBudget: state.detail!.summary.suggestedBudget,
+              suggestedBudgetCents: state.detail!.summary.suggestedBudgetCents,
               onUpdate: () {
                 final updated = state.detail!.summary.activity.copyWith(
-                  budget: state.detail!.summary.suggestedBudget,
+                  budgetCents: state.detail!.summary.suggestedBudgetCents,
                 );
                 context.read<ActivityDetailCubit>().updateActivity(updated);
               },
@@ -443,7 +445,7 @@ class _ActivityContent extends StatelessWidget {
       final updated = transaction.copyWith(
         type: result['type'] as TransactionType,
         accountId: result['accountId'] as String? ?? transaction.accountId,
-        amount: result['amount'] as double,
+        amountCents: result['amountCents'] as int,
         date: result['date'] as DateTime,
         description: result['description'] as String?,
         operationalTaskId: result['operationalTaskId'] as String?,

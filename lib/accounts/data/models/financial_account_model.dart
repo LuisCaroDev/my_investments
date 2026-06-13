@@ -5,7 +5,7 @@ class FinancialAccountModel extends FinancialAccount {
     required super.id,
     required super.name,
     required super.type,
-    required super.balance,
+    required super.balanceCents,
     required super.createdAt,
   });
 
@@ -17,7 +17,7 @@ class FinancialAccountModel extends FinancialAccount {
         (e) => e.name == json['type'],
         orElse: () => FinancialAccountType.bank,
       ),
-      balance: (json['balance'] as num).toDouble(),
+      balanceCents: json['balance_cents'] as int,
       createdAt: DateTime.parse(json['created_at']),
     );
   }
@@ -27,7 +27,7 @@ class FinancialAccountModel extends FinancialAccount {
       'id': id,
       'name': name,
       'type': type.name,
-      'balance': balance,
+      'balance_cents': balanceCents,
       'created_at': createdAt.toIso8601String(),
     };
   }
@@ -37,7 +37,7 @@ class FinancialAccountModel extends FinancialAccount {
       id: entity.id,
       name: entity.name,
       type: entity.type,
-      balance: entity.balance,
+      balanceCents: entity.balanceCents,
       createdAt: entity.createdAt,
     );
   }

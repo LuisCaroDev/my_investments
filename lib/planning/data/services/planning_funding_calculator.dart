@@ -1,6 +1,7 @@
 import 'dart:math' as math;
 
 import 'package:capitalflow/core/domain/entities/transaction.dart';
+import 'package:capitalflow/core/utils/money.dart';
 import 'package:capitalflow/planning/domain/entities/activity.dart';
 import 'package:capitalflow/planning/domain/entities/project.dart';
 import 'package:capitalflow/planning/domain/entities/project_summary.dart';
@@ -17,7 +18,9 @@ class PlanningFundingCalculator {
     final sortedProjects = List<Project>.from(projects)
       ..sort((a, b) => a.priority.compareTo(b.priority));
 
-    var totalLiquidity = calculateAvailableLiquidityFromAccounts(transactions);
+    var totalLiquidityCents = calculateAvailableLiquidityFromAccounts(
+      transactions,
+    );
     final summaries = <ProjectSummary>[];
 
     for (final project in sortedProjects) {
@@ -28,47 +31,47 @@ class PlanningFundingCalculator {
           .where((transaction) => transaction.projectId == project.id)
           .toList();
 
-      final totalSpent = _sumTransactions(
+      final totalSpentCents = _sumTransactions(
         projectTransactions,
         TransactionType.expense,
       );
-      final totalDeposited = _sumTransactions(
+      final totalDepositedCents = _sumTransactions(
         projectTransactions,
         TransactionType.deposit,
       );
-      final totalBudget = calculateProjectBudget(
+      final totalBudgetCents = calculateProjectBudget(
         project: project,
         projectActivities: projectActivities,
         projectTransactions: projectTransactions,
       );
-      final remainingNeed = calculateRemainingProjectNeed(
-        totalBudget: totalBudget,
-        totalSpent: totalSpent,
+      final remainingNeedCents = calculateRemainingProjectNeed(
+        totalBudgetCents: totalBudgetCents,
+        totalSpentCents: totalSpentCents,
       );
 
-      var fundedAmount = 0.0;
-      if (remainingNeed > 0) {
-        fundedAmount = remainingNeed < totalLiquidity
-            ? remainingNeed
-            : totalLiquidity;
-        if (fundedAmount < 0) {
-          fundedAmount = 0.0;
+      var fundedAmountCents = 0;
+      if (remainingNeedCents > 0) {
+        fundedAmountCents = remainingNeedCents < totalLiquidityCents
+            ? remainingNeedCents
+            : totalLiquidityCents;
+        if (fundedAmountCents < 0) {
+          fundedAmountCents = 0;
         }
-        totalLiquidity -= fundedAmount;
+        totalLiquidityCents -= fundedAmountCents;
       }
 
-      final remainingToFund = remainingNeed > 0
-          ? (remainingNeed - fundedAmount)
-          : 0.0;
+      final remainingToFundCents = remainingNeedCents > 0
+          ? (remainingNeedCents - fundedAmountCents)
+          : 0;
 
       summaries.add(
         ProjectSummary(
           project: project,
-          totalBudget: totalBudget,
-          totalSpent: totalSpent,
-          totalDeposited: totalDeposited,
-          fundedAmount: fundedAmount,
-          remainingToFund: remainingToFund,
+          totalBudgetCents: totalBudgetCents,
+          totalSpentCents: totalSpentCents,
+          totalDepositedCents: totalDepositedCents,
+          fundedAmountCents: fundedAmountCents,
+          remainingToFundCents: remainingToFundCents,
           activityCount: projectActivities.length,
         ),
       );
@@ -77,13 +80,13 @@ class PlanningFundingCalculator {
     return summaries.where((summary) => summary.project.type == type).toList();
   }
 
-  double calculateFundedAmountForProject({
+  int calculateFundedAmountForProject({
     required Project project,
     required List<Project> projects,
     required List<Activity> allActivities,
     required List<Transaction> allTransactions,
   }) {
-    var totalLiquidity = calculateAvailableLiquidityFromAccounts(
+    var totalLiquidityCents = calculateAvailableLiquidityFromAccounts(
       allTransactions,
     );
     final sortedProjects = List<Project>.from(projects)
@@ -96,89 +99,91 @@ class PlanningFundingCalculator {
       final projectTransactions = allTransactions
           .where((transaction) => transaction.projectId == currentProject.id)
           .toList();
-      final projectBudget = calculateProjectBudget(
+      final projectBudgetCents = calculateProjectBudget(
         project: currentProject,
         projectActivities: projectActivities,
         projectTransactions: projectTransactions,
       );
-      final projectSpent = _sumTransactions(
+      final projectSpentCents = _sumTransactions(
         projectTransactions,
         TransactionType.expense,
       );
-      final projectRemainingNeed = calculateRemainingProjectNeed(
-        totalBudget: projectBudget,
-        totalSpent: projectSpent,
+      final projectRemainingNeedCents = calculateRemainingProjectNeed(
+        totalBudgetCents: projectBudgetCents,
+        totalSpentCents: projectSpentCents,
       );
 
-      var fundedAmount = 0.0;
-      if (projectRemainingNeed > 0) {
-        fundedAmount = projectRemainingNeed < totalLiquidity
-            ? projectRemainingNeed
-            : totalLiquidity;
-        if (fundedAmount < 0) {
-          fundedAmount = 0.0;
+      var fundedAmountCents = 0;
+      if (projectRemainingNeedCents > 0) {
+        fundedAmountCents = projectRemainingNeedCents < totalLiquidityCents
+            ? projectRemainingNeedCents
+            : totalLiquidityCents;
+        if (fundedAmountCents < 0) {
+          fundedAmountCents = 0;
         }
-        totalLiquidity -= fundedAmount;
+        totalLiquidityCents -= fundedAmountCents;
       }
 
       if (currentProject.id == project.id) {
-        return fundedAmount;
+        return fundedAmountCents;
       }
     }
 
-    return 0.0;
+    return 0;
   }
 
-  double calculateAvailableLiquidityFromAccounts(
+  int calculateAvailableLiquidityFromAccounts(
     List<Transaction> transactions,
   ) {
     return transactions.fold(
-      0.0,
+      0,
       (sum, transaction) =>
           sum +
           (transaction.type == TransactionType.deposit
-              ? transaction.amount
-              : -transaction.amount),
+              ? transaction.amountCents
+              : -transaction.amountCents),
     );
   }
 
-  Map<String, double> allocateFundingSequentially({
+  Map<String, int> allocateFundingSequentially({
     required List<Activity> activities,
-    required double fundedAmount,
+    required int fundedAmountCents,
     required List<Transaction> transactions,
   }) {
-    final allocations = <String, double>{};
-    var balance = fundedAmount < 0 ? 0.0 : fundedAmount;
+    final allocations = <String, int>{};
+    var balanceCents = fundedAmountCents < 0 ? 0 : fundedAmountCents;
     final sortedActivities = List<Activity>.from(activities)
       ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
 
     for (final activity in sortedActivities) {
-      final budget = activity.budget ?? 0.0;
-      final spent = _sumTransactions(
+      final budgetCents = activity.budgetCents ?? 0;
+      final spentCents = _sumTransactions(
         transactions.where(
           (transaction) => transaction.activityId == activity.id,
         ),
         TransactionType.expense,
       );
-      final remainingNeed = calculateRemainingProjectNeed(
-        totalBudget: budget,
-        totalSpent: spent,
+      final remainingNeedCents = calculateRemainingProjectNeed(
+        totalBudgetCents: budgetCents,
+        totalSpentCents: spentCents,
       );
 
-      if (remainingNeed <= 0 || balance <= 0) {
-        allocations[activity.id] = 0.0;
+      if (remainingNeedCents <= 0 || balanceCents <= 0) {
+        allocations[activity.id] = 0;
         continue;
       }
 
-      final allocated = balance < remainingNeed ? balance : remainingNeed;
-      allocations[activity.id] = allocated;
-      balance -= allocated;
+      final allocatedCents = balanceCents < remainingNeedCents
+          ? balanceCents
+          : remainingNeedCents;
+      allocations[activity.id] = allocatedCents;
+      balanceCents -= allocatedCents;
     }
 
     return allocations;
   }
 
-  double calculateProjectBudget({
+  int calculateProjectBudget({
     required Project project,
     required List<Activity> projectActivities,
     required List<Transaction> projectTransactions,
@@ -189,56 +194,60 @@ class PlanningFundingCalculator {
         projectTransactions: projectTransactions,
       );
     }
-    return project.globalBudget ??
-        projectActivities.fold<double>(
-          0.0,
-          (sum, activity) => sum + (activity.budget ?? 0.0),
+    return project.globalBudgetCents ??
+        projectActivities.fold<int>(
+          0,
+          (sum, activity) => sum + (activity.budgetCents ?? 0),
         );
   }
 
-  double calculateSuggestedProjectBudget({
+  int calculateSuggestedProjectBudget({
     required List<Activity> projectActivities,
     required List<Transaction> projectTransactions,
   }) {
-    final activitiesBudget = projectActivities.fold<double>(0.0, (
+    final activitiesBudgetCents = projectActivities.fold<int>(0, (
       sum,
       activity,
     ) {
-      final activitySpent = _sumTransactions(
+      final activitySpentCents = _sumTransactions(
         projectTransactions.where((t) => t.activityId == activity.id),
         TransactionType.expense,
       );
-      final dynamicActivityBudget = activity.autoUpdateBudget
-          ? math.max(activity.budget ?? 0.0, activitySpent)
-          : (activity.budget ?? 0.0);
-      return sum + dynamicActivityBudget;
+      final dynamicActivityBudgetCents = activity.autoUpdateBudget
+          ? math.max(activity.budgetCents ?? 0, activitySpentCents)
+          : (activity.budgetCents ?? 0);
+      return sum + dynamicActivityBudgetCents;
     });
 
-    final projectLevelSpent = _sumTransactions(
+    final projectLevelSpentCents = _sumTransactions(
       projectTransactions.where((t) => t.activityId == null),
       TransactionType.expense,
     );
 
-    return activitiesBudget + projectLevelSpent;
+    return activitiesBudgetCents + projectLevelSpentCents;
   }
 
-  double calculateRemainingProjectNeed({
-    required double totalBudget,
-    required double totalSpent,
+  int calculateRemainingProjectNeed({
+    required int totalBudgetCents,
+    required int totalSpentCents,
   }) {
-    if (totalBudget <= 0) {
-      return 0.0;
+    if (totalBudgetCents <= 0) {
+      return 0;
     }
 
-    return (totalBudget - totalSpent).clamp(0.0, totalBudget);
+    return clampMoney(
+      totalBudgetCents - totalSpentCents,
+      0,
+      totalBudgetCents,
+    );
   }
 
-  double _sumTransactions(
+  int _sumTransactions(
     Iterable<Transaction> transactions,
     TransactionType type,
   ) {
     return transactions
         .where((transaction) => transaction.type == type)
-        .fold(0.0, (sum, transaction) => sum + transaction.amount);
+        .fold(0, (sum, transaction) => sum + transaction.amountCents);
   }
 }

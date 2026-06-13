@@ -84,7 +84,7 @@ class InvestmentsPage extends StatelessWidget {
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: result['name'] as String,
         description: result['description'] as String?,
-        globalBudget: result['budget'] as double?,
+        globalBudgetCents: result['budgetCents'] as int?,
         createdAt: DateTime.now(),
       );
       context.read<InvestmentsCubit>().addInvestment(project);
@@ -101,17 +101,26 @@ class _ProjectsList extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     // Calculate portfolio totals
-    final totalBudget = summaries.fold(0.0, (sum, s) => sum + s.totalBudget);
-    final totalSpent = summaries.fold(0.0, (sum, s) => sum + s.totalSpent);
-    final totalDeposited = summaries.fold(
-      0.0,
-      (sum, s) => sum + s.totalDeposited,
+    final totalBudgetCents = summaries.fold(
+      0,
+      (sum, s) => sum + s.totalBudgetCents,
     );
-    final totalFundedAmount = summaries.fold(
-      0.0,
-      (sum, s) => sum + s.fundedAmount,
+    final totalSpentCents = summaries.fold(
+      0,
+      (sum, s) => sum + s.totalSpentCents,
     );
-    final totalNetBalance = summaries.fold(0.0, (sum, s) => sum + s.netBalance);
+    final totalDepositedCents = summaries.fold(
+      0,
+      (sum, s) => sum + s.totalDepositedCents,
+    );
+    final totalFundedAmountCents = summaries.fold(
+      0,
+      (sum, s) => sum + s.fundedAmountCents,
+    );
+    final totalNetBalanceCents = summaries.fold(
+      0,
+      (sum, s) => sum + s.netBalanceCents,
+    );
 
     final theme = Theme.of(context);
     return SingleChildScrollView(
@@ -143,7 +152,7 @@ class _ProjectsList extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.projects_summary_deposited,
-                      value: totalDeposited.toCompactCurrency(context),
+                      value: totalDepositedCents.toCompactCurrency(context),
                       icon: RadixIcons.download,
                     ),
                   ),
@@ -151,7 +160,7 @@ class _ProjectsList extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.projects_summary_spent,
-                      value: totalSpent.toCompactCurrency(context),
+                      value: totalSpentCents.toCompactCurrency(context),
                       icon: RadixIcons.minusCircled,
                       valueColor: Theme.of(context).colorScheme.destructive,
                     ),
@@ -160,7 +169,7 @@ class _ProjectsList extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.projects_summary_budget,
-                      value: totalBudget.toCompactCurrency(context),
+                      value: totalBudgetCents.toCompactCurrency(context),
                       icon: RadixIcons.target,
                     ),
                   ),
@@ -168,7 +177,7 @@ class _ProjectsList extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.projects_summary_funded,
-                      value: totalFundedAmount.toCompactCurrency(context),
+                      value: totalFundedAmountCents.toCompactCurrency(context),
                       icon: RadixIcons.drawingPinSolid,
                     ),
                   ),
@@ -176,9 +185,9 @@ class _ProjectsList extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.projects_summary_net_balance,
-                      value: totalNetBalance.toCompactCurrency(context),
+                      value: totalNetBalanceCents.toCompactCurrency(context),
                       icon: RadixIcons.barChart,
-                      valueColor: totalNetBalance < 0
+                      valueColor: totalNetBalanceCents < 0
                           ? Theme.of(context).colorScheme.destructive
                           : Theme.of(context).colorScheme.primary,
                     ),
@@ -297,14 +306,14 @@ class _ProjectCard extends StatelessWidget {
             ],
           ),
           const Gap(16),
-          if (summary.totalBudget > 0)
+          if (summary.totalBudgetCents > 0)
             BudgetProgress(
-              budget: summary.totalBudget,
-              fundedAmount: summary.fundedAmount,
-              spent: summary.totalSpent,
+              budgetCents: summary.totalBudgetCents,
+              fundedAmountCents: summary.fundedAmountCents,
+              spentCents: summary.totalSpentCents,
               formatCurrency: (v) => v.toCompactCurrency(context),
             ),
-          if (summary.totalBudget == 0) ...[
+          if (summary.totalBudgetCents == 0) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -313,7 +322,7 @@ class _ProjectCard extends StatelessWidget {
                   children: [
                     Text(l10n.projects_summary_deposited).muted.small,
                     Text(
-                      summary.totalDeposited.toCompactCurrency(context),
+                      summary.totalDepositedCents.toCompactCurrency(context),
                     ).semiBold(color: theme.colorScheme.primary),
                   ],
                 ),
@@ -322,7 +331,7 @@ class _ProjectCard extends StatelessWidget {
                   children: [
                     Text(l10n.projects_summary_spent).muted.small,
                     Text(
-                      summary.totalSpent.toCompactCurrency(context),
+                      summary.totalSpentCents.toCompactCurrency(context),
                     ).semiBold(color: theme.colorScheme.muted),
                   ],
                 ),
@@ -363,14 +372,14 @@ class _ProjectCard extends StatelessWidget {
       builder: (ctx) => AddProjectDialog(
         initialName: summary.project.name,
         initialDescription: summary.project.description,
-        initialBudget: summary.project.globalBudget,
+        initialBudgetCents: summary.project.globalBudgetCents,
       ),
     );
     if (result != null && context.mounted) {
       final updated = summary.project.copyWith(
         name: result['name'] as String,
         description: result['description'] as String?,
-        globalBudget: result['budget'] as double?,
+        globalBudgetCents: result['budgetCents'] as int?,
       );
       context.read<InvestmentsCubit>().updateInvestment(updated);
     }

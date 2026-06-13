@@ -117,6 +117,9 @@ class DataConflictHandler {
     }
 
     // We have data in both
+    if (!context.mounted) {
+      return true;
+    }
     bool? keepLocal = await showDialog<bool>(
       context: context,
       barrierDismissible: false,

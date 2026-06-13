@@ -1,13 +1,14 @@
 import 'package:capitalflow/l10n/app_localizations.dart';
+import 'package:capitalflow/core/utils/money.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class AddAccountDepositDialog extends StatefulWidget {
-  final double? initialAmount;
+  final int? initialAmountCents;
   final String? initialDescription;
 
   const AddAccountDepositDialog({
     super.key,
-    this.initialAmount,
+    this.initialAmountCents,
     this.initialDescription,
   });
 
@@ -24,7 +25,9 @@ class _AddAccountDepositDialogState extends State<AddAccountDepositDialog> {
   void initState() {
     super.initState();
     _amountController = TextEditingController(
-      text: widget.initialAmount?.toString() ?? '',
+      text: widget.initialAmountCents != null
+          ? formatCentsForInput(widget.initialAmountCents!)
+          : '',
     );
     _descriptionController = TextEditingController(
       text: widget.initialDescription ?? '',
@@ -42,7 +45,7 @@ class _AddAccountDepositDialogState extends State<AddAccountDepositDialog> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final isEditing =
-        widget.initialAmount != null || widget.initialDescription != null;
+        widget.initialAmountCents != null || widget.initialDescription != null;
     return AnimatedPadding(
       padding: EdgeInsets.only(
         bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -86,11 +89,11 @@ class _AddAccountDepositDialogState extends State<AddAccountDepositDialog> {
           ),
           PrimaryButton(
             onPressed: () {
-              final amount = double.tryParse(_amountController.text.trim());
-              if (amount == null || amount <= 0) return;
+              final amountCents = parseMoneyToCents(_amountController.text);
+              if (amountCents == null || amountCents <= 0) return;
               final description = _descriptionController.text.trim();
               Navigator.of(context).pop({
-                'amount': amount,
+                'amountCents': amountCents,
                 'description': description.isEmpty ? null : description,
               });
             },

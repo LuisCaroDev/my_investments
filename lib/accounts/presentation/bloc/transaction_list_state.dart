@@ -42,8 +42,8 @@ class TransactionListLoaded extends TransactionListState {
       return switch (sort) {
         TransactionSort.dateDesc => b.date.compareTo(a.date),
         TransactionSort.dateAsc => a.date.compareTo(b.date),
-        TransactionSort.amountDesc => b.amount.compareTo(a.amount),
-        TransactionSort.amountAsc => a.amount.compareTo(b.amount),
+        TransactionSort.amountDesc => b.amountCents.compareTo(a.amountCents),
+        TransactionSort.amountAsc => a.amountCents.compareTo(b.amountCents),
       };
     });
     return sorted;

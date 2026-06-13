@@ -25,11 +25,11 @@ class TransactionProjectionJob {
 
     // 1. Recalculate account balances
     final accounts = _accountsDs.getFinancialAccounts();
-    final totals = <String, double>{};
+    final totals = <String, int>{};
     for (final transaction in transactions) {
       final delta = transaction.type == TransactionType.deposit
-          ? transaction.amount
-          : -transaction.amount;
+          ? transaction.amountCents
+          : -transaction.amountCents;
       totals.update(
         transaction.accountId,
         (value) => value + delta,
@@ -41,7 +41,7 @@ class TransactionProjectionJob {
         id: account.id,
         name: account.name,
         type: account.type,
-        balance: totals[account.id] ?? 0.0,
+        balanceCents: totals[account.id] ?? 0,
         createdAt: account.createdAt,
       );
     }).toList();
@@ -79,14 +79,14 @@ class TransactionProjectionJob {
           id: project.id,
           name: project.name,
           description: project.description,
-          globalBudget: project.globalBudget,
+          globalBudgetCents: project.globalBudgetCents,
           type: project.type,
           priority: project.priority,
           autoUpdateBudget: project.autoUpdateBudget,
           createdAt: project.createdAt,
-          cachedTotalSpent: summary.totalSpent,
-          cachedFundedAmount: summary.fundedAmount,
-          cachedRemainingToFund: summary.remainingToFund,
+          cachedTotalSpentCents: summary.totalSpentCents,
+          cachedFundedAmountCents: summary.fundedAmountCents,
+          cachedRemainingToFundCents: summary.remainingToFundCents,
         ),
       );
 
@@ -99,7 +99,7 @@ class TransactionProjectionJob {
 
       final activityFunding = _calculator.allocateFundingSequentially(
         activities: projectActivities,
-        fundedAmount: summary.fundedAmount,
+        fundedAmountCents: summary.fundedAmountCents,
         transactions: projectTransactions,
       );
 
@@ -107,11 +107,11 @@ class TransactionProjectionJob {
         final activityTransactions = projectTransactions
             .where((t) => t.activityId == activity.id)
             .toList();
-        final spent = _sumTransactions(
+        final spentCents = _sumTransactions(
           activityTransactions,
           TransactionType.expense,
         );
-        final deposited = _sumTransactions(
+        final depositedCents = _sumTransactions(
           activityTransactions,
           TransactionType.deposit,
         );
@@ -123,12 +123,12 @@ class TransactionProjectionJob {
             name: activity.name,
             description: activity.description,
             year: activity.year,
-            budget: activity.budget,
+            budgetCents: activity.budgetCents,
             autoUpdateBudget: activity.autoUpdateBudget,
             createdAt: activity.createdAt,
-            cachedSpent: spent,
-            cachedDeposited: deposited,
-            cachedFundedAmount: activityFunding[activity.id] ?? 0.0,
+            cachedSpentCents: spentCents,
+            cachedDepositedCents: depositedCents,
+            cachedFundedAmountCents: activityFunding[activity.id] ?? 0,
           ),
         );
       }
@@ -138,12 +138,12 @@ class TransactionProjectionJob {
     await _planningDs.saveActivities(updatedActivities);
   }
 
-  double _sumTransactions(
+  int _sumTransactions(
     Iterable<Transaction> transactions,
     TransactionType type,
   ) {
     return transactions
         .where((transaction) => transaction.type == type)
-        .fold(0.0, (sum, transaction) => sum + transaction.amount);
+        .fold(0, (sum, transaction) => sum + transaction.amountCents);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:capitalflow/l10n/app_localizations.dart';
+import 'package:capitalflow/core/utils/money.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:capitalflow/planning/domain/entities/operational_task.dart'
     as domain;
@@ -40,7 +41,9 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
             ? TransactionType.deposit
             : TransactionType.expense);
     _amountController = TextEditingController(
-      text: widget.initialTransaction?.amount.toString() ?? '',
+      text: widget.initialTransaction != null
+          ? formatCentsForInput(widget.initialTransaction!.amountCents)
+          : '',
     );
     _descriptionController = TextEditingController(
       text: widget.initialTransaction?.description ?? '',
@@ -173,12 +176,12 @@ class _AddTransactionDialogState extends State<AddTransactionDialog> {
           ),
           PrimaryButton(
             onPressed: () {
-              final amount = double.tryParse(_amountController.text.trim());
-              if (amount == null || amount <= 0) return;
+              final amountCents = parseMoneyToCents(_amountController.text);
+              if (amountCents == null || amountCents <= 0) return;
               final description = _descriptionController.text.trim();
               Navigator.of(context).pop({
                 'type': _type,
-                'amount': amount,
+                'amountCents': amountCents,
                 'date': _selectedDate,
                 'description': description.isEmpty ? null : description,
                 'operationalTaskId': isExpense

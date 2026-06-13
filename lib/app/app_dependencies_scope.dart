@@ -10,6 +10,7 @@ import 'package:capitalflow/auth/data/repositories/auth_repository.dart';
 import 'package:capitalflow/auth/presentation/bloc/auth_cubit.dart';
 import 'package:capitalflow/core/presentation/bloc/settings_cubit.dart';
 import 'package:capitalflow/core/presentation/bloc/settings_state.dart';
+import 'package:capitalflow/core/domain/jobs/transaction_projection_job.dart';
 import 'package:capitalflow/planning/data/datasources/planning_local_ds.dart';
 import 'package:capitalflow/planning/data/repositories/activity_repository.dart';
 import 'package:capitalflow/planning/data/repositories/operational_task_repository.dart';
@@ -25,7 +26,6 @@ import 'package:capitalflow/sync/data/sync_change_recorder_impl.dart';
 import 'package:capitalflow/sync/domain/usecases/sync_coordinator.dart';
 import 'package:capitalflow/sync/domain/usecases/sync_service.dart';
 import 'package:capitalflow/sync/presentation/widgets/sync_coordinator_host.dart';
-import 'package:capitalflow/core/domain/jobs/transaction_projection_job.dart';
 
 class AppDependenciesScope extends StatelessWidget {
   final SharedPreferences prefs;

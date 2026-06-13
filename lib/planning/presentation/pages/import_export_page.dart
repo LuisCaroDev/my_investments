@@ -145,7 +145,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
         'id',
         'name',
         'description',
-        'global_budget',
+        'global_budget_cents',
         'type',
         'priority',
         'created_at',
@@ -157,7 +157,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
           _csv(p.id),
           _csv(p.name),
           _csv(p.description),
-          _csv(p.globalBudget),
+          _csv(p.globalBudgetCents),
           _csv(p.type.name),
           _csv(p.priority),
           _csv(p.createdAt.toIso8601String()),
@@ -174,7 +174,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
         'name',
         'description',
         'year',
-        'budget',
+        'budget_cents',
         'created_at',
       ].join(','),
     );
@@ -186,7 +186,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
           _csv(a.name),
           _csv(a.description),
           _csv(a.year),
-          _csv(a.budget),
+          _csv(a.budgetCents),
           _csv(a.createdAt.toIso8601String()),
         ].join(','),
       );
@@ -215,7 +215,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
         'account_id',
         'activity_id',
         'type',
-        'amount',
+        'amount_cents',
         'date',
         'description',
         'category_id',
@@ -230,7 +230,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
           _csv(t.accountId),
           _csv(t.activityId),
           _csv(t.type.name),
-          _csv(t.amount),
+          _csv(t.amountCents),
           _csv(t.date.toIso8601String()),
           _csv(t.description),
           _csv(t.operationalTaskId),
@@ -241,14 +241,16 @@ class _ImportExportPageState extends State<ImportExportPage> {
 
     buffer.writeln();
     buffer.writeln('## accounts.csv');
-    buffer.writeln(['id', 'name', 'type', 'balance', 'created_at'].join(','));
+    buffer.writeln(
+      ['id', 'name', 'type', 'balance_cents', 'created_at'].join(','),
+    );
     for (final a in accounts) {
       buffer.writeln(
         [
           _csv(a.id),
           _csv(a.name),
           _csv(a.type.name),
-          _csv(a.balance),
+          _csv(a.balanceCents),
           _csv(a.createdAt.toIso8601String()),
         ].join(','),
       );
@@ -396,7 +398,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
         id: map['id'] ?? '',
         name: map['name'] ?? '',
         description: _nullIfEmpty(map['description']),
-        globalBudget: _toDouble(map['global_budget']),
+        globalBudgetCents: _toInt(map['global_budget_cents']),
         type: type,
         priority: _toInt(map['priority']) ?? 0,
         createdAt: DateTime.parse(
@@ -418,7 +420,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
         name: map['name'] ?? '',
         description: _nullIfEmpty(map['description']),
         year: _toInt(map['year']),
-        budget: _toDouble(map['budget']),
+        budgetCents: _toInt(map['budget_cents']),
         createdAt: DateTime.parse(
           map['created_at'] ?? DateTime.now().toString(),
         ),
@@ -454,7 +456,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
         activityId: _nullIfEmpty(map['activity_id']),
         operationalTaskId: _nullIfEmpty(map['category_id']),
         type: _parseTransactionType(map['type']),
-        amount: _toDouble(map['amount']) ?? 0,
+        amountCents: _toInt(map['amount_cents']) ?? 0,
         date: DateTime.parse(map['date'] ?? DateTime.now().toString()),
         description: _nullIfEmpty(map['description']),
         createdAt: DateTime.parse(
@@ -478,7 +480,7 @@ class _ImportExportPageState extends State<ImportExportPage> {
         id: map['id'] ?? '',
         name: map['name'] ?? '',
         type: type,
-        balance: _toDouble(map['balance']) ?? 0,
+        balanceCents: _toInt(map['balance_cents']) ?? 0,
         createdAt: DateTime.parse(
           map['created_at'] ?? DateTime.now().toString(),
         ),
@@ -533,12 +535,6 @@ class _ImportExportPageState extends State<ImportExportPage> {
   String? _nullIfEmpty(String? value) {
     final v = value?.trim() ?? '';
     return v.isEmpty ? null : v;
-  }
-
-  double? _toDouble(String? value) {
-    final v = value?.trim();
-    if (v == null || v.isEmpty) return null;
-    return double.tryParse(v);
   }
 
   int? _toInt(String? value) {

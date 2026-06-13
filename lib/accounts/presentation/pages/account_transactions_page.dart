@@ -139,14 +139,14 @@ class _AccountTransactionsView extends StatelessWidget {
     final result = await showDialog<Map<String, dynamic>>(
       context: context,
       builder: (ctx) => AddAccountDepositDialog(
-        initialAmount: transaction.amount,
+        initialAmountCents: transaction.amountCents,
         initialDescription: transaction.description,
       ),
     );
     if (result == null) return;
     await accountsRepository.updateTransaction(
       transaction.copyWith(
-        amount: result['amount'] as double,
+        amountCents: result['amountCents'] as int,
         description: result['description'] as String?,
       ),
     );

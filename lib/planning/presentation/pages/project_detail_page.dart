@@ -158,7 +158,7 @@ class _ProjectDetailView extends StatelessWidget {
         projectId: cubit.projectId,
         accountId: result['accountId'] as String? ?? 'initial_statement',
         type: result['type'] as TransactionType,
-        amount: result['amount'] as double,
+        amountCents: result['amountCents'] as int,
         date: result['date'] as DateTime,
         description: result['description'] as String?,
         operationalTaskId: result['operationalTaskId'] as String?,
@@ -216,14 +216,14 @@ class _ProjectDetailContent extends StatelessWidget {
             InvestmentMetricsSection(detail: state.detail),
 
           if (!state.detail.project.autoUpdateBudget &&
-              state.detail.suggestedBudget >
-                  (state.detail.project.globalBudget ?? 0)) ...[
+              state.detail.suggestedBudgetCents >
+                  (state.detail.project.globalBudgetCents ?? 0)) ...[
             const Gap(24),
             SuggestedBudgetBanner(
-              suggestedBudget: state.detail.suggestedBudget,
+              suggestedBudgetCents: state.detail.suggestedBudgetCents,
               onUpdate: () {
                 final updated = state.detail.project.copyWith(
-                  globalBudget: state.detail.suggestedBudget,
+                  globalBudgetCents: state.detail.suggestedBudgetCents,
                 );
                 context.read<ProjectDetailCubit>().updateProject(updated);
               },
@@ -249,7 +249,7 @@ class _ProjectDetailContent extends StatelessWidget {
           const Gap(24),
           Builder(
             builder: (context) {
-              final balance = state.detail.projectLevelBalance;
+              final balanceCents = state.detail.projectLevelBalanceCents;
 
               return PreviewSection(
                 title: l10n.project_detail_transactions_title,
@@ -261,7 +261,7 @@ class _ProjectDetailContent extends StatelessWidget {
                 emptyIcon: RadixIcons.cardStack,
                 emptyTitle: l10n.project_detail_transactions_empty,
                 emptySubtitle: l10n.project_detail_transactions_empty_info,
-                headerBottom: balance != 0
+                headerBottom: balanceCents != 0
                     ? Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 16,
@@ -279,8 +279,8 @@ class _ProjectDetailContent extends StatelessWidget {
                             Text(
                               l10n.project_detail_summary_net_balance,
                             ).medium,
-                            Text(balance.toCompactCurrency(context)).medium(
-                              color: balance >= 0
+                            Text(balanceCents.toCompactCurrency(context)).medium(
+                              color: balanceCents >= 0
                                   ? theme.colorScheme.primary
                                   : theme.colorScheme.destructive,
                             ),
@@ -401,7 +401,7 @@ class _ProjectDetailContent extends StatelessWidget {
       final updated = transaction.copyWith(
         type: result['type'] as TransactionType,
         accountId: result['accountId'] as String? ?? transaction.accountId,
-        amount: result['amount'] as double,
+        amountCents: result['amountCents'] as int,
         date: result['date'] as DateTime,
         description: result['description'] as String?,
         operationalTaskId: result['operationalTaskId'] as String?,
@@ -432,7 +432,7 @@ class _ProjectDetailContent extends StatelessWidget {
         name: result['name'] as String,
         description: result['description'] as String?,
         year: result['year'] as int?,
-        budget: result['budget'] as double?,
+        budgetCents: result['budgetCents'] as int?,
         createdAt: DateTime.now(),
       );
       cubit.addActivity(activity);
@@ -446,7 +446,7 @@ class _ProjectDetailContent extends StatelessWidget {
         initialName: activity.name,
         initialDescription: activity.description,
         initialYear: activity.year,
-        initialBudget: activity.budget,
+        initialBudgetCents: activity.budgetCents,
       ),
     );
     if (result != null && context.mounted) {
@@ -455,7 +455,7 @@ class _ProjectDetailContent extends StatelessWidget {
         name: result['name'] as String,
         description: result['description'] as String?,
         year: result['year'] as int?,
-        budget: result['budget'] as double?,
+        budgetCents: result['budgetCents'] as int?,
       );
       cubit.updateActivity(updated);
     }
@@ -586,11 +586,11 @@ class _ActivityCard extends StatelessWidget {
             ],
           ),
           const Gap(12),
-          if (summary.budget > 0)
+          if (summary.budgetCents > 0)
             BudgetProgress(
-              budget: summary.budget,
-              fundedAmount: summary.fundedAmount,
-              spent: summary.spent,
+              budgetCents: summary.budgetCents,
+              fundedAmountCents: summary.fundedAmountCents,
+              spentCents: summary.spentCents,
               formatCurrency: (v) => v.toCompactCurrency(context),
             )
           else
@@ -598,10 +598,10 @@ class _ActivityCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  '${l10n.project_detail_summary_deposited}: ${summary.deposited.toCompactCurrency(context)}',
+                  '${l10n.project_detail_summary_deposited}: ${summary.depositedCents.toCompactCurrency(context)}',
                 ).small(color: theme.colorScheme.primary),
                 Text(
-                  '${l10n.project_detail_summary_spent}: ${summary.spent.toCompactCurrency(context)}',
+                  '${l10n.project_detail_summary_spent}: ${summary.spentCents.toCompactCurrency(context)}',
                 ).small(color: theme.colorScheme.destructive),
               ],
             ),

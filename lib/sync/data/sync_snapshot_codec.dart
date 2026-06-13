@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class SyncSnapshotCodec {
-  static const currentVersion = 1;
+  static const currentVersion = 2;
 
   static String encode(Map<String, List<Map<String, dynamic>>> data) {
     return jsonEncode({'version': currentVersion, 'data': data});

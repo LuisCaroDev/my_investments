@@ -154,7 +154,7 @@ class _TransactionListView extends StatelessWidget {
         activityId: cubit.activityId,
         accountId: result['accountId'] as String? ?? 'initial_statement',
         type: result['type'] as TransactionType,
-        amount: result['amount'] as double,
+        amountCents: result['amountCents'] as int,
         date: result['date'] as DateTime,
         description: result['description'] as String?,
         operationalTaskId: result['operationalTaskId'] as String?,
@@ -344,7 +344,7 @@ class _TransactionListContent extends StatelessWidget {
       final updated = transaction.copyWith(
         type: result['type'] as TransactionType,
         accountId: result['accountId'] as String? ?? transaction.accountId,
-        amount: result['amount'] as double,
+        amountCents: result['amountCents'] as int,
         date: result['date'] as DateTime,
         description: result['description'] as String?,
         operationalTaskId: result['operationalTaskId'] as String?,

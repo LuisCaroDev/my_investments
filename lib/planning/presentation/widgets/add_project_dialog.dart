@@ -1,17 +1,18 @@
 import 'package:capitalflow/l10n/app_localizations.dart';
+import 'package:capitalflow/core/utils/money.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class AddProjectDialog extends StatefulWidget {
   final String? initialName;
   final String? initialDescription;
-  final double? initialBudget;
+  final int? initialBudgetCents;
   final bool? initialAutoUpdateBudget;
 
   const AddProjectDialog({
     super.key,
     this.initialName,
     this.initialDescription,
-    this.initialBudget,
+    this.initialBudgetCents,
     this.initialAutoUpdateBudget,
   });
 
@@ -33,7 +34,9 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
       text: widget.initialDescription ?? '',
     );
     _budgetController = TextEditingController(
-      text: widget.initialBudget?.toString() ?? '',
+      text: widget.initialBudgetCents != null
+          ? formatCentsForInput(widget.initialBudgetCents!)
+          : '',
     );
     _autoUpdateBudget = widget.initialAutoUpdateBudget ?? false;
   }
@@ -121,12 +124,12 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
             onPressed: () {
               final name = _nameController.text.trim();
               if (name.isEmpty) return;
-              final budget = double.tryParse(_budgetController.text.trim());
+              final budgetCents = parseMoneyToCents(_budgetController.text);
               final description = _descriptionController.text.trim();
               Navigator.of(context).pop({
                 'name': name,
                 'description': description.isEmpty ? null : description,
-                'budget': budget,
+                'budgetCents': budgetCents,
                 'autoUpdateBudget': _autoUpdateBudget,
               });
             },

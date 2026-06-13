@@ -85,7 +85,7 @@ class GoalsPage extends StatelessWidget {
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         name: result['name'] as String,
         description: result['description'] as String?,
-        globalBudget: result['budget'] as double?,
+        globalBudgetCents: result['budgetCents'] as int?,
         createdAt: DateTime.now(),
       );
       context.read<GoalsCubit>().addGoal(project);
@@ -101,15 +101,21 @@ class _ProjectsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    final totalBudget = summaries.fold(0.0, (sum, s) => sum + s.totalBudget);
-    final totalSpent = summaries.fold(0.0, (sum, s) => sum + s.totalSpent);
-    final totalFundedAmount = summaries.fold(
-      0.0,
-      (sum, s) => sum + s.fundedAmount,
+    final totalBudgetCents = summaries.fold(
+      0,
+      (sum, s) => sum + s.totalBudgetCents,
     );
-    final totalMissing = summaries.fold(
-      0.0,
-      (sum, s) => sum + s.remainingToFund,
+    final totalSpentCents = summaries.fold(
+      0,
+      (sum, s) => sum + s.totalSpentCents,
+    );
+    final totalFundedAmountCents = summaries.fold(
+      0,
+      (sum, s) => sum + s.fundedAmountCents,
+    );
+    final totalMissingCents = summaries.fold(
+      0,
+      (sum, s) => sum + s.remainingToFundCents,
     );
 
     final theme = Theme.of(context);
@@ -142,7 +148,7 @@ class _ProjectsList extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.goals_summary_saved,
-                      value: totalFundedAmount.toCompactCurrency(context),
+                      value: totalFundedAmountCents.toCompactCurrency(context),
                       icon: RadixIcons.archive,
                       valueColor: Theme.of(context).colorScheme.primary,
                     ),
@@ -151,7 +157,7 @@ class _ProjectsList extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.goals_summary_spent,
-                      value: totalSpent.toCompactCurrency(context),
+                      value: totalSpentCents.toCompactCurrency(context),
                       icon: RadixIcons.minusCircled,
                       valueColor: Theme.of(context).colorScheme.destructive,
                     ),
@@ -160,7 +166,7 @@ class _ProjectsList extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.goals_summary_target,
-                      value: totalBudget.toCompactCurrency(context),
+                      value: totalBudgetCents.toCompactCurrency(context),
                       icon: RadixIcons.target,
                     ),
                   ),
@@ -168,7 +174,7 @@ class _ProjectsList extends StatelessWidget {
                     width: cardWidth,
                     child: StatCard(
                       label: l10n.goals_summary_missing,
-                      value: totalMissing.toCompactCurrency(context),
+                      value: totalMissingCents.toCompactCurrency(context),
                       icon: RadixIcons.backpack,
                     ),
                   ),
@@ -279,9 +285,9 @@ class _ProjectCard extends StatelessWidget {
           ),
           const Gap(16),
           BudgetProgress(
-            budget: summary.totalBudget,
-            fundedAmount: summary.fundedAmount,
-            spent: summary.totalSpent,
+            budgetCents: summary.totalBudgetCents,
+            fundedAmountCents: summary.fundedAmountCents,
+            spentCents: summary.totalSpentCents,
             formatCurrency: (v) => v.toCompactCurrency(context),
             budgetLabel: l10n.widget_goal_progress_target,
             fundedLabel: l10n.widget_goal_progress_saved,
@@ -323,14 +329,14 @@ class _ProjectCard extends StatelessWidget {
       builder: (ctx) => AddProjectDialog(
         initialName: summary.project.name,
         initialDescription: summary.project.description,
-        initialBudget: summary.project.globalBudget,
+        initialBudgetCents: summary.project.globalBudgetCents,
       ),
     );
     if (result != null && context.mounted) {
       final updated = summary.project.copyWith(
         name: result['name'] as String,
         description: result['description'] as String?,
-        globalBudget: result['budget'] as double?,
+        globalBudgetCents: result['budgetCents'] as int?,
       );
       context.read<GoalsCubit>().updateGoal(updated);
     }
