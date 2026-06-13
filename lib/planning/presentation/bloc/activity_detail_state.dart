@@ -1,4 +1,4 @@
-import 'package:my_investments/planning/domain/entities/activity_detail.dart';
+import 'package:capitalflow/planning/domain/entities/activity_detail.dart';
 
 class ActivityDetailState {
   final bool loading;

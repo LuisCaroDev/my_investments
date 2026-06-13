@@ -1,4 +1,4 @@
-import 'package:my_investments/accounts/domain/entities/financial_account.dart';
+import 'package:capitalflow/accounts/domain/entities/financial_account.dart';
 
 class FinancialAccountModel extends FinancialAccount {
   const FinancialAccountModel({

@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:my_investments/core/constants/supabase_config.dart';
-import 'package:my_investments/core/storage/sync_snapshot_provider.dart';
-import 'package:my_investments/auth/data/repositories/auth_repository.dart';
-import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
-import 'package:my_investments/sync/data/repositories/sync_repository.dart';
-import 'package:my_investments/sync/domain/usecases/sync_service.dart';
+import 'package:capitalflow/core/constants/supabase_config.dart';
+import 'package:capitalflow/core/storage/sync_snapshot_provider.dart';
+import 'package:capitalflow/auth/data/repositories/auth_repository.dart';
+import 'package:capitalflow/core/presentation/bloc/settings_cubit.dart';
+import 'package:capitalflow/sync/data/repositories/sync_repository.dart';
+import 'package:capitalflow/sync/domain/usecases/sync_service.dart';
 
 class SyncCoordinator {
   final SyncService _service;

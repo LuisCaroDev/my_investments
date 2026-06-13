@@ -1,4 +1,4 @@
-import 'package:my_investments/core/storage/sync_snapshot_provider.dart';
+import 'package:capitalflow/core/storage/sync_snapshot_provider.dart';
 
 class SyncSnapshotMerger {
   static Map<String, List<Map<String, dynamic>>> mergeProviders(

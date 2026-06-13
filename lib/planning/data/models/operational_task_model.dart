@@ -1,4 +1,4 @@
-import 'package:my_investments/planning/domain/entities/operational_task.dart';
+import 'package:capitalflow/planning/domain/entities/operational_task.dart';
 
 class OperationalTaskModel extends OperationalTask {
   const OperationalTaskModel({

@@ -4,8 +4,8 @@ import 'dart:typed_data';
 
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:my_investments/sync/data/sync_paths.dart';
-import 'package:my_investments/sync/domain/entities/sync_manifest.dart';
+import 'package:capitalflow/sync/data/sync_paths.dart';
+import 'package:capitalflow/sync/domain/entities/sync_manifest.dart';
 
 class SyncRemoteDataSource {
   final SupabaseClient _client;

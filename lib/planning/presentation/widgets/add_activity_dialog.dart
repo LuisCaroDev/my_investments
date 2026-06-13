@@ -1,4 +1,4 @@
-import 'package:my_investments/l10n/app_localizations.dart';
+import 'package:capitalflow/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class AddActivityDialog extends StatefulWidget {

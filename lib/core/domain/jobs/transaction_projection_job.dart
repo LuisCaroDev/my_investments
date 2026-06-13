@@ -1,11 +1,11 @@
-import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
-import 'package:my_investments/accounts/data/models/financial_account_model.dart';
-import 'package:my_investments/core/domain/entities/transaction.dart';
-import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
-import 'package:my_investments/planning/data/models/activity_model.dart';
-import 'package:my_investments/planning/data/models/project_model.dart';
-import 'package:my_investments/planning/data/services/planning_funding_calculator.dart';
-import 'package:my_investments/planning/domain/entities/project.dart';
+import 'package:capitalflow/accounts/data/datasources/accounts_local_ds.dart';
+import 'package:capitalflow/accounts/data/models/financial_account_model.dart';
+import 'package:capitalflow/core/domain/entities/transaction.dart';
+import 'package:capitalflow/planning/data/datasources/planning_local_ds.dart';
+import 'package:capitalflow/planning/data/models/activity_model.dart';
+import 'package:capitalflow/planning/data/models/project_model.dart';
+import 'package:capitalflow/planning/data/services/planning_funding_calculator.dart';
+import 'package:capitalflow/planning/domain/entities/project.dart';
 
 class TransactionProjectionJob {
   final AccountsLocalDataSource _accountsDs;

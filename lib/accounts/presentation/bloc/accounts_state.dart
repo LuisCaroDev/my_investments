@@ -1,4 +1,4 @@
-import 'package:my_investments/core/domain/entities/financial_account.dart';
+import 'package:capitalflow/core/domain/entities/financial_account.dart';
 
 sealed class AccountsState {
   const AccountsState();

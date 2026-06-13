@@ -59,7 +59,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get common_auto_update_budget_label => 'Autocalcular presupuesto';
 
   @override
-  String get projects_title => 'Mis Inversiones';
+  String get projects_title => 'CapitalFlow';
 
   @override
   String get projects_add_button => 'Nuevo Proyecto';
@@ -713,7 +713,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get welcome_title_prefix => 'Bienvenido a';
 
   @override
-  String get welcome_title_suffix => 'Mis Inversiones';
+  String get welcome_title_suffix => 'CapitalFlow';
 
   @override
   String get welcome_subtitle =>

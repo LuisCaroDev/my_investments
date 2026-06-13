@@ -1,9 +1,9 @@
-import 'package:my_investments/core/storage/sync_snapshot_provider.dart';
-import 'package:my_investments/sync/data/pending_changes_applier.dart';
-import 'package:my_investments/sync/data/repositories/sync_repository.dart';
-import 'package:my_investments/sync/data/sync_snapshot_codec.dart';
-import 'package:my_investments/sync/data/sync_snapshot_merger.dart';
-import 'package:my_investments/sync/domain/entities/sync_manifest.dart';
+import 'package:capitalflow/core/storage/sync_snapshot_provider.dart';
+import 'package:capitalflow/sync/data/pending_changes_applier.dart';
+import 'package:capitalflow/sync/data/repositories/sync_repository.dart';
+import 'package:capitalflow/sync/data/sync_snapshot_codec.dart';
+import 'package:capitalflow/sync/data/sync_snapshot_merger.dart';
+import 'package:capitalflow/sync/domain/entities/sync_manifest.dart';
 
 class SyncService {
   final SyncRepository _repository;

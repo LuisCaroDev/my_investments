@@ -1,4 +1,4 @@
-package com.example.my_investments
+package com.luiscarodev.capitalflow
 
 import io.flutter.embedding.android.FlutterActivity
 

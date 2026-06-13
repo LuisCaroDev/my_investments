@@ -1,5 +1,5 @@
-import 'package:my_investments/planning/domain/entities/operational_task.dart';
-import 'package:my_investments/core/domain/entities/transaction.dart';
+import 'package:capitalflow/planning/domain/entities/operational_task.dart';
+import 'package:capitalflow/core/domain/entities/transaction.dart';
 
 enum TransactionSort { dateDesc, dateAsc, amountDesc, amountAsc }
 

@@ -4,12 +4,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'dart:async';
 
-import 'package:my_investments/core/storage/sync_snapshot_provider.dart';
-import 'package:my_investments/core/storage/profile_keys.dart';
-import 'package:my_investments/planning/data/models/project_model.dart';
-import 'package:my_investments/planning/data/models/activity_model.dart';
-import 'package:my_investments/planning/data/models/operational_task_model.dart';
-import 'package:my_investments/core/domain/jobs/transaction_projection_job.dart';
+import 'package:capitalflow/core/storage/sync_snapshot_provider.dart';
+import 'package:capitalflow/core/storage/profile_keys.dart';
+import 'package:capitalflow/planning/data/models/project_model.dart';
+import 'package:capitalflow/planning/data/models/activity_model.dart';
+import 'package:capitalflow/planning/data/models/operational_task_model.dart';
+import 'package:capitalflow/core/domain/jobs/transaction_projection_job.dart';
 
 class PlanningLocalDataSource implements SyncSnapshotProvider {
   static const _projectsKey = 'projects';

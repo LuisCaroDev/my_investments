@@ -1,4 +1,4 @@
-import 'package:my_investments/planning/domain/entities/project.dart';
+import 'package:capitalflow/planning/domain/entities/project.dart';
 
 class ProjectModel extends Project {
   final double? cachedTotalSpent;

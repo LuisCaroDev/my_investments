@@ -1,14 +1,14 @@
 import 'dart:async';
 
-import 'package:my_investments/core/constants/ledger.dart';
-import 'package:my_investments/core/domain/repositories/transactions_reader.dart';
-import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
-import 'package:my_investments/accounts/data/models/financial_account_model.dart';
-import 'package:my_investments/accounts/data/models/transaction_model.dart';
-import 'package:my_investments/accounts/domain/entities/financial_account.dart';
-import 'package:my_investments/accounts/domain/entities/transaction.dart';
-import 'package:my_investments/core/storage/sync_change_recorder.dart';
-import 'package:my_investments/core/domain/jobs/transaction_projection_job.dart';
+import 'package:capitalflow/core/constants/ledger.dart';
+import 'package:capitalflow/core/domain/repositories/transactions_reader.dart';
+import 'package:capitalflow/accounts/data/datasources/accounts_local_ds.dart';
+import 'package:capitalflow/accounts/data/models/financial_account_model.dart';
+import 'package:capitalflow/accounts/data/models/transaction_model.dart';
+import 'package:capitalflow/accounts/domain/entities/financial_account.dart';
+import 'package:capitalflow/accounts/domain/entities/transaction.dart';
+import 'package:capitalflow/core/storage/sync_change_recorder.dart';
+import 'package:capitalflow/core/domain/jobs/transaction_projection_job.dart';
 
 class AccountsRepository implements TransactionsReader {
   final AccountsLocalDataSource _localDataSource;

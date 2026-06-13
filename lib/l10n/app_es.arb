@@ -18,7 +18,7 @@
   "common_description_placeholder": "Describe el elemento...",
   "common_auto_update_budget_label": "Autocalcular presupuesto",
 
-  "projects_title": "Mis Inversiones",
+  "projects_title": "CapitalFlow",
   "projects_add_button": "Nuevo Proyecto",
   "projects_empty_title": "Aún no tienes proyectos",
   "projects_empty_subtitle": "Crea tu primer proyecto de inversión para comenzar a registrar gastos y presupuestos.",
@@ -236,7 +236,7 @@
   "auth_terms_privacy": "Política de Privacidad",
   "auth_terms_suffix": ".",
   "welcome_title_prefix": "Bienvenido a",
-  "welcome_title_suffix": "Mis Inversiones",
+  "welcome_title_suffix": "CapitalFlow",
   "welcome_subtitle": "Toma el control de tus metas y proyectos con herramientas de nivel profesional.",
   "welcome_feature1_title": "Gestión de Proyectos",
   "welcome_feature1_desc": "Sigue tus proyectos y metas de ahorro con datos precisos.",

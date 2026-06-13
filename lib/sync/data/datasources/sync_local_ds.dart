@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:uuid/uuid.dart';
 
-import 'package:my_investments/core/storage/profile_keys.dart';
-import 'package:my_investments/sync/domain/entities/pending_change.dart';
+import 'package:capitalflow/core/storage/profile_keys.dart';
+import 'package:capitalflow/sync/domain/entities/pending_change.dart';
 
 class SyncLocalDataSource {
   static const _pendingChangesKey = 'sync_pending_changes';

@@ -1,4 +1,4 @@
-import 'package:my_investments/sync/domain/entities/pending_change.dart';
+import 'package:capitalflow/sync/domain/entities/pending_change.dart';
 
 class PendingChangesApplier {
   static Map<String, List<Map<String, dynamic>>> apply(

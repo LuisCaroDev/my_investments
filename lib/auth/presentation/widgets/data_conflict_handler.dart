@@ -1,13 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
-import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
-import 'package:my_investments/sync/data/repositories/sync_repository.dart';
-import 'package:my_investments/sync/data/sync_snapshot_codec.dart';
-import 'package:my_investments/sync/domain/usecases/sync_service.dart';
-import 'package:my_investments/core/storage/profile_ids.dart';
-import 'package:my_investments/sync/data/datasources/sync_local_ds.dart';
+import 'package:capitalflow/planning/data/datasources/planning_local_ds.dart';
+import 'package:capitalflow/accounts/data/datasources/accounts_local_ds.dart';
+import 'package:capitalflow/sync/data/repositories/sync_repository.dart';
+import 'package:capitalflow/sync/data/sync_snapshot_codec.dart';
+import 'package:capitalflow/sync/domain/usecases/sync_service.dart';
+import 'package:capitalflow/core/storage/profile_ids.dart';
+import 'package:capitalflow/sync/data/datasources/sync_local_ds.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DataConflictHandler {

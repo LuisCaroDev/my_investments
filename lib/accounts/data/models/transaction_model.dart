@@ -1,4 +1,4 @@
-import 'package:my_investments/accounts/domain/entities/transaction.dart';
+import 'package:capitalflow/accounts/domain/entities/transaction.dart';
 
 class TransactionModel extends Transaction {
   const TransactionModel({

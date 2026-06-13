@@ -1,4 +1,4 @@
-import 'package:my_investments/planning/domain/entities/activity.dart';
+import 'package:capitalflow/planning/domain/entities/activity.dart';
 
 class ActivityModel extends Activity {
   final double? cachedSpent;

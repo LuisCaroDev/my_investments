@@ -1,15 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_investments/l10n/app_localizations.dart';
+import 'package:capitalflow/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-import 'package:my_investments/core/widgets/app_back_button.dart';
-import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
-import 'package:my_investments/planning/domain/entities/operational_task.dart'
+import 'package:capitalflow/core/widgets/app_back_button.dart';
+import 'package:capitalflow/planning/data/repositories/operational_task_repository.dart';
+import 'package:capitalflow/planning/domain/entities/operational_task.dart'
     as domain;
-import 'package:my_investments/planning/presentation/bloc/operational_task_management_cubit.dart';
-import 'package:my_investments/planning/presentation/bloc/operational_task_management_state.dart';
-import 'package:my_investments/planning/presentation/widgets/add_operational_task_dialog.dart';
-import 'package:my_investments/planning/presentation/widgets/operational_task_tile.dart';
+import 'package:capitalflow/planning/presentation/bloc/operational_task_management_cubit.dart';
+import 'package:capitalflow/planning/presentation/bloc/operational_task_management_state.dart';
+import 'package:capitalflow/planning/presentation/widgets/add_operational_task_dialog.dart';
+import 'package:capitalflow/planning/presentation/widgets/operational_task_tile.dart';
 
 class OperationalTaskManagementPage extends StatelessWidget {
   static const routePattern = '/projects/:projectId/categories';

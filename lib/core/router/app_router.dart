@@ -1,19 +1,19 @@
 import 'package:go_router/go_router.dart';
 import 'package:flutter/widgets.dart';
-import 'package:my_investments/accounts/presentation/pages/account_transactions_page.dart';
-import 'package:my_investments/accounts/presentation/pages/accounts_page.dart';
-import 'package:my_investments/accounts/presentation/pages/transaction_list_page.dart';
-import 'package:my_investments/auth/presentation/pages/home_gate.dart';
-import 'package:my_investments/auth/presentation/pages/login_page.dart';
-import 'package:my_investments/auth/presentation/pages/welcome_page.dart';
-import 'package:my_investments/core/presentation/pages/settings_page.dart';
-import 'package:my_investments/planning/presentation/pages/activity_detail_page.dart';
-import 'package:my_investments/planning/presentation/pages/goals_page.dart';
-import 'package:my_investments/planning/presentation/pages/import_export_page.dart';
-import 'package:my_investments/planning/presentation/pages/investments_page.dart';
-import 'package:my_investments/planning/presentation/pages/main_navigation_shell.dart';
-import 'package:my_investments/planning/presentation/pages/operational_task_management_page.dart';
-import 'package:my_investments/planning/presentation/pages/project_detail_page.dart';
+import 'package:capitalflow/accounts/presentation/pages/account_transactions_page.dart';
+import 'package:capitalflow/accounts/presentation/pages/accounts_page.dart';
+import 'package:capitalflow/accounts/presentation/pages/transaction_list_page.dart';
+import 'package:capitalflow/auth/presentation/pages/home_gate.dart';
+import 'package:capitalflow/auth/presentation/pages/login_page.dart';
+import 'package:capitalflow/auth/presentation/pages/welcome_page.dart';
+import 'package:capitalflow/core/presentation/pages/settings_page.dart';
+import 'package:capitalflow/planning/presentation/pages/activity_detail_page.dart';
+import 'package:capitalflow/planning/presentation/pages/goals_page.dart';
+import 'package:capitalflow/planning/presentation/pages/import_export_page.dart';
+import 'package:capitalflow/planning/presentation/pages/investments_page.dart';
+import 'package:capitalflow/planning/presentation/pages/main_navigation_shell.dart';
+import 'package:capitalflow/planning/presentation/pages/operational_task_management_page.dart';
+import 'package:capitalflow/planning/presentation/pages/project_detail_page.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 

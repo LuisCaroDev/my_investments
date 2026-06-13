@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:my_investments/auth/data/repositories/auth_repository.dart';
-import 'package:my_investments/auth/presentation/bloc/auth_state.dart';
+import 'package:capitalflow/auth/data/repositories/auth_repository.dart';
+import 'package:capitalflow/auth/presentation/bloc/auth_state.dart';
 
 class AuthCubit extends Cubit<AuthCubitState> {
   static const _otpInvalidOrExpiredCode = 'otp_invalid_or_expired';

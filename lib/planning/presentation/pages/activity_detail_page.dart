@@ -1,32 +1,32 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_investments/l10n/app_localizations.dart';
-import 'package:my_investments/planning/presentation/bloc/activity_detail_cubit.dart';
-import 'package:my_investments/planning/presentation/bloc/activity_detail_state.dart';
+import 'package:capitalflow/l10n/app_localizations.dart';
+import 'package:capitalflow/planning/presentation/bloc/activity_detail_cubit.dart';
+import 'package:capitalflow/planning/presentation/bloc/activity_detail_state.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-import 'package:my_investments/core/extensions/currency_ext.dart';
+import 'package:capitalflow/core/extensions/currency_ext.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_investments/planning/presentation/pages/operational_task_management_page.dart';
-import 'package:my_investments/accounts/presentation/pages/transaction_list_page.dart';
-import 'package:my_investments/core/widgets/app_back_button.dart';
-import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
-import 'package:my_investments/planning/data/repositories/activity_repository.dart';
-import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
-import 'package:my_investments/planning/data/services/planning_detail_query_service.dart';
-import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
+import 'package:capitalflow/planning/presentation/pages/operational_task_management_page.dart';
+import 'package:capitalflow/accounts/presentation/pages/transaction_list_page.dart';
+import 'package:capitalflow/core/widgets/app_back_button.dart';
+import 'package:capitalflow/accounts/data/repositories/accounts_repository.dart';
+import 'package:capitalflow/planning/data/repositories/activity_repository.dart';
+import 'package:capitalflow/planning/data/repositories/operational_task_repository.dart';
+import 'package:capitalflow/planning/data/services/planning_detail_query_service.dart';
+import 'package:capitalflow/planning/data/datasources/planning_local_ds.dart';
 
-import 'package:my_investments/core/domain/entities/financial_account.dart';
-import 'package:my_investments/core/domain/entities/transaction.dart';
-import 'package:my_investments/accounts/presentation/bloc/accounts_cubit.dart';
-import 'package:my_investments/accounts/presentation/bloc/accounts_state.dart';
-import 'package:my_investments/planning/presentation/bloc/goals_cubit.dart';
-import 'package:my_investments/planning/presentation/bloc/investments_cubit.dart';
-import 'package:my_investments/accounts/presentation/widgets/add_transaction_dialog.dart';
-import 'package:my_investments/planning/presentation/widgets/budget_progress.dart';
-import 'package:my_investments/planning/presentation/widgets/preview_section.dart';
-import 'package:my_investments/accounts/presentation/widgets/transaction_tile.dart';
-import 'package:my_investments/planning/presentation/widgets/operational_task_tile.dart';
-import 'package:my_investments/planning/presentation/widgets/suggested_budget_banner.dart';
+import 'package:capitalflow/core/domain/entities/financial_account.dart';
+import 'package:capitalflow/core/domain/entities/transaction.dart';
+import 'package:capitalflow/accounts/presentation/bloc/accounts_cubit.dart';
+import 'package:capitalflow/accounts/presentation/bloc/accounts_state.dart';
+import 'package:capitalflow/planning/presentation/bloc/goals_cubit.dart';
+import 'package:capitalflow/planning/presentation/bloc/investments_cubit.dart';
+import 'package:capitalflow/accounts/presentation/widgets/add_transaction_dialog.dart';
+import 'package:capitalflow/planning/presentation/widgets/budget_progress.dart';
+import 'package:capitalflow/planning/presentation/widgets/preview_section.dart';
+import 'package:capitalflow/accounts/presentation/widgets/transaction_tile.dart';
+import 'package:capitalflow/planning/presentation/widgets/operational_task_tile.dart';
+import 'package:capitalflow/planning/presentation/widgets/suggested_budget_banner.dart';
 
 List<FinancialAccount> _getAccountsFromContext(BuildContext context) {
   final state = context.read<AccountsCubit>().state;

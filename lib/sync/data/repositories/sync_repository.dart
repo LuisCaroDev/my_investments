@@ -1,7 +1,7 @@
-import 'package:my_investments/sync/data/datasources/sync_local_ds.dart';
-import 'package:my_investments/sync/data/datasources/sync_remote_ds.dart';
-import 'package:my_investments/sync/domain/entities/pending_change.dart';
-import 'package:my_investments/sync/domain/entities/sync_manifest.dart';
+import 'package:capitalflow/sync/data/datasources/sync_local_ds.dart';
+import 'package:capitalflow/sync/data/datasources/sync_remote_ds.dart';
+import 'package:capitalflow/sync/domain/entities/pending_change.dart';
+import 'package:capitalflow/sync/domain/entities/sync_manifest.dart';
 
 class SyncRepository {
   final SyncRemoteDataSource _remote;

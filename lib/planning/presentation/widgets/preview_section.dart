@@ -1,5 +1,5 @@
-import 'package:my_investments/core/widgets/empty_state.dart';
-import 'package:my_investments/planning/presentation/widgets/section_header.dart';
+import 'package:capitalflow/core/widgets/empty_state.dart';
+import 'package:capitalflow/planning/presentation/widgets/section_header.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class PreviewSection<T> extends StatelessWidget {

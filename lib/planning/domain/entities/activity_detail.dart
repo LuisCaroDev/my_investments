@@ -1,6 +1,6 @@
-import 'package:my_investments/planning/domain/entities/activity_summary.dart';
-import 'package:my_investments/planning/domain/entities/operational_task.dart';
-import 'package:my_investments/core/domain/entities/transaction.dart';
+import 'package:capitalflow/planning/domain/entities/activity_summary.dart';
+import 'package:capitalflow/planning/domain/entities/operational_task.dart';
+import 'package:capitalflow/core/domain/entities/transaction.dart';
 
 class ActivityDetail {
   final ActivitySummary summary;

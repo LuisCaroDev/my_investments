@@ -1,12 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_investments/l10n/app_localizations.dart';
+import 'package:capitalflow/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-import 'package:my_investments/accounts/presentation/bloc/accounts_cubit.dart';
-import 'package:my_investments/accounts/presentation/bloc/accounts_state.dart';
-import 'package:my_investments/planning/presentation/bloc/goals_cubit.dart';
-import 'package:my_investments/planning/presentation/bloc/investments_cubit.dart';
+import 'package:capitalflow/accounts/presentation/bloc/accounts_cubit.dart';
+import 'package:capitalflow/accounts/presentation/bloc/accounts_state.dart';
+import 'package:capitalflow/planning/presentation/bloc/goals_cubit.dart';
+import 'package:capitalflow/planning/presentation/bloc/investments_cubit.dart';
 
 class MainNavigationShell extends StatelessWidget {
   final StatefulNavigationShell navigationShell;

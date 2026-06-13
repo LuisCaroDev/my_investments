@@ -197,7 +197,7 @@ abstract class AppLocalizations {
   /// No description provided for @projects_title.
   ///
   /// In es, this message translates to:
-  /// **'Mis Inversiones'**
+  /// **'CapitalFlow'**
   String get projects_title;
 
   /// No description provided for @projects_add_button.
@@ -1433,7 +1433,7 @@ abstract class AppLocalizations {
   /// No description provided for @welcome_title_suffix.
   ///
   /// In es, this message translates to:
-  /// **'Mis Inversiones'**
+  /// **'CapitalFlow'**
   String get welcome_title_suffix;
 
   /// No description provided for @welcome_subtitle.

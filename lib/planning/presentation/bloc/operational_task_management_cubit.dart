@@ -1,7 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
-import 'package:my_investments/planning/domain/entities/operational_task.dart';
-import 'package:my_investments/planning/presentation/bloc/operational_task_management_state.dart';
+import 'package:capitalflow/planning/data/repositories/operational_task_repository.dart';
+import 'package:capitalflow/planning/domain/entities/operational_task.dart';
+import 'package:capitalflow/planning/presentation/bloc/operational_task_management_state.dart';
 
 class OperationalTaskManagementCubit
     extends Cubit<OperationalTaskManagementState> {

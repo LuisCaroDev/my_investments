@@ -1,13 +1,13 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_investments/auth/presentation/bloc/auth_cubit.dart';
-import 'package:my_investments/auth/presentation/bloc/auth_state.dart';
-import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
-import 'package:my_investments/core/presentation/bloc/settings_state.dart';
-import 'package:my_investments/auth/presentation/pages/welcome_page.dart';
-import 'package:my_investments/planning/presentation/pages/investments_page.dart';
-import 'package:my_investments/core/storage/profile_ids.dart';
+import 'package:capitalflow/auth/presentation/bloc/auth_cubit.dart';
+import 'package:capitalflow/auth/presentation/bloc/auth_state.dart';
+import 'package:capitalflow/core/presentation/bloc/settings_cubit.dart';
+import 'package:capitalflow/core/presentation/bloc/settings_state.dart';
+import 'package:capitalflow/auth/presentation/pages/welcome_page.dart';
+import 'package:capitalflow/planning/presentation/pages/investments_page.dart';
+import 'package:capitalflow/core/storage/profile_ids.dart';
 
 class HomeGate extends StatefulWidget {
   const HomeGate({super.key});

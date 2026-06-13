@@ -1,7 +1,7 @@
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:my_investments/core/storage/profile_ids.dart';
+import 'package:capitalflow/core/storage/profile_ids.dart';
 import 'settings_state.dart';
 
 class SettingsCubit extends Cubit<SettingsState> {

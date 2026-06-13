@@ -1,7 +1,7 @@
-import 'package:my_investments/core/storage/sync_change_recorder.dart';
-import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
-import 'package:my_investments/planning/data/models/project_model.dart';
-import 'package:my_investments/planning/domain/entities/project.dart';
+import 'package:capitalflow/core/storage/sync_change_recorder.dart';
+import 'package:capitalflow/planning/data/datasources/planning_local_ds.dart';
+import 'package:capitalflow/planning/data/models/project_model.dart';
+import 'package:capitalflow/planning/domain/entities/project.dart';
 
 class ProjectRepository {
   final PlanningLocalDataSource _localDataSource;

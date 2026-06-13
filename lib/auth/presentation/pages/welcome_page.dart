@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_investments/core/widgets/responsive_container.dart';
+import 'package:capitalflow/core/widgets/responsive_container.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
+import 'package:capitalflow/core/presentation/bloc/settings_cubit.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_investments/auth/presentation/pages/login_page.dart';
-import 'package:my_investments/core/router/app_router.dart';
-import 'package:my_investments/l10n/app_localizations.dart';
+import 'package:capitalflow/auth/presentation/pages/login_page.dart';
+import 'package:capitalflow/core/router/app_router.dart';
+import 'package:capitalflow/l10n/app_localizations.dart';
 
 class WelcomePage extends StatelessWidget {
   static const route = '/welcome';
@@ -16,6 +16,10 @@ class WelcomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context)!;
+    final iconAsset = theme.brightness == Brightness.dark
+        ? 'assets/branding/capitalflow-icon-dark-card.png'
+        : 'assets/branding/capitalflow-icon-light-card.png';
+
     return Scaffold(
       child: LayoutBuilder(
         builder: (context, contrains) {
@@ -30,31 +34,33 @@ class WelcomePage extends StatelessWidget {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    // Icono / Logo
                     Center(
                       child: Container(
-                        width: 80,
-                        height: 80,
+                        width: 80 * theme.scaling,
+                        height: 80 * theme.scaling,
                         decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.foreground,
-                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: theme.colorScheme.border),
+                          borderRadius: theme.borderRadiusXxl,
                         ),
-                        child: Icon(
-                          RadixIcons.lightningBolt,
-                          size: 40,
-                          color: Theme.of(context).colorScheme.background,
+                        child: ClipRRect(
+                          borderRadius: theme.borderRadiusXxl,
+                          child: Image.asset(iconAsset, fit: BoxFit.cover),
                         ),
                       ),
                     ),
-                    const Gap(32),
+                    const Gap(16),
                     Text(
                       l10n.welcome_title_prefix,
                       textAlign: TextAlign.center,
-                    ).h3,
+                      style: TextStyle(
+                        color: theme.colorScheme.mutedForeground,
+                      ),
+                    ).small,
+                    const Gap(6),
                     Text(
                       l10n.welcome_title_suffix,
                       style: theme.typography.h3.copyWith(
-                        color: theme.colorScheme.primary,
+                        color: theme.colorScheme.foreground,
                       ),
                       textAlign: TextAlign.center,
                     ),

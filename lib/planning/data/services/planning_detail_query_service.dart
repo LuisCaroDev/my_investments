@@ -1,14 +1,14 @@
-import 'package:my_investments/core/domain/entities/transaction.dart';
-import 'package:my_investments/core/domain/repositories/transactions_reader.dart';
-import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
-import 'package:my_investments/planning/data/repositories/activity_repository.dart';
-import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
-import 'package:my_investments/planning/data/services/planning_funding_calculator.dart';
-import 'package:my_investments/planning/domain/entities/activity_detail.dart';
-import 'package:my_investments/planning/domain/entities/activity_summary.dart';
-import 'package:my_investments/planning/domain/entities/project.dart';
-import 'package:my_investments/planning/domain/entities/project_detail.dart';
-import 'package:my_investments/planning/domain/entities/project_summary.dart';
+import 'package:capitalflow/core/domain/entities/transaction.dart';
+import 'package:capitalflow/core/domain/repositories/transactions_reader.dart';
+import 'package:capitalflow/planning/data/datasources/planning_local_ds.dart';
+import 'package:capitalflow/planning/data/repositories/activity_repository.dart';
+import 'package:capitalflow/planning/data/repositories/operational_task_repository.dart';
+import 'package:capitalflow/planning/data/services/planning_funding_calculator.dart';
+import 'package:capitalflow/planning/domain/entities/activity_detail.dart';
+import 'package:capitalflow/planning/domain/entities/activity_summary.dart';
+import 'package:capitalflow/planning/domain/entities/project.dart';
+import 'package:capitalflow/planning/domain/entities/project_detail.dart';
+import 'package:capitalflow/planning/domain/entities/project_summary.dart';
 
 class PlanningDetailQueryService {
   final PlanningLocalDataSource _localDataSource;

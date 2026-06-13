@@ -1,7 +1,7 @@
 import 'dart:math' as math;
 
-import 'package:my_investments/planning/domain/entities/activity.dart';
-import 'package:my_investments/planning/domain/entities/operational_task.dart';
+import 'package:capitalflow/planning/domain/entities/activity.dart';
+import 'package:capitalflow/planning/domain/entities/operational_task.dart';
 
 class ActivitySummary {
   final Activity activity;

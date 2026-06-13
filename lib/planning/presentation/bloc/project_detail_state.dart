@@ -1,4 +1,4 @@
-import 'package:my_investments/planning/domain/entities/project_detail.dart';
+import 'package:capitalflow/planning/domain/entities/project_detail.dart';
 
 sealed class ProjectDetailState {
   const ProjectDetailState();

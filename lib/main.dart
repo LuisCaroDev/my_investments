@@ -1,18 +1,18 @@
 import 'package:flutter/services.dart';
-import 'package:my_investments/core/constants/supabase_config.dart';
+import 'package:capitalflow/core/constants/supabase_config.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:my_investments/app/app_dependencies_scope.dart';
-import 'package:my_investments/l10n/app_localizations.dart';
-import 'package:my_investments/core/theme/app_theme.dart';
-import 'package:my_investments/core/router/app_router.dart';
-import 'package:my_investments/core/i18n/shadcn_localizations_es.dart';
-import 'package:my_investments/auth/data/repositories/auth_repository.dart';
-import 'package:my_investments/core/storage/profile_keys.dart';
-import 'package:my_investments/core/storage/profile_ids.dart';
+import 'package:capitalflow/app/app_dependencies_scope.dart';
+import 'package:capitalflow/l10n/app_localizations.dart';
+import 'package:capitalflow/core/theme/app_theme.dart';
+import 'package:capitalflow/core/router/app_router.dart';
+import 'package:capitalflow/core/i18n/shadcn_localizations_es.dart';
+import 'package:capitalflow/auth/data/repositories/auth_repository.dart';
+import 'package:capitalflow/core/storage/profile_keys.dart';
+import 'package:capitalflow/core/storage/profile_ids.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -96,7 +96,7 @@ class _MyInvestmentsAppState extends State<MyInvestmentsApp> {
       authRepository: widget.authRepository,
       builder: (context, settingsState) => ShadcnApp.router(
         scaling: AdaptiveScaling.only(sizeScaling: 1.5, radiusScaling: 1),
-        title: 'My Investments',
+        title: 'CapitalFlow',
         theme: AppTheme.light(),
         darkTheme: AppTheme.dark(),
         themeMode: settingsState.themeMode,

@@ -1,23 +1,23 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_investments/l10n/app_localizations.dart';
+import 'package:capitalflow/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
-import 'package:my_investments/core/presentation/bloc/settings_state.dart';
+import 'package:capitalflow/core/presentation/bloc/settings_cubit.dart';
+import 'package:capitalflow/core/presentation/bloc/settings_state.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_investments/auth/presentation/pages/login_page.dart';
-import 'package:my_investments/planning/presentation/pages/import_export_page.dart';
-import 'package:my_investments/core/widgets/app_back_button.dart';
-import 'package:my_investments/core/constants/supabase_config.dart';
-import 'package:my_investments/accounts/presentation/bloc/accounts_cubit.dart';
-import 'package:my_investments/planning/presentation/bloc/goals_cubit.dart';
-import 'package:my_investments/planning/presentation/bloc/investments_cubit.dart';
-import 'package:my_investments/sync/data/repositories/sync_repository.dart';
-import 'package:my_investments/sync/domain/usecases/sync_service.dart';
-import 'package:my_investments/core/storage/profile_ids.dart';
-import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
-import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
+import 'package:capitalflow/auth/presentation/pages/login_page.dart';
+import 'package:capitalflow/planning/presentation/pages/import_export_page.dart';
+import 'package:capitalflow/core/widgets/app_back_button.dart';
+import 'package:capitalflow/core/constants/supabase_config.dart';
+import 'package:capitalflow/accounts/presentation/bloc/accounts_cubit.dart';
+import 'package:capitalflow/planning/presentation/bloc/goals_cubit.dart';
+import 'package:capitalflow/planning/presentation/bloc/investments_cubit.dart';
+import 'package:capitalflow/sync/data/repositories/sync_repository.dart';
+import 'package:capitalflow/sync/domain/usecases/sync_service.dart';
+import 'package:capitalflow/core/storage/profile_ids.dart';
+import 'package:capitalflow/planning/data/datasources/planning_local_ds.dart';
+import 'package:capitalflow/accounts/data/datasources/accounts_local_ds.dart';
 
 class SettingsPage extends StatefulWidget {
   static const route = '/settings';

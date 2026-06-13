@@ -1,15 +1,15 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
-import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
-import 'package:my_investments/planning/data/repositories/activity_repository.dart';
-import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
-import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
-import 'package:my_investments/planning/data/services/planning_detail_query_service.dart';
-import 'package:my_investments/core/domain/entities/transaction.dart';
-import 'package:my_investments/planning/presentation/bloc/activity_detail_state.dart';
-import 'package:my_investments/planning/domain/entities/activity.dart'
+import 'package:capitalflow/accounts/data/repositories/accounts_repository.dart';
+import 'package:capitalflow/planning/data/repositories/activity_repository.dart';
+import 'package:capitalflow/planning/data/repositories/operational_task_repository.dart';
+import 'package:capitalflow/planning/data/datasources/planning_local_ds.dart';
+import 'package:capitalflow/planning/data/services/planning_detail_query_service.dart';
+import 'package:capitalflow/core/domain/entities/transaction.dart';
+import 'package:capitalflow/planning/presentation/bloc/activity_detail_state.dart';
+import 'package:capitalflow/planning/domain/entities/activity.dart'
     as domain;
-import 'package:my_investments/planning/domain/entities/operational_task.dart'
+import 'package:capitalflow/planning/domain/entities/operational_task.dart'
     as domain;
 
 class ActivityDetailCubit extends Cubit<ActivityDetailState> {

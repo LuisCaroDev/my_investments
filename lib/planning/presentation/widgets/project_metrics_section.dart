@@ -1,8 +1,8 @@
-import 'package:my_investments/l10n/app_localizations.dart';
-import 'package:my_investments/planning/domain/entities/project_detail.dart';
-import 'package:my_investments/core/extensions/currency_ext.dart';
-import 'package:my_investments/core/widgets/stat_card.dart';
-import 'package:my_investments/planning/presentation/widgets/budget_progress.dart';
+import 'package:capitalflow/l10n/app_localizations.dart';
+import 'package:capitalflow/planning/domain/entities/project_detail.dart';
+import 'package:capitalflow/core/extensions/currency_ext.dart';
+import 'package:capitalflow/core/widgets/stat_card.dart';
+import 'package:capitalflow/planning/presentation/widgets/budget_progress.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
 class InvestmentMetricsSection extends StatelessWidget {

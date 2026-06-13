@@ -1,1 +1,1 @@
-export 'package:my_investments/core/domain/entities/transaction.dart';
+export 'package:capitalflow/core/domain/entities/transaction.dart';

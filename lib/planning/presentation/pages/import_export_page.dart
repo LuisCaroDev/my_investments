@@ -1,24 +1,24 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_investments/l10n/app_localizations.dart';
+import 'package:capitalflow/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-import 'package:my_investments/core/widgets/app_back_button.dart';
-import 'package:my_investments/planning/data/datasources/planning_local_ds.dart';
-import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
-import 'package:my_investments/planning/data/models/activity_model.dart';
-import 'package:my_investments/planning/data/models/operational_task_model.dart';
-import 'package:my_investments/accounts/data/models/financial_account_model.dart';
-import 'package:my_investments/planning/data/models/project_model.dart';
-import 'package:my_investments/accounts/data/models/transaction_model.dart';
-import 'package:my_investments/planning/domain/entities/activity.dart';
-import 'package:my_investments/planning/domain/entities/operational_task.dart';
-import 'package:my_investments/core/domain/entities/financial_account.dart';
-import 'package:my_investments/planning/domain/entities/project.dart';
-import 'package:my_investments/core/domain/entities/transaction.dart';
-import 'package:my_investments/accounts/presentation/bloc/accounts_cubit.dart';
-import 'package:my_investments/planning/presentation/bloc/goals_cubit.dart';
-import 'package:my_investments/planning/presentation/bloc/investments_cubit.dart';
+import 'package:capitalflow/core/widgets/app_back_button.dart';
+import 'package:capitalflow/planning/data/datasources/planning_local_ds.dart';
+import 'package:capitalflow/accounts/data/datasources/accounts_local_ds.dart';
+import 'package:capitalflow/planning/data/models/activity_model.dart';
+import 'package:capitalflow/planning/data/models/operational_task_model.dart';
+import 'package:capitalflow/accounts/data/models/financial_account_model.dart';
+import 'package:capitalflow/planning/data/models/project_model.dart';
+import 'package:capitalflow/accounts/data/models/transaction_model.dart';
+import 'package:capitalflow/planning/domain/entities/activity.dart';
+import 'package:capitalflow/planning/domain/entities/operational_task.dart';
+import 'package:capitalflow/core/domain/entities/financial_account.dart';
+import 'package:capitalflow/planning/domain/entities/project.dart';
+import 'package:capitalflow/core/domain/entities/transaction.dart';
+import 'package:capitalflow/accounts/presentation/bloc/accounts_cubit.dart';
+import 'package:capitalflow/planning/presentation/bloc/goals_cubit.dart';
+import 'package:capitalflow/planning/presentation/bloc/investments_cubit.dart';
 
 class ImportExportPage extends StatefulWidget {
   static const route = '/settings/import-export';

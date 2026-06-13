@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
-import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
-import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
-import 'package:my_investments/core/domain/entities/financial_account.dart';
-import 'package:my_investments/accounts/presentation/bloc/accounts_state.dart';
-import 'package:my_investments/planning/data/repositories/project_repository.dart';
+import 'package:capitalflow/accounts/data/repositories/accounts_repository.dart';
+import 'package:capitalflow/accounts/data/datasources/accounts_local_ds.dart';
+import 'package:capitalflow/core/domain/entities/financial_account.dart';
+import 'package:capitalflow/accounts/presentation/bloc/accounts_state.dart';
+import 'package:capitalflow/planning/data/repositories/project_repository.dart';
 
 class AccountsCubit extends Cubit<AccountsState> {
   final AccountsRepository _repository;

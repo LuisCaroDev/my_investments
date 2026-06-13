@@ -1,6 +1,6 @@
-# my_investments
+# CapitalFlow
 
-A new Flutter project.
+Aplicacion de control y planificacion financiera personal.
 
 ## Configuración de Supabase y Variables de Entorno
 

@@ -18,7 +18,7 @@
   "common_description_placeholder": "Describe the element...",
   "common_auto_update_budget_label": "Auto-update budget",
 
-  "projects_title": "My Investments",
+  "projects_title": "CapitalFlow",
   "projects_add_button": "New Project",
   "projects_empty_title": "You don't have any projects yet",
   "projects_empty_subtitle": "Create your first investment project to start recording expenses and budgets.",
@@ -236,7 +236,7 @@
   "auth_terms_privacy": "Privacy Policy",
   "auth_terms_suffix": ".",
   "welcome_title_prefix": "Welcome to",
-  "welcome_title_suffix": "My Investments",
+  "welcome_title_suffix": "CapitalFlow",
   "welcome_subtitle": "Take control of your goals and projects with professional-grade tools.",
   "welcome_feature1_title": "Project Management",
   "welcome_feature1_desc": "Track your projects and saving goals with precision.",

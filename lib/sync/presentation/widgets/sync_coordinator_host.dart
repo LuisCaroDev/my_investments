@@ -1,11 +1,11 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-import 'package:my_investments/auth/presentation/bloc/auth_cubit.dart';
-import 'package:my_investments/auth/presentation/bloc/auth_state.dart';
-import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
-import 'package:my_investments/core/presentation/bloc/settings_state.dart';
-import 'package:my_investments/sync/domain/usecases/sync_coordinator.dart';
+import 'package:capitalflow/auth/presentation/bloc/auth_cubit.dart';
+import 'package:capitalflow/auth/presentation/bloc/auth_state.dart';
+import 'package:capitalflow/core/presentation/bloc/settings_cubit.dart';
+import 'package:capitalflow/core/presentation/bloc/settings_state.dart';
+import 'package:capitalflow/sync/domain/usecases/sync_coordinator.dart';
 
 class SyncCoordinatorHost extends StatefulWidget {
   final SyncCoordinator coordinator;

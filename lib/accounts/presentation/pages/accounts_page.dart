@@ -1,23 +1,23 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_investments/l10n/app_localizations.dart';
+import 'package:capitalflow/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-import 'package:my_investments/core/extensions/currency_ext.dart';
+import 'package:capitalflow/core/extensions/currency_ext.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_investments/accounts/presentation/pages/account_transactions_page.dart';
-import 'package:my_investments/core/widgets/empty_state.dart';
-import 'package:my_investments/core/widgets/stat_card.dart';
-import 'package:my_investments/core/domain/entities/financial_account.dart';
-import 'package:my_investments/planning/domain/entities/project.dart';
-import 'package:my_investments/planning/domain/entities/project_summary.dart';
-import 'package:my_investments/accounts/presentation/bloc/accounts_cubit.dart';
-import 'package:my_investments/accounts/presentation/bloc/accounts_state.dart';
-import 'package:my_investments/planning/presentation/bloc/goals_cubit.dart';
-import 'package:my_investments/planning/presentation/bloc/goals_state.dart';
-import 'package:my_investments/planning/presentation/bloc/investments_cubit.dart';
-import 'package:my_investments/planning/presentation/bloc/investments_state.dart';
-import 'package:my_investments/accounts/presentation/widgets/add_financial_account_dialog.dart';
-import 'package:my_investments/accounts/presentation/widgets/add_account_deposit_dialog.dart';
+import 'package:capitalflow/accounts/presentation/pages/account_transactions_page.dart';
+import 'package:capitalflow/core/widgets/empty_state.dart';
+import 'package:capitalflow/core/widgets/stat_card.dart';
+import 'package:capitalflow/core/domain/entities/financial_account.dart';
+import 'package:capitalflow/planning/domain/entities/project.dart';
+import 'package:capitalflow/planning/domain/entities/project_summary.dart';
+import 'package:capitalflow/accounts/presentation/bloc/accounts_cubit.dart';
+import 'package:capitalflow/accounts/presentation/bloc/accounts_state.dart';
+import 'package:capitalflow/planning/presentation/bloc/goals_cubit.dart';
+import 'package:capitalflow/planning/presentation/bloc/goals_state.dart';
+import 'package:capitalflow/planning/presentation/bloc/investments_cubit.dart';
+import 'package:capitalflow/planning/presentation/bloc/investments_state.dart';
+import 'package:capitalflow/accounts/presentation/widgets/add_financial_account_dialog.dart';
+import 'package:capitalflow/accounts/presentation/widgets/add_account_deposit_dialog.dart';
 import 'package:flutter/material.dart'
     show ReorderableDragStartListener, ReorderableListView, WidgetsBinding;
 

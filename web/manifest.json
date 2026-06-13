@@ -1,11 +1,11 @@
 {
-    "name": "my_investments",
-    "short_name": "my_investments",
+    "name": "CapitalFlow",
+    "short_name": "CapitalFlow",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F6F7F8",
+    "theme_color": "#0B8F6A",
+    "description": "Control y planificación financiera personal.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

@@ -1,20 +1,20 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_investments/l10n/app_localizations.dart';
+import 'package:capitalflow/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-import 'package:my_investments/core/widgets/app_back_button.dart';
-import 'package:my_investments/core/widgets/empty_state.dart';
-import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
-import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
-import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
-import 'package:my_investments/core/domain/entities/financial_account.dart';
-import 'package:my_investments/core/domain/entities/transaction.dart';
-import 'package:my_investments/accounts/presentation/bloc/accounts_cubit.dart';
-import 'package:my_investments/accounts/presentation/bloc/accounts_state.dart';
-import 'package:my_investments/accounts/presentation/bloc/transaction_list_cubit.dart';
-import 'package:my_investments/accounts/presentation/bloc/transaction_list_state.dart';
-import 'package:my_investments/accounts/presentation/widgets/add_transaction_dialog.dart';
-import 'package:my_investments/accounts/presentation/widgets/transaction_tile.dart';
+import 'package:capitalflow/core/widgets/app_back_button.dart';
+import 'package:capitalflow/core/widgets/empty_state.dart';
+import 'package:capitalflow/accounts/data/repositories/accounts_repository.dart';
+import 'package:capitalflow/accounts/data/datasources/accounts_local_ds.dart';
+import 'package:capitalflow/planning/data/repositories/operational_task_repository.dart';
+import 'package:capitalflow/core/domain/entities/financial_account.dart';
+import 'package:capitalflow/core/domain/entities/transaction.dart';
+import 'package:capitalflow/accounts/presentation/bloc/accounts_cubit.dart';
+import 'package:capitalflow/accounts/presentation/bloc/accounts_state.dart';
+import 'package:capitalflow/accounts/presentation/bloc/transaction_list_cubit.dart';
+import 'package:capitalflow/accounts/presentation/bloc/transaction_list_state.dart';
+import 'package:capitalflow/accounts/presentation/widgets/add_transaction_dialog.dart';
+import 'package:capitalflow/accounts/presentation/widgets/transaction_tile.dart';
 
 List<FinancialAccount> _getAccountsFromContext(BuildContext context) {
   final state = context.read<AccountsCubit>().state;

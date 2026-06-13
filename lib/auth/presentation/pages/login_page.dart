@@ -1,18 +1,18 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_investments/core/widgets/responsive_container.dart';
+import 'package:capitalflow/core/widgets/responsive_container.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
-import 'package:my_investments/auth/presentation/bloc/auth_cubit.dart';
-import 'package:my_investments/auth/presentation/bloc/auth_state.dart';
-import 'package:my_investments/core/presentation/bloc/settings_cubit.dart';
-import 'package:my_investments/core/widgets/app_back_button.dart';
-import 'package:my_investments/auth/presentation/widgets/data_conflict_handler.dart';
-import 'package:my_investments/auth/presentation/widgets/login_email_view.dart';
-import 'package:my_investments/auth/presentation/widgets/login_otp_view.dart';
+import 'package:capitalflow/auth/presentation/bloc/auth_cubit.dart';
+import 'package:capitalflow/auth/presentation/bloc/auth_state.dart';
+import 'package:capitalflow/core/presentation/bloc/settings_cubit.dart';
+import 'package:capitalflow/core/widgets/app_back_button.dart';
+import 'package:capitalflow/auth/presentation/widgets/data_conflict_handler.dart';
+import 'package:capitalflow/auth/presentation/widgets/login_email_view.dart';
+import 'package:capitalflow/auth/presentation/widgets/login_otp_view.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:my_investments/core/router/app_router.dart';
-import 'package:my_investments/core/storage/profile_ids.dart';
-import 'package:my_investments/l10n/app_localizations.dart';
+import 'package:capitalflow/core/router/app_router.dart';
+import 'package:capitalflow/core/storage/profile_ids.dart';
+import 'package:capitalflow/l10n/app_localizations.dart';
 
 class LoginPage extends StatefulWidget {
   static const route = '/login';

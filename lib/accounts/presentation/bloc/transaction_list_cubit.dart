@@ -1,10 +1,10 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:async';
-import 'package:my_investments/accounts/data/repositories/accounts_repository.dart';
-import 'package:my_investments/accounts/data/datasources/accounts_local_ds.dart';
-import 'package:my_investments/core/domain/entities/transaction.dart';
-import 'package:my_investments/accounts/presentation/bloc/transaction_list_state.dart';
-import 'package:my_investments/planning/data/repositories/operational_task_repository.dart';
+import 'package:capitalflow/accounts/data/repositories/accounts_repository.dart';
+import 'package:capitalflow/accounts/data/datasources/accounts_local_ds.dart';
+import 'package:capitalflow/core/domain/entities/transaction.dart';
+import 'package:capitalflow/accounts/presentation/bloc/transaction_list_state.dart';
+import 'package:capitalflow/planning/data/repositories/operational_task_repository.dart';
 
 class TransactionListCubit extends Cubit<TransactionListState> {
   final AccountsRepository _accountsRepository;

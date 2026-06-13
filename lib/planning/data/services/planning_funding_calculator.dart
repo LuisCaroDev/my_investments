@@ -1,9 +1,9 @@
 import 'dart:math' as math;
 
-import 'package:my_investments/core/domain/entities/transaction.dart';
-import 'package:my_investments/planning/domain/entities/activity.dart';
-import 'package:my_investments/planning/domain/entities/project.dart';
-import 'package:my_investments/planning/domain/entities/project_summary.dart';
+import 'package:capitalflow/core/domain/entities/transaction.dart';
+import 'package:capitalflow/planning/domain/entities/activity.dart';
+import 'package:capitalflow/planning/domain/entities/project.dart';
+import 'package:capitalflow/planning/domain/entities/project_summary.dart';
 
 class PlanningFundingCalculator {
   const PlanningFundingCalculator();

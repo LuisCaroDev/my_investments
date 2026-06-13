@@ -1,18 +1,18 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:my_investments/l10n/app_localizations.dart';
+import 'package:capitalflow/l10n/app_localizations.dart';
 import 'package:shadcn_flutter/shadcn_flutter.dart';
 
-import 'package:my_investments/core/extensions/currency_ext.dart';
+import 'package:capitalflow/core/extensions/currency_ext.dart';
 import 'package:go_router/go_router.dart';
-import 'package:my_investments/planning/presentation/pages/project_detail_page.dart';
-import 'package:my_investments/core/widgets/empty_state.dart';
-import 'package:my_investments/core/widgets/stat_card.dart';
-import 'package:my_investments/planning/domain/entities/project.dart';
-import 'package:my_investments/planning/domain/entities/project_summary.dart';
-import 'package:my_investments/planning/presentation/bloc/goals_cubit.dart';
-import 'package:my_investments/planning/presentation/bloc/goals_state.dart';
-import 'package:my_investments/planning/presentation/widgets/add_project_dialog.dart';
-import 'package:my_investments/planning/presentation/widgets/budget_progress.dart';
+import 'package:capitalflow/planning/presentation/pages/project_detail_page.dart';
+import 'package:capitalflow/core/widgets/empty_state.dart';
+import 'package:capitalflow/core/widgets/stat_card.dart';
+import 'package:capitalflow/planning/domain/entities/project.dart';
+import 'package:capitalflow/planning/domain/entities/project_summary.dart';
+import 'package:capitalflow/planning/presentation/bloc/goals_cubit.dart';
+import 'package:capitalflow/planning/presentation/bloc/goals_state.dart';
+import 'package:capitalflow/planning/presentation/widgets/add_project_dialog.dart';
+import 'package:capitalflow/planning/presentation/widgets/budget_progress.dart';
 
 class GoalsPage extends StatelessWidget {
   static const route = '/goals';

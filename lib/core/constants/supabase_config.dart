@@ -1,4 +1,4 @@
-import 'package:my_investments/core/env/env.dart';
+import 'package:capitalflow/core/env/env.dart';
 
 class SupabaseConfig {
   static final url = Env.supabaseUrl;

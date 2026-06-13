@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
-import 'package:my_investments/core/storage/sync_change_recorder.dart';
-import 'package:my_investments/sync/data/datasources/sync_local_ds.dart';
-import 'package:my_investments/sync/domain/entities/pending_change.dart';
+import 'package:capitalflow/core/storage/sync_change_recorder.dart';
+import 'package:capitalflow/sync/data/datasources/sync_local_ds.dart';
+import 'package:capitalflow/sync/domain/entities/pending_change.dart';
 
 class SyncChangeRecorderImpl implements SyncChangeRecorder {
   final SyncLocalDataSource _local;
